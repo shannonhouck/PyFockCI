@@ -125,7 +125,6 @@ def get_cis_H(wfn):
     nb_dets = b_occ*b_virt
     nbf = wfn.basisset().nbf()
     dets = generate_dets_ab(a_occ, a_virt, b_occ, b_virt)
-    print(dets)
     n_dets = dets.shape[0]
     print(n_dets)
     np.set_printoptions(suppress=True,precision=4,linewidth=800)
@@ -142,9 +141,12 @@ def get_cis_H(wfn):
     tei = np.kron(I, tei.T)
     tei_phys = tei.transpose(0, 2, 1, 3) - tei.transpose(0, 2, 3, 1)
     # tranform TEI to MO basis
-    C = np.block([[Ca, np.zeros_like(Ca)],
-                      [np.zeros_like(Cb), Cb]])
-    eps = np.append(np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b()))
+    C = np.block([[Ca, np.zeros_like(Cb)],
+                      [np.zeros_like(Ca), Cb]])
+    #print("C")
+    #print(C)
+    #eps = nddp.append(np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b()))
+    #C = C[:, eps.argsort()]
     tei_phys = np.einsum('pQRS, pP -> PQRS',
            np.einsum('pqRS, qQ -> pQRS',
            np.einsum('pqrS, rR -> pqRS', 
@@ -206,25 +208,24 @@ def run():
     e, wfn = psi4.energy('scf/sto-3G', molecule=mol, return_wfn=True)
     occ = wfn.doccpi()[0]
     virt = wfn.basisset().nbf() - occ
-    psi4.set_options({'num_roots': 11, 'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10})
+    psi4.set_options({'num_roots': 12, 'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10})
     energy_cis = psi4.energy('ci1/sto-3g', molecule=mol, ref_wfn=wfn)
     psi4.core.print_variables()
     H, F, tei = get_cis_H(wfn)
-    Hr, Fr, teir = get_cis_H_rhf(wfn)
+    #Hr, Fr, teir = get_cis_H_rhf(wfn)
     print(e*np.eye(H.shape[0]) + H)
-    print(e*np.eye(Hr.shape[0]) + Hr)
+    #print(e*np.eye(Hr.shape[0]) + Hr)
     print(np.allclose(H, H.T))
     print(np.sort(27.2114*LIN.eigvalsh(H)))
     print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 0 TOTAL ENERGY'))
-    print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 1 TOTAL ENERGY'))
-    print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 2 TOTAL ENERGY'))
-    print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 3 TOTAL ENERGY'))
-    print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 4 TOTAL ENERGY'))
-    print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 5 TOTAL ENERGY'))
-    print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 6 TOTAL ENERGY'))
-    print(np.allclose(H, H.T))
+    #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 1 TOTAL ENERGY'))
+    #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 2 TOTAL ENERGY'))
+    #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 3 TOTAL ENERGY'))
+    #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 4 TOTAL ENERGY'))
+    #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 5 TOTAL ENERGY'))
+    #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 6 TOTAL ENERGY'))
     print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0])
-    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(Hr))[0])
+    #print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(Hr))[0])
     vals, vects = LIN.eig(H)
     #print("FROM CIS FN: ")
     #for i in range(vals.size):
