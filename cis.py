@@ -29,23 +29,23 @@ def generate_dets(n_occ, n_virt):
 def generate_dets_ab(na_occ, na_virt, nb_occ, nb_virt):
     nbf = na_occ + na_virt
     n_dets = (na_occ + nb_occ) * (na_virt + nb_virt)
-    det_list = np.zeros((n_dets, 2)).astype(int)
+    det_list = np.zeros((n_dets+1, 2)).astype(int)
     # fill out alpha -> ??
     for i in range(na_occ):
         # a -> a
         for a in range(na_virt):
-            det_list[i*na_virt+a] = [i,na_occ+a]
+            det_list[i*na_virt+a+1] = [i,na_occ+a]
         # a -> b
         for a in range(nb_virt):
-            det_list[i*nb_virt+a+(na_virt*na_occ)] = [i,nb_occ+a+nbf]
+            det_list[i*nb_virt+a+(na_virt*na_occ)+1] = [i,nb_occ+a+nbf]
     # fill out beta -> ??
     for i in range(nb_occ):
         # b -> a
         for a in range(na_virt):
-            det_list[i*na_virt+a+(na_occ*(na_virt+nb_virt))] = [nbf+i,na_occ+a]
+            det_list[i*na_virt+a+(na_occ*(na_virt+nb_virt))+1] = [nbf+i,na_occ+a]
         # b -> b
         for a in range(nb_virt):
-            det_list[i*nb_virt+a+(na_occ*(na_virt+nb_virt))+(nb_occ*na_virt)] = [i+nbf,nb_occ+a+nbf]
+            det_list[i*nb_virt+a+(na_occ*(na_virt+nb_virt))+(nb_occ*na_virt)+1] = [i+nbf,nb_occ+a+nbf]
     return det_list
 
 # Forms the CIS Hamiltonian
@@ -108,12 +108,10 @@ def get_cis_H(wfn):
     # this gets it in AO basis, transform to MO needed
     Ca = psi4.core.Matrix.to_array(wfn.Ca())
     Cb = psi4.core.Matrix.to_array(wfn.Cb())
-    h = psi4.core.Matrix.to_array(wfn.H())
-    h = np.dot(Ca.T, np.dot(h, Ca))
     Fa = psi4.core.Matrix.to_array(wfn.Fa())
     Fb = psi4.core.Matrix.to_array(wfn.Fb())
-    Fa = np.dot(Ca.T, np.dot(Fa, Ca))
-    Fb = np.dot(Cb.T, np.dot(Fb, Cb))
+    #Fa = np.dot(Ca.T, np.dot(Fa, Ca))
+    #Fb = np.dot(Cb.T, np.dot(Fb, Cb))
     # All of these are in AO basis...
     mints = psi4.core.MintsHelper(wfn.basisset())
     # determine number of dets
@@ -131,9 +129,10 @@ def get_cis_H(wfn):
     # Build CIS Hamiltonian matrix
     H = np.zeros((n_dets, n_dets))
     # <ai|H|bj>
-    F = np.block([[Fa, np.zeros((Fa.shape[0],Fb.shape[1]))],
-                  [np.zeros((Fb.shape[0],Fa.shape[1])), Fb]])
+    F = np.block([[Fa, np.zeros_like(Fa)],
+                  [np.zeros_like(Fb), Fb]])
     print(F)
+    print(n_dets)
     # ref: Psi4Numpy tutorials
     tei = psi4.core.Matrix.to_array(mints.ao_eri())
     I = np.eye(2)
@@ -145,12 +144,17 @@ def get_cis_H(wfn):
                       [np.zeros_like(Ca), Cb]])
     #print("C")
     #print(C)
-    #eps = nddp.append(np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b()))
+    eps = np.append(np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b()))
+    #print(eps)
+    #print("F")
+    #print(F)
     #C = C[:, eps.argsort()]
+    #eps.sort()
     tei_phys = np.einsum('pQRS, pP -> PQRS',
            np.einsum('pqRS, qQ -> pQRS',
            np.einsum('pqrS, rR -> pqRS', 
            np.einsum('pqrs, sS -> pqrS', tei_phys, C), C), C), C)
+    F = np.dot(C.T, np.dot(F, C))
     for d1index, det1 in enumerate(dets):
         for d2index, det2 in enumerate(dets):
             i = det1[0]
@@ -170,21 +174,18 @@ def get_cis_H(wfn):
                 elif((j > nbf) and (b > nbf)):
                     H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei_bb[a-nbf, i-nbf, j-nbf, b-nbf] - tei_bb[a-nbf, b-nbf, j-nbf, i-nbf]
             '''
-            # if i->a in beta set
             #H[d1index, d2index] = Fa[a, b]*kdel(i,j) - Fa[i,j]*kdel(a,b) + 2.0*tei[a, j, i, b] - tei[a, j, b, i]
-            H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei_phys[a, j, i, b]
-    return (H, Fa, tei)
-
-'''
-def davidson(n_roots=1):
-    # set initial guess
-    # collapse size, cutoff for adding vector to Krylov space
-    collapse_size = 100
-    delta = 0.000001
-    # k is number of roots
-    sig = []
-''' 
+            if(d1index == 0 and d2index == 0):
+                H[0, 0] = 0
+            elif(d1index == 0):
+                H[0, d2index] = F[j, b]
+            elif(d2index == 0):
+                H[d1index, 0] = F[i, a]
+            else:
+                H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei_phys[a, j, i, b]
+                #H[d1index, d2index] = eps[a]*kdel(i,j) - eps[i]*kdel(a,b) + tei_phys[a, j, i, b]
     
+    return (H, Fa, tei)
 
 def run():
     psi4.core.clean()
@@ -204,20 +205,25 @@ def run():
         """)
     '''
     #psi4.set_options({'scf_type': 'direct', 'reference': 'rhf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
+    #psi4.set_options({'scf_type': 'direct', 'reference': 'uhf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
     psi4.set_options({'scf_type': 'direct', 'reference': 'rohf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
     e, wfn = psi4.energy('scf/sto-3G', molecule=mol, return_wfn=True)
     occ = wfn.doccpi()[0]
     virt = wfn.basisset().nbf() - occ
-    psi4.set_options({'num_roots': 12, 'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10})
-    energy_cis = psi4.energy('ci1/sto-3g', molecule=mol, ref_wfn=wfn)
-    psi4.core.print_variables()
+    psi4.set_options({'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10, 'ex_level': 1})
+    energy_cis2 = psi4.energy('ci1/sto-3g', molecule=mol, ref_wfn=wfn)
+    #psi4.core.clean()
+    #psi4.set_options({'num_roots': 12, 'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10, 'ras1': [5], 'ras2': [4], 'ras3': [1], 'ex_level': 1})
+    #energy_cis1 = psi4.energy('detci/sto-3g', molecule=mol, ref_wfn=wfn)
+    #psi4.core.print_variables()
     H, F, tei = get_cis_H(wfn)
     #Hr, Fr, teir = get_cis_H_rhf(wfn)
     print(e*np.eye(H.shape[0]) + H)
     #print(e*np.eye(Hr.shape[0]) + Hr)
     print(np.allclose(H, H.T))
-    print(np.sort(27.2114*LIN.eigvalsh(H)))
-    print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 0 TOTAL ENERGY'))
+    print("REF", energy_cis2)
+    #print("REF (PSI4): ", energy_cis1 - e)
+    #print("REF (PSI4): ", energy_cis2 - e)
     #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 1 TOTAL ENERGY'))
     #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 2 TOTAL ENERGY'))
     #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 3 TOTAL ENERGY'))
