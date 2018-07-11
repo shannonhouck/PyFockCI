@@ -85,15 +85,17 @@ def davidson( A, vInit, cutoff, maxIter ):
             D = np.diag(np.diag(A));
             for i in range(k) :
                 sNew = LIN.solve(LIN.inv(D-eVals[i]*np.eye(D.shape[0])), r[:,i])
+                print(sNew)
                 if ( LIN.norm(sNew) > delta ):
                     # orthogonalize
                     h = np.dot(vSpace.T, sNew);
                     sNew = sNew - np.dot(vSpace,h);
                     # normalize
                     sNew = (1.0/LIN.norm(sNew))*sNew
-                    #sNew = np.dot(LIN.inv(LIN.norm(sNew).T), sNew.T).T
                     vSpace = np.column_stack((vSpace, sNew));
                     lastSig = lastSig + 1;
+                else:
+                    print("AAAAAAAAA WHY")
         if ( vSpace.shape[1] > A.shape[1] ):
             printf("...\nError: Make sure your inputs are reasonable!\n\n");
             return;
@@ -106,8 +108,10 @@ ATest = ATest.T + ATest
 ATest = ATest + np.diag(np.eye(dim,1)) - 5000*np.eye(dim)
 guessindexes = np.diag(ATest).argsort()
 vTest = np.zeros((dim,2))
-vTest[guessindexes[0], 0] = 1.0
-vTest[guessindexes[1], 1] = 1.0
+#vTest[guessindexes[0], 0] = 1.0
+#vTest[guessindexes[1], 1] = 1.0
+vTest[0, 0] = 1.0
+vTest[1, 1] = 1.0
 print(vTest.shape)
 cutTest = 1e-4; # cutoff
 maxTest = 300; # max iteration

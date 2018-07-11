@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 from numpy import linalg as LIN
 import psi4
@@ -16,9 +17,9 @@ def kdel(i, j):
     else:
         return 0
 
-# Generates the set of singles determinants.
+# Generates the set of singles determinants (spin adapted).
 # First row is i, second is a.
-def generate_dets(n_occ, n_virt):
+def generate_dets_sa(n_occ, n_virt):
     n_dets = n_occ * n_virt
     det_list = np.zeros((n_dets, 2)).astype(int)
     for i in range(n_occ):
@@ -26,7 +27,12 @@ def generate_dets(n_occ, n_virt):
             det_list[i*n_virt+a] = [i,n_occ+a]
     return det_list
 
-def generate_dets_ab(na_occ, na_virt, nb_occ, nb_virt):
+# Generates the set of singly-excited determinants (spin unadapted).
+# First row is orbital excited from, second row is the orbital excited into.
+# Indexing treats alphas as the first "block" and betas as the second,
+# regardless of which orbitals are virtual/occupied.
+# Determinant at index 0 is the ground state.
+def generate_dets(na_occ, na_virt, nb_occ, nb_virt):
     nbf = na_occ + na_virt
     n_dets = (na_occ + nb_occ) * (na_virt + nb_virt)
     det_list = np.zeros((n_dets+1, 2)).astype(int)
@@ -48,8 +54,9 @@ def generate_dets_ab(na_occ, na_virt, nb_occ, nb_virt):
             det_list[i*nb_virt+a+(na_occ*(na_virt+nb_virt))+(nb_occ*na_virt)+1] = [i+nbf,nb_occ+a+nbf]
     return det_list
 
-# Forms the CIS Hamiltonian
-def get_cis_H_rhf(wfn):
+# Forms the CIS Hamiltonian (spin adapted)
+# Could use a bit of clean-up at some point, probably.
+def get_cis_H_sa(wfn):
     # get necessary integrals/matrices from Psi4
     # this gets it in AO basis, transform to MO needed
     h = psi4.core.Matrix.to_array(wfn.H()) 
@@ -65,14 +72,12 @@ def get_cis_H_rhf(wfn):
     V_p4.transform(wfn.Ca())
     T = psi4.core.Matrix.to_array(T_p4)
     V = psi4.core.Matrix.to_array(V_p4)
-    print(np.allclose(T+V, h))
     tei_ao = psi4.core.Matrix.to_array(mints.ao_eri())
     tei_mo_temp = np.einsum('pqrs,pa',tei_ao,Ca)
     tei_mo_temp = np.einsum('aqrs,qb',tei_mo_temp,Ca)
     tei_mo_temp = np.einsum('abrs,rc',tei_mo_temp,Ca)
     tei_mo_temp = np.einsum('abcs,sd',tei_mo_temp,Ca)
     tei = psi4.core.Matrix.to_array(mints.mo_eri(wfn.Ca(), wfn.Ca(), wfn.Ca(), wfn.Ca()))
-    print(np.allclose(tei, tei_mo_temp))
     tei = np.swapaxes(tei, 1, 2)
     # determine number of dets
     occ = wfn.doccpi()[0]
@@ -87,8 +92,6 @@ def get_cis_H_rhf(wfn):
             for k in range(occ):
                 F[p, q] = F[p, q] + 2.0*(tei[p, k, q, k]) - tei[p, k, k, q]
     np.set_printoptions(suppress=True,precision=4,linewidth=800)
-    # checking F
-    print(np.allclose(F, F_ref))
     # Build CIS Hamiltonian matrix
     H = np.zeros((n_dets, n_dets))
     # <ai|H|bj>
@@ -101,20 +104,33 @@ def get_cis_H_rhf(wfn):
             H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + 2.0*tei[a, j, i, b] - tei[a, j, b, i]
     return (H, F, tei)
 
-# Forms the CIS Hamiltonian
+# Forms the CIS Hamiltonian (not spin adapted)
 def get_cis_H(wfn):
     np.set_printoptions(suppress=True,precision=4,linewidth=800)
-    # get necessary integrals/matrices from Psi4
-    # this gets it in AO basis, transform to MO needed
+    # get necessary integrals/matrices from Psi4 (AO basis)
+    # References: Psi4NumPy tutorials
     Ca = psi4.core.Matrix.to_array(wfn.Ca())
     Cb = psi4.core.Matrix.to_array(wfn.Cb())
+    C = np.block([[Ca, np.zeros_like(Cb)],
+                      [np.zeros_like(Ca), Cb]])
+    # one-electron part
     Fa = psi4.core.Matrix.to_array(wfn.Fa())
     Fb = psi4.core.Matrix.to_array(wfn.Fb())
-    #Fa = np.dot(Ca.T, np.dot(Fa, Ca))
-    #Fb = np.dot(Cb.T, np.dot(Fb, Cb))
-    # All of these are in AO basis...
+    F = np.block([[Fa, np.zeros_like(Fa)],
+                  [np.zeros_like(Fb), Fb]])
+    F = np.dot(C.T, np.dot(F, C))
+    # two-electron part
     mints = psi4.core.MintsHelper(wfn.basisset())
-    # determine number of dets
+    tei = psi4.core.Matrix.to_array(mints.ao_eri())
+    I = np.eye(2)
+    tei = np.kron(I, tei)
+    tei = np.kron(I, tei.T)
+    tei = tei.transpose(0, 2, 1, 3) - tei.transpose(0, 2, 3, 1)
+    tei = np.einsum('pqrs,pa',tei,C)
+    tei = np.einsum('aqrs,qb',tei,C)
+    tei = np.einsum('abrs,rc',tei,C)
+    tei = np.einsum('abcs,sd',tei,C)
+    # Get determinant list (hole-particle format)
     a_occ = wfn.doccpi()[0] + wfn.soccpi()[0]
     b_occ = wfn.doccpi()[0]
     a_virt = wfn.basisset().nbf() - a_occ
@@ -122,75 +138,139 @@ def get_cis_H(wfn):
     na_dets = a_occ*a_virt
     nb_dets = b_occ*b_virt
     nbf = wfn.basisset().nbf()
-    dets = generate_dets_ab(a_occ, a_virt, b_occ, b_virt)
+    dets = generate_dets(a_occ, a_virt, b_occ, b_virt)
     n_dets = dets.shape[0]
-    print(n_dets)
     np.set_printoptions(suppress=True,precision=4,linewidth=800)
     # Build CIS Hamiltonian matrix
     H = np.zeros((n_dets, n_dets))
-    # <ai|H|bj>
-    F = np.block([[Fa, np.zeros_like(Fa)],
-                  [np.zeros_like(Fb), Fb]])
-    print(F)
-    print(n_dets)
-    # ref: Psi4Numpy tutorials
-    tei = psi4.core.Matrix.to_array(mints.ao_eri())
-    I = np.eye(2)
-    tei = np.kron(I, tei)
-    tei = np.kron(I, tei.T)
-    tei_phys = tei.transpose(0, 2, 1, 3) - tei.transpose(0, 2, 3, 1)
-    # tranform TEI to MO basis
-    C = np.block([[Ca, np.zeros_like(Cb)],
-                      [np.zeros_like(Ca), Cb]])
-    #print("C")
-    #print(C)
-    eps = np.append(np.asarray(wfn.epsilon_a()), np.asarray(wfn.epsilon_b()))
-    #print(eps)
-    #print("F")
-    #print(F)
-    #C = C[:, eps.argsort()]
-    #eps.sort()
-    tei_phys = np.einsum('pQRS, pP -> PQRS',
-           np.einsum('pqRS, qQ -> pQRS',
-           np.einsum('pqrS, rR -> pqRS', 
-           np.einsum('pqrs, sS -> pqrS', tei_phys, C), C), C), C)
-    F = np.dot(C.T, np.dot(F, C))
     for d1index, det1 in enumerate(dets):
         for d2index, det2 in enumerate(dets):
             i = det1[0]
             a = det1[1]
             j = det2[0]
             b = det2[1]
-            # if i and a in alpha (assumed to be the case)
-            '''
-            if((i < nbf) and (a < nbf)):
-                if((j < nbf) and (b < nbf)):
-                    H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei_aa[a, i, j, b] - tei_aa[a, b, j, i]
-                elif((j > nbf) and (b > nbf)):
-                    H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei_ab[a, i, j-nbf, b-nbf]
-            elif((i > nbf) and (a > nbf)):
-                if((j < nbf) and (b < nbf)):
-                    H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei_ba[a-nbf, i-nbf, j, b]
-                elif((j > nbf) and (b > nbf)):
-                    H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei_bb[a-nbf, i-nbf, j-nbf, b-nbf] - tei_bb[a-nbf, b-nbf, j-nbf, i-nbf]
-            '''
-            #H[d1index, d2index] = Fa[a, b]*kdel(i,j) - Fa[i,j]*kdel(a,b) + 2.0*tei[a, j, i, b] - tei[a, j, b, i]
             if(d1index == 0 and d2index == 0):
                 H[0, 0] = 0
             elif(d1index == 0):
-                H[0, d2index] = F[j, b]
+                H[0, d2index] = 0*F[j, b]
             elif(d2index == 0):
-                H[d1index, 0] = F[i, a]
+                H[d1index, 0] = 0*F[i, a]
             else:
-                H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei_phys[a, j, i, b]
-                #H[d1index, d2index] = eps[a]*kdel(i,j) - eps[i]*kdel(a,b) + tei_phys[a, j, i, b]
-    
-    return (H, Fa, tei)
+                H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei[a, j, i, b]
+    return H
+
+# using Davidson to solve the Hamiltonian
+def davidson( A, n_roots=2, e_conv=1e-4, maxIter=300 ):
+    # generate vSpace (search subspace)
+    # based on vInit (input vectors)guessindexes = np.diag(ATest).argsort()
+    guessindexes = np.diag(A).argsort()
+    vInit = np.zeros((A.shape[0], n_roots))
+    for i in range(n_roots):
+        vInit[guessindexes[i], i] = 1.0
+    vSpace = vInit;
+    # size at which to collapse search subspace
+    collapseSize = n_roots*A.shape[0];
+    # cutoff for adding vector to Krylov search subspace
+    delta = 1e-20;
+    # number of eigenvalues to solve for
+    k = vInit.shape[1];
+
+    # iterations completed
+    j = 0;
+
+    sig = None;
+
+    # index of last sigma added
+    lastSig = 0;
+
+    while ( j<maxIter ):
+        # form k sigma vectors
+        for i in range(lastSig, vSpace.shape[1]):
+            if(type(sig)==type(None)):
+                sig = np.dot(A, vSpace[:,i])
+            else:
+                sig = np.column_stack((sig, np.dot(A, vSpace[:,i])))
+  
+        # form subspace matrix
+        Av = np.dot(vSpace.T, sig)
+        # solve for k lowest eigenvalues
+        eVals, eVects = LIN.eig(Av)
+        # eIndex tracks where the lowest values are
+        # so we can extract the appropriate eigenvectors
+        # discard high values
+        eIndex = eVals.argsort()[0:k]
+        eVals = np.sort(eVals)[0:k]
+
+        r = None;
+        # compute residuals
+        for i in range(k):
+            rNew = np.dot(sig, eVects[:,eIndex[i]]) - eVals[i]*np.dot(vSpace, eVects[:,eIndex[i]]);
+            if(type(r)==type(None)):
+                r = rNew
+            else:
+                r = np.column_stack((r, rNew));
+
+        print("Iteration: %4i" % j, end='')
+        for i in eVals:
+            print("%16.8f" % i, end='')
+        for i in range(k):
+            print("%16.8f" % LIN.norm(r[:,i]), end='')
+        print("")
+
+        # check residuals for convergence (break)
+        converged = True;
+        for i in range(k):
+            if( LIN.norm(r[:,i])>e_conv ):
+                converged = False
+
+        if ( converged ):
+            print("Done! \n")
+            return eVals;
+        #collapse subspace if necessary (if)
+        # I DON'T know for sure if this is working yet!!!
+        elif( vSpace.shape[1] > collapseSize ):
+            print("Y I K E S")
+            lastSig = 0
+            vSpaceNew = None
+            for l in range(k):
+                newVect = np.zeros((rows(A),1))
+                for i in range(vSpace.shape[1]):
+                    newVect = newVect + np.dot(eVects[i,eIndex(l)], vSpace[:,i])
+            # orthonormalize
+            newVect = newVect/norm(newVect);
+            vSpaceNew = [vSpaceNew, newVect];
+            vSpace = vSpaceNew
+            sig = None
+
+        # else, apply preconditioner to residuals (elif)
+        else:
+            # apply preconditioner
+            D = np.diag(np.diag(A));
+            for i in range(k) :
+                # construct inv(D-eVal) (preconditioner)
+                precond = D - eVals[i]*np.eye(D.shape[0])
+                for l in range(D.shape[0]):
+                    if(precond[l,l] > 1e-20):
+                        precond[l, l] = 1.0/precond[l,l]
+                sNew, tmp1,tmp2,tmp3 = LIN.lstsq(precond, r[:,i])
+                if ( LIN.norm(sNew) > delta ):
+                    # orthogonalize
+                    h = np.dot(vSpace.T, sNew);
+                    sNew = sNew - np.dot(vSpace,h);
+                    # normalize
+                    sNew = (1.0/LIN.norm(sNew))*sNew
+                    vSpace = np.column_stack((vSpace, sNew));
+                    lastSig = lastSig + 1;
+        if ( vSpace.shape[1] > A.shape[1] ):
+            printf("...\nError: Make sure your inputs are reasonable!\n\n");
+            return 0;
+        # increase j and loop again
+        j = j+1;
 
 def run():
     psi4.core.clean()
     mol = psi4.geometry("""
-        0 3
+        0 7
         N 0 0 0
         N 1.5 0 0
         symmetry c1
@@ -206,21 +286,20 @@ def run():
     '''
     #psi4.set_options({'scf_type': 'direct', 'reference': 'rhf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
     #psi4.set_options({'scf_type': 'direct', 'reference': 'uhf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
-    psi4.set_options({'scf_type': 'direct', 'reference': 'rohf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
-    e, wfn = psi4.energy('scf/sto-3G', molecule=mol, return_wfn=True)
+    psi4.set_options({'scf_type': 'pk', 'reference': 'uhf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
+    e, wfn = psi4.energy('scf/cc-pvdz', molecule=mol, return_wfn=True)
     occ = wfn.doccpi()[0]
     virt = wfn.basisset().nbf() - occ
-    psi4.set_options({'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10, 'ex_level': 1})
-    energy_cis2 = psi4.energy('ci1/sto-3g', molecule=mol, ref_wfn=wfn)
+    #psi4.set_options({'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10, 'ex_level': 1})
+    #energy_cis2 = psi4.energy('ci1/sto-3g', molecule=mol, ref_wfn=wfn)
+    energy_cis2 = 0
     #psi4.core.clean()
     #psi4.set_options({'num_roots': 12, 'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10, 'ras1': [5], 'ras2': [4], 'ras3': [1], 'ex_level': 1})
     #energy_cis1 = psi4.energy('detci/sto-3g', molecule=mol, ref_wfn=wfn)
     #psi4.core.print_variables()
-    H, F, tei = get_cis_H(wfn)
+    H = get_cis_H(wfn)
     #Hr, Fr, teir = get_cis_H_rhf(wfn)
-    print(e*np.eye(H.shape[0]) + H)
     #print(e*np.eye(Hr.shape[0]) + Hr)
-    print(np.allclose(H, H.T))
     print("REF", energy_cis2)
     #print("REF (PSI4): ", energy_cis1 - e)
     #print("REF (PSI4): ", energy_cis2 - e)
@@ -231,6 +310,11 @@ def run():
     #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 5 TOTAL ENERGY'))
     #print("REF (PSI4): ", psi4.core.get_variable('CI ROOT 6 TOTAL ENERGY'))
     print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0])
+    #print(H + e*np.eye(H.shape[0]))
+    #print(H[1:, 1:])
+    vals = davidson(H[1:, 1:], n_roots=4, e_conv = 1e-9)
+    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0])
+    print("FROM DAV:  ", e + np.sort(vals)[0])
     #print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(Hr))[0])
     vals, vects = LIN.eig(H)
     #print("FROM CIS FN: ")
