@@ -309,7 +309,7 @@ def run():
     #psi4.set_options({'scf_type': 'direct', 'reference': 'rhf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
     #psi4.set_options({'scf_type': 'direct', 'reference': 'uhf', 'e_convergence': 1e-10, 'd_convergence': 1e-10})
     psi4.set_options({'scf_type': 'pk', 'reference': 'uhf', 'e_convergence': 1e-8, 'd_convergence': 1e-8})
-    e, wfn = psi4.energy('scf/sto-3g', molecule=mol, return_wfn=True)
+    e, wfn = psi4.energy('scf/cc-pvdz', molecule=mol, return_wfn=True)
     occ = wfn.doccpi()[0]
     virt = wfn.basisset().nbf() - occ
     #psi4.set_options({'diag_method': 'rsp', 'e_convergence': 1e-10, 'r_convergence': 1e-10, 'ex_level': 1})
@@ -336,8 +336,8 @@ def run():
     #vals = davidson(H[1:, 1:], n_roots=6, e_conv = 1e-5)
     np.set_printoptions(precision=8, suppress=True)
     
-    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:10])
-    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:10])
+    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
+    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
 
     #A = SPLIN.LinearOperator(H[1:, 1:].shape, matvec=mv)
     A = LinOpH(H.shape, dets, F, tei)
