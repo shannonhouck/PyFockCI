@@ -1,0 +1,500 @@
+
+Host: shannon-book.local
+
+Timers On : Wed Jul 11 10:02:04 2018
+Timers Off: Wed Jul 11 10:02:08 2018
+
+Wall Time:        3.69 seconds
+
+Total PK formation time     :      0.017u      0.000s      0.015w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.001w     10 calls
+JK: D                       :      0.000u      0.000s      0.000w     10 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     10 calls
+JK: JK                      :      0.000u      0.000s      0.000w     10 calls
+PK computes JK              :      0.000u      0.000s      0.000w     10 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     10 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     10 calls
+HF: DIIS                    :      0.000u      0.000s      0.002w     10 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     10 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.001w      9 calls
+bMatrix setup               :      0.000u      0.000s      0.000w      9 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w      9 calls
+New vector                  :      0.000u      0.000s      0.000w      9 calls
+HF: Form C                  :      0.000u      0.000s      0.000w     10 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     10 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.017u      0.000s      0.015w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.001w     10 calls
+| JK: D                     :      0.000u      0.000s      0.000w     10 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     10 calls
+| JK: JK                    :      0.000u      0.000s      0.000w     10 calls
+| | PK computes JK          :      0.000u      0.000s      0.000w     10 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     10 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     10 calls
+HF: DIIS                    :      0.000u      0.000s      0.002w     10 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     10 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.001w      9 calls
+| | bMatrix setup           :      0.000u      0.000s      0.000w      9 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w      9 calls
+| | New vector              :      0.000u      0.000s      0.000w      9 calls
+HF: Form C                  :      0.000u      0.000s      0.000w     10 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     10 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Wed Jul 11 10:02:49 2018
+Timers Off: Wed Jul 11 10:02:50 2018
+
+Wall Time:        0.74 seconds
+
+Total PK formation time     :      0.017u      0.000s      0.011w      1 calls
+HF: Form H                  :      0.000u      0.017s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.000w     10 calls
+JK: D                       :      0.000u      0.000s      0.000w     10 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     10 calls
+JK: JK                      :      0.000u      0.000s      0.000w     10 calls
+PK computes JK              :      0.000u      0.000s      0.000w     10 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     10 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     10 calls
+HF: DIIS                    :      0.000u      0.000s      0.001w     10 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     10 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.000w      9 calls
+bMatrix setup               :      0.000u      0.000s      0.000w      9 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w      9 calls
+New vector                  :      0.000u      0.000s      0.000w      9 calls
+HF: Form C                  :      0.000u      0.000s      0.000w     10 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     10 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.017u      0.000s      0.011w      1 calls
+HF: Form H                  :      0.000u      0.017s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.000w     10 calls
+| JK: D                     :      0.000u      0.000s      0.000w     10 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     10 calls
+| JK: JK                    :      0.000u      0.000s      0.000w     10 calls
+| | PK computes JK          :      0.000u      0.000s      0.000w     10 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     10 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     10 calls
+HF: DIIS                    :      0.000u      0.000s      0.001w     10 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     10 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.000w      9 calls
+| | bMatrix setup           :      0.000u      0.000s      0.000w      9 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w      9 calls
+| | New vector              :      0.000u      0.000s      0.000w      9 calls
+HF: Form C                  :      0.000u      0.000s      0.000w     10 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     10 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Wed Jul 11 11:03:16 2018
+Timers Off: Wed Jul 11 11:03:21 2018
+
+Wall Time:        4.99 seconds
+
+Total PK formation time     :      0.083u      0.000s      0.059w      1 calls
+HF: Form H                  :      0.000u      0.017s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.004w     12 calls
+JK: D                       :      0.000u      0.000s      0.000w     12 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     12 calls
+JK: JK                      :      0.017u      0.000s      0.004w     12 calls
+PK computes JK              :      0.017u      0.000s      0.004w     12 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.003w     12 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     12 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.001w     11 calls
+bMatrix setup               :      0.000u      0.000s      0.001w     11 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w     11 calls
+New vector                  :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.083u      0.000s      0.059w      1 calls
+HF: Form H                  :      0.000u      0.017s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.004w     12 calls
+| JK: D                     :      0.000u      0.000s      0.000w     12 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     12 calls
+| JK: JK                    :      0.017u      0.000s      0.004w     12 calls
+| | PK computes JK          :      0.017u      0.000s      0.004w     12 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.003w     12 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     12 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.001w     11 calls
+| | bMatrix setup           :      0.000u      0.000s      0.001w     11 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w     11 calls
+| | New vector              :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Wed Jul 11 14:24:21 2018
+Timers Off: Wed Jul 11 14:24:26 2018
+
+Wall Time:        5.30 seconds
+
+Total PK formation time     :      0.100u      0.000s      0.057w      1 calls
+HF: Form H                  :      0.000u      0.017s      0.004w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.004w     12 calls
+JK: D                       :      0.000u      0.000s      0.000w     12 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     12 calls
+JK: JK                      :      0.017u      0.000s      0.004w     12 calls
+PK computes JK              :      0.017u      0.000s      0.004w     12 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.003w     12 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     12 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.001w     11 calls
+bMatrix setup               :      0.000u      0.000s      0.000w     11 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w     11 calls
+New vector                  :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.000s      0.057w      1 calls
+HF: Form H                  :      0.000u      0.017s      0.004w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.004w     12 calls
+| JK: D                     :      0.000u      0.000s      0.000w     12 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     12 calls
+| JK: JK                    :      0.017u      0.000s      0.004w     12 calls
+| | PK computes JK          :      0.017u      0.000s      0.004w     12 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.003w     12 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     12 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.001w     11 calls
+| | bMatrix setup           :      0.000u      0.000s      0.000w     11 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w     11 calls
+| | New vector              :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Wed Jul 11 14:34:12 2018
+Timers Off: Wed Jul 11 14:34:17 2018
+
+Wall Time:        5.51 seconds
+
+Total PK formation time     :      0.100u      0.017s      0.066w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.005w     12 calls
+JK: D                       :      0.000u      0.000s      0.000w     12 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     12 calls
+JK: JK                      :      0.000u      0.000s      0.005w     12 calls
+PK computes JK              :      0.000u      0.000s      0.005w     12 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.003w     12 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     12 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.001w     11 calls
+bMatrix setup               :      0.000u      0.000s      0.001w     11 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w     11 calls
+New vector                  :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.017u      0.000s      0.000w     12 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.017s      0.066w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.005w     12 calls
+| JK: D                     :      0.000u      0.000s      0.000w     12 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     12 calls
+| JK: JK                    :      0.000u      0.000s      0.005w     12 calls
+| | PK computes JK          :      0.000u      0.000s      0.005w     12 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.003w     12 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     12 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.001w     11 calls
+| | bMatrix setup           :      0.000u      0.000s      0.001w     11 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w     11 calls
+| | New vector              :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.017u      0.000s      0.000w     12 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Wed Jul 11 15:39:32 2018
+Timers Off: Wed Jul 11 15:39:37 2018
+
+Wall Time:        4.75 seconds
+
+Total PK formation time     :      0.083u      0.000s      0.057w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.004w     12 calls
+JK: D                       :      0.000u      0.000s      0.000w     12 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     12 calls
+JK: JK                      :      0.017u      0.000s      0.004w     12 calls
+PK computes JK              :      0.017u      0.000s      0.004w     12 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.002w     12 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     12 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.001w     11 calls
+bMatrix setup               :      0.000u      0.000s      0.000w     11 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w     11 calls
+New vector                  :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.083u      0.000s      0.057w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.004w     12 calls
+| JK: D                     :      0.000u      0.000s      0.000w     12 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     12 calls
+| JK: JK                    :      0.017u      0.000s      0.004w     12 calls
+| | PK computes JK          :      0.017u      0.000s      0.004w     12 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.002w     12 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     12 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.001w     11 calls
+| | bMatrix setup           :      0.000u      0.000s      0.000w     11 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w     11 calls
+| | New vector              :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Wed Jul 11 15:40:12 2018
+Timers Off: Wed Jul 11 15:40:16 2018
+
+Wall Time:        4.74 seconds
+
+Total PK formation time     :      0.100u      0.017s      0.055w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.004w     12 calls
+JK: D                       :      0.000u      0.000s      0.000w     12 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     12 calls
+JK: JK                      :      0.000u      0.000s      0.004w     12 calls
+PK computes JK              :      0.000u      0.000s      0.004w     12 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.002w     12 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     12 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.001w     11 calls
+bMatrix setup               :      0.000u      0.000s      0.000w     11 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w     11 calls
+New vector                  :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.017s      0.055w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.004w     12 calls
+| JK: D                     :      0.000u      0.000s      0.000w     12 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     12 calls
+| JK: JK                    :      0.000u      0.000s      0.004w     12 calls
+| | PK computes JK          :      0.000u      0.000s      0.004w     12 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.002w     12 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     12 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.001w     11 calls
+| | bMatrix setup           :      0.000u      0.000s      0.000w     11 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w     11 calls
+| | New vector              :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Wed Jul 11 15:40:30 2018
+Timers Off: Wed Jul 11 15:40:35 2018
+
+Wall Time:        5.11 seconds
+
+Total PK formation time     :      0.100u      0.000s      0.059w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.004w     12 calls
+JK: D                       :      0.000u      0.000s      0.000w     12 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     12 calls
+JK: JK                      :      0.000u      0.000s      0.004w     12 calls
+PK computes JK              :      0.000u      0.000s      0.004w     12 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.017s      0.002w     12 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     12 calls
+DIISManager::extrapolate    :      0.000u      0.017s      0.001w     11 calls
+bMatrix setup               :      0.000u      0.017s      0.000w     11 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w     11 calls
+New vector                  :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.017u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.000s      0.059w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.004w     12 calls
+| JK: D                     :      0.000u      0.000s      0.000w     12 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     12 calls
+| JK: JK                    :      0.000u      0.000s      0.004w     12 calls
+| | PK computes JK          :      0.000u      0.000s      0.004w     12 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.017s      0.002w     12 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     12 calls
+| DIISManager::extrapolate  :      0.000u      0.017s      0.001w     11 calls
+| | bMatrix setup           :      0.000u      0.017s      0.000w     11 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w     11 calls
+| | New vector              :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.017u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Thu Jul 12 14:14:18 2018
+Timers Off: Thu Jul 12 14:14:23 2018
+
+Wall Time:        5.60 seconds
+
+Total PK formation time     :      0.100u      0.000s      0.061w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.005w     13 calls
+JK: D                       :      0.000u      0.000s      0.000w     13 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     13 calls
+JK: JK                      :      0.000u      0.000s      0.005w     13 calls
+PK computes JK              :      0.000u      0.000s      0.005w     13 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     13 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     13 calls
+HF: DIIS                    :      0.017u      0.000s      0.003w     13 calls
+DIISManager::add_entry      :      0.017u      0.000s      0.001w     13 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.001w     12 calls
+bMatrix setup               :      0.000u      0.000s      0.001w     12 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w     12 calls
+New vector                  :      0.000u      0.000s      0.000w     12 calls
+HF: Form C                  :      0.000u      0.000s      0.004w     13 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     13 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.000s      0.061w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.005w     13 calls
+| JK: D                     :      0.000u      0.000s      0.000w     13 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     13 calls
+| JK: JK                    :      0.000u      0.000s      0.005w     13 calls
+| | PK computes JK          :      0.000u      0.000s      0.005w     13 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     13 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     13 calls
+HF: DIIS                    :      0.017u      0.000s      0.003w     13 calls
+| DIISManager::add_entry    :      0.017u      0.000s      0.001w     13 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.001w     12 calls
+| | bMatrix setup           :      0.000u      0.000s      0.001w     12 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w     12 calls
+| | New vector              :      0.000u      0.000s      0.000w     12 calls
+HF: Form C                  :      0.000u      0.000s      0.004w     13 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     13 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Thu Jul 12 14:14:42 2018
+Timers Off: Thu Jul 12 14:14:48 2018
+
+Wall Time:        5.58 seconds
+
+Total PK formation time     :      0.100u      0.017s      0.060w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.004w     12 calls
+JK: D                       :      0.000u      0.000s      0.000w     12 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     12 calls
+JK: JK                      :      0.017u      0.000s      0.004w     12 calls
+PK computes JK              :      0.017u      0.000s      0.004w     12 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.003w     12 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.001w     12 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.001w     11 calls
+bMatrix setup               :      0.000u      0.000s      0.000w     11 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w     11 calls
+New vector                  :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.017s      0.060w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.004w     12 calls
+| JK: D                     :      0.000u      0.000s      0.000w     12 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     12 calls
+| JK: JK                    :      0.017u      0.000s      0.004w     12 calls
+| | PK computes JK          :      0.017u      0.000s      0.004w     12 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     12 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     12 calls
+HF: DIIS                    :      0.000u      0.000s      0.003w     12 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.001w     12 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.001w     11 calls
+| | bMatrix setup           :      0.000u      0.000s      0.000w     11 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w     11 calls
+| | New vector              :      0.000u      0.000s      0.000w     11 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     12 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     12 calls
+
+***********************************************************
