@@ -121,12 +121,9 @@ def get_sf_H(wfn):
 
 def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp" ):
     psi4.core.clean()
-    opts = {'scf_type': 'direct',
-            'basis': 'cc-pvdz',
+    opts = {'basis': 'cc-pvdz',
+            'scf_type': 'pk',
             'reference': 'rohf',
-            'guess': 'sad',
-            'maxiter': 1000,
-            'ci_maxiter': 50, 
             'mixed': False}
     opts.update(add_opts)
     psi4.set_options(opts)
