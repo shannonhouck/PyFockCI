@@ -119,50 +119,28 @@ def get_sf_H(wfn):
                 H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei[a, j, i, b]
     return (H, dets, F, tei)
 
-
-def run():
+def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp" ):
     psi4.core.clean()
-    mol = psi4.geometry("""
-        0 7
-        N 0 0 0
-        N 1.5 0 0
-        symmetry c1
-        """)
-    '''
-    mol = psi4.geometry("""
-        0 3
-        O   0.000000000000  -0.143225816552   0.000000000000
-        H   1.638036840407   1.136548822547  -0.000000000000
-        H  -1.638036840407   1.136548822547  -0.000000000000
-        symmetry c1
-        """)
-    '''
-
-    psi4.set_options({'basis': 'cc-pvdz', 'diis_start': 4, 'e_convergence': 1e-10, 'num_roots': 4, 'reference': 'rohf', 'scf_type': 'pk', 'd_convergence': 1e-10})
-    e, wfn = psi4.energy('scf/cc-pvdz', molecule=mol, return_wfn=True)
-
+    opts = {'scf_type': 'direct',
+            'basis': 'cc-pvdz',
+            'reference': 'rohf',
+            'guess': 'sad',
+            'maxiter': 1000,
+            'ci_maxiter': 50, 
+            'mixed': False}
+    opts.update(add_opts)
+    psi4.set_options(opts)
+    e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
     H, dets, F, tei = get_sf_H(wfn)
-    print(dets)
-    print(dets.shape)
-    #Hr, Fr, teir = get_cis_H_rhf(wfn)
-    #print(e*np.eye(Hr.shape[0]) + Hr)
-    #vals = davidson(H[1:, 1:], n_roots=6, e_conv = 1e-5)
     np.set_printoptions(precision=8, suppress=True)
-    
-    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
-    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
-
-    #A = SPLIN.LinearOperator(H.shape, matvec=mv)
-    A = LinOpH(H.shape, dets, F, tei)
-    vals, vects = SPLIN.eigsh(A, which='SA')
-    print("FROM LinOp:  ", vals)
-
-    #print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(Hr))[0])
-    #vals, vects = LIN.eig(H)
-    #print("FROM CIS FN: ")
-    #for i in range(vals.size):
-    #    print(e + cis_energy(vects[:,i], H, F, tei, wfn))
-    
-
-
+    if(sf_diag_method == "RSP"):
+        print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
+        print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
+        return(e + np.sort(LIN.eigvalsh(H))[0])
+    if(sf_diag_method == "LinOp"):
+        #A = SPLIN.LinearOperator(H.shape, matvec=mv)
+        A = LinOpH(H.shape, dets, F, tei)
+        vals, vects = SPLIN.eigsh(A, which='SA')
+        print("FROM LinOp:  ", vals)
+        return(e + vals[0])
 
