@@ -66,8 +66,22 @@ def generate_sf_dets(na_occ, na_virt, nb_occ, nb_virt):
             det_list[i*(na_occ - nb_occ)+a] = [nb_occ+i, nb_occ+a+nbf]
     return det_list
 
+def generate_sf_h_dets(na_occ, na_virt, nb_occ, nb_virt):
+    nbf = na_occ + na_virt
+    n_dets = (na_occ - nb_occ) * (na_virt + nb_virt)
+    det_list = np.zeros((n_dets, 2)).astype(int)
+    # fill out alpha -> ??
+    for i in range(na_occ - nb_occ):
+        # a -> a_virt
+        for a in range(na_virt):
+            det_list[i*na_virt+a] = [nb_occ+i, na_occ+a]
+        # a -> b_virt
+        for a in range(nb_virt):
+            det_list[i*nb_virt+a+((na_occ - nb_occ)*na_virt)] = [nb_occ+i, nb_occ+a+nbf]
+    return det_list
+
 # Forms the CIS Hamiltonian (not spin adapted)
-def get_sf_H(wfn):
+def get_sf_H(wfn, conf_space):
     # get necessary integrals/matrices from Psi4 (AO basis)
     # References: Psi4NumPy tutorials
     Ca = psi4.core.Matrix.to_array(wfn.Ca())
@@ -99,7 +113,10 @@ def get_sf_H(wfn):
     na_dets = a_occ*a_virt
     nb_dets = b_occ*b_virt
     nbf = wfn.basisset().nbf()
-    dets = generate_sf_dets(a_occ, a_virt, b_occ, b_virt)
+    if(conf_space == ""):
+        dets = generate_sf_dets(a_occ, a_virt, b_occ, b_virt)
+    elif(conf_space == "h"):
+        dets = generate_sf_h_dets(a_occ, a_virt, b_occ, b_virt)
     n_dets = dets.shape[0]
     # Build CIS Hamiltonian matrix
     H = np.zeros((n_dets, n_dets))
@@ -109,26 +126,20 @@ def get_sf_H(wfn):
             a = det1[1]
             j = det2[0]
             b = det2[1]
-            if(d1index == 0 and d2index == 0):
-                H[0, 0] = 0
-            elif(d1index == 0):
-                H[0, d2index] = 0*F[j, b]
-            elif(d2index == 0):
-                H[d1index, 0] = 0*F[i, a]
-            else:
-                H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei[a, j, i, b]
+            H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei[a, j, i, b]
     return (H, dets, F, tei)
 
 def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp" ):
     psi4.core.clean()
     opts = {'basis': 'cc-pvdz',
             'scf_type': 'pk',
-            'reference': 'rohf',
-            'mixed': False}
+            'reference': 'rohf'}
     opts.update(add_opts)
     psi4.set_options(opts)
     e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
-    H, dets, F, tei = get_sf_H(wfn)
+    H, dets, F, tei = get_sf_H(wfn, conf_space)
+    print(dets)
+    print(dets.shape)
     np.set_printoptions(precision=8, suppress=True)
     if(sf_diag_method == "RSP"):
         print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
