@@ -24,13 +24,13 @@ symmetry c1
 
 # Test: 1SF-CAS
 def test_1():
-    options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'd_convergence': 1e-10}
+    options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     expected = sf_cas_ref( 0, 5, n2, conf_space="", add_opts=options )
     e = do_sf_cas( 0, 5, n2, conf_space="", add_opts=options )
-    assert (e - expected) < threshold
+    assert abs(e - expected) < threshold
 
 def test_2():
-    options = {"basis": "cc-pvdz", 'diag_method': 'rsp'}
+    options = {"basis": "cc-pvdz", 'diag_method': 'rsp', 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     expected = sf_cas_ref( 0, 1, o2, conf_space="", add_opts=options )
     e = do_sf_cas( 0, 1, o2, conf_space="", add_opts=options, sf_diag_method="RSP" )
-    assert (e - expected) < threshold
+    assert abs(e - expected) < threshold
