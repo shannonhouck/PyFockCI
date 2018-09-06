@@ -1,4 +1,5 @@
 from __future__ import print_function
+import math
 import numpy as np
 from numpy import linalg as LIN
 from scipy.sparse import linalg as SPLIN
@@ -66,18 +67,38 @@ def generate_sf_dets(na_occ, na_virt, nb_occ, nb_virt):
             det_list[i*(na_occ - nb_occ)+a] = [[nb_occ+i, 0], [nb_occ+a+nbf, 0]]
     return det_list
 
-def generate_sf_h_dets(na_occ, na_virt, nb_occ, nb_virt):
+def generate_sf_p_dets(na_occ, na_virt, nb_occ, nb_virt):
     nbf = na_occ + na_virt
-    n_dets = (na_occ - nb_occ) * (na_virt + nb_virt)
-    det_list = np.zeros((n_dets, 2, 2)).astype(int)
-    # fill out alpha -> ??
-    for i in range(na_occ - nb_occ):
-        # a -> a_virt
-        for a in range(na_virt):
-            det_list[i*na_virt+a] = [nb_occ+i, na_occ+a]
-        # a -> b_virt
+    n_dets_ras2 = (na_occ - nb_occ) * (na_occ - nb_occ)
+    n_dets_ras3 = (na_occ - nb_occ - 1) * (na_virt)
+    n_dets = n_dets_ras2 * n_dets_ras3
+    print("NUMBER OF DETS??")
+    print(n_dets)
+    socc = na_occ - nb_occ
+    #det_list = np.zeros((n_dets, 2, 2)).astype(int)
+    n_dets_singles = socc * nb_virt
+    print(n_dets_singles)
+    n_dets_doubles = socc * na_virt * (math.factorial(socc)/(2*math.factorial(socc-2)))
+    print(n_dets_doubles)
+    det_list = np.zeros((n_dets_singles + n_dets_doubles, 2, 2)).astype(int)
+    index = 0
+    # fill out singles
+    for i in range(socc):
+        # a -> b_virt (singles)
         for a in range(nb_virt):
-            det_list[i*nb_virt+a+((na_occ - nb_occ)*na_virt)] = [nb_occ+i, nb_occ+a+nbf]
+            det_list[index] = [[nb_occ+i, 0], [nb_occ+a, 0]]
+            index = index + 1
+    # fill out doubles
+    for a in range(na_virt):
+        for b in range(socc):
+            for i in range(socc):
+                for j in range(i-1):
+                    # i->a, j->b
+                    det_list[index] = [[nb_occ+i, nb_occ+j], [na_occ+a, nbf+nb_occ+b]]
+                    index = index + 1
+                    det_list[index] = [[nb_occ+i, nb_occ+j], [nbf+nb_occ+b, na_occ+a]]
+                    index = index + 1
+    print(det_list)
     return det_list
 
 # Forms the CIS Hamiltonian (not spin adapted)
@@ -113,8 +134,8 @@ def get_sf_H(wfn, conf_space):
     nbf = wfn.basisset().nbf()
     if(conf_space == ""):
         dets = generate_sf_dets(a_occ, a_virt, b_occ, b_virt)
-    elif(conf_space == "h"):
-        dets = generate_sf_h_dets(a_occ, a_virt, b_occ, b_virt)
+    elif(conf_space == "p"):
+        dets = generate_sf_p_dets(a_occ, a_virt, b_occ, b_virt)
     n_dets = dets.shape[0]
     # Build CIS Hamiltonian matrix
     H = np.zeros((n_dets, n_dets))
@@ -139,23 +160,19 @@ def get_sf_H(wfn, conf_space):
                         if(b1 == b2):
                             H[d1index, d2index] = F[a1, a2] - F[i1,i2] + tei[a1, i2, i1, a2]
                         # differ by b excited orbital -> D1
-                        #else:
-                        #    print("TERRIBLE")dd
-                        #    H[d1index, d2index] = F[a1, a2] + tei[a1, i2, i1, a2]
+                        else:
+                            H[d1index, d2index] = F[a1, a2] + tei[a1, i2, i1, a2]
                     # differ by a excited orbital
                     else:
                         # differ by a only -> D1
                         if(b1 == b2):
                             H[d1index, d2index] = F[a1, a2] + tei[a1, i2, i1, a2]
                         # differ by a+b excited orbital -> D2
-                        #else:
-                        #    print("TERRIBLE")
-                        #    H[d1index, d2index] = tei[a1, i2, i1, a2] 
+                        else:
+                            H[d1index, d2index] = tei[a1, i2, i1, a2] 
 
                 # differ in second elimination j
-                '''
                 else:
-                    print("TERRIBLE")
                     # first added same
                     if(a1 == a2):
                         # all added same -> D1
@@ -170,7 +187,6 @@ def get_sf_H(wfn, conf_space):
                         if(b1 == b2):
                             H[d1index, d2index] = tei[a1, i2, i1, a2]             
                         # differ by a+b excited orbital -> 0
-                '''
             # differ in first elimination i
             else:
                 # all eliminated same
@@ -190,15 +206,12 @@ def get_sf_H(wfn, conf_space):
                             H[d1index, d2index] = tei[a1, i2, i1, a2]             
 
                 # differ in second elimination j
-                '''
                 else:
-                    print("TERRIBLE")
                     # first added same
                     if(a1 == a2):
                         # all added same -> D2
                         if(b1 == b2):
                             H[d1index, d2index] = tei[a1, i2, i1, a2]          
-                '''
             #H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei[a, j, i, b]
     return (H, dets, F, tei)
 
