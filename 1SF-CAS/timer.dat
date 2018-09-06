@@ -47820,3 +47820,43 @@ HF: Form C                  :      0.000u      0.000s      0.000w      2 calls
 HF: Form D                  :      0.000u      0.000s      0.000w      2 calls
 
 ***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Thu Sep  6 16:36:24 2018
+Timers Off: Thu Sep  6 16:36:25 2018
+
+Wall Time:        1.06 seconds
+
+Total PK formation time     :      0.017u      0.000s      0.014w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.002w     13 calls
+JK: D                       :      0.000u      0.000s      0.000w     13 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     13 calls
+JK: JK                      :      0.000u      0.000s      0.001w     13 calls
+PK computes JK              :      0.000u      0.000s      0.001w     13 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     13 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     13 calls
+HF: DIIS                    :      0.017u      0.000s      0.000w     13 calls
+HF: Form C                  :      0.000u      0.000s      0.001w     13 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     13 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.017u      0.000s      0.014w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.002w     13 calls
+| JK: D                     :      0.000u      0.000s      0.000w     13 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     13 calls
+| JK: JK                    :      0.000u      0.000s      0.001w     13 calls
+| | PK computes JK          :      0.000u      0.000s      0.001w     13 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     13 calls
+HF: Form F                  :      0.000u      0.000s      0.000w     13 calls
+HF: DIIS                    :      0.017u      0.000s      0.000w     13 calls
+HF: Form C                  :      0.000u      0.000s      0.001w     13 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     13 calls
+
+***********************************************************

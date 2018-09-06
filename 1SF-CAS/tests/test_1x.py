@@ -30,7 +30,7 @@ def test_1():
     assert abs(e - expected) < threshold
 
 def test_2():
-    options = {"basis": "cc-pvdz", 'diag_method': 'rsp', 'e_convergence': 1e-10, 'd_convergence': 1e-10}
+    options = {"basis": "cc-pvdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'diag_method': 'rsp'}
     expected = sf_cas_ref( 0, 1, o2, conf_space="", add_opts=options )
-    e = do_sf_cas( 0, 1, o2, conf_space="", add_opts=options, sf_diag_method="RSP" )
+    e = do_sf_cas( 0, 1, o2, conf_space="", add_opts=options, num_roots=2 )
     assert abs(e - expected) < threshold

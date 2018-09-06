@@ -258,7 +258,7 @@ def get_cis_H(wfn):
             H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei[a, j, i, b]
     return (H, dets, F, tei)
 
-def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp" ):
+def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6 ):
     psi4.core.clean()
     opts = {'basis': 'cc-pvdz',
             'scf_type': 'pk',
@@ -281,16 +281,20 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
             if(not tf_matrix[i, j]):
                 print(dets[j])
     '''
-    #if(sf_diag_method == "RSP"):
-    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
-    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
-    return(e + np.sort(LIN.eigvalsh(H))[0])
-    '''
+    if(sf_diag_method == "RSP"):
+        print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
+        print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
+        return(e + np.sort(LIN.eigvalsh(H))[0])
     if(sf_diag_method == "LinOp"):
         #A = SPLIN.LinearOperator(H.shape, matvec=mv)
-        A = LinOpH(H.shape, dets, F, tei)
-        vals, vects = SPLIN.eigsh(A, which='SA')
+        a_occ = wfn.doccpi()[0] + wfn.soccpi()[0]
+        b_occ = wfn.doccpi()[0]
+        a_virt = wfn.basisset().nbf() - a_occ
+        b_virt = wfn.basisset().nbf() - b_occ
+        print(a_virt)
+        print(b_virt)
+        A = LinOpH(H.shape, a_occ, b_occ, a_virt, b_virt, F, tei)
+        vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         print("FROM LinOp:  ", vals)
         return(e + vals[0])
-    '''
 
