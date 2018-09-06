@@ -69,11 +69,6 @@ def generate_sf_dets(na_occ, na_virt, nb_occ, nb_virt):
 
 def generate_sf_p_dets(na_occ, na_virt, nb_occ, nb_virt):
     nbf = na_occ + na_virt
-    n_dets_ras2 = (na_occ - nb_occ) * (na_occ - nb_occ)
-    n_dets_ras3 = (na_occ - nb_occ - 1) * (na_virt)
-    n_dets = n_dets_ras2 * n_dets_ras3
-    print("NUMBER OF DETS??")
-    print(n_dets)
     socc = na_occ - nb_occ
     #det_list = np.zeros((n_dets, 2, 2)).astype(int)
     n_dets_singles = socc * nb_virt
@@ -86,18 +81,21 @@ def generate_sf_p_dets(na_occ, na_virt, nb_occ, nb_virt):
     for i in range(socc):
         # a -> b_virt (singles)
         for a in range(nb_virt):
-            det_list[index] = [[nb_occ+i, 0], [nb_occ+a, 0]]
+            det_list[index] = [[nb_occ+i, 0], [nbf+nb_occ+a, 0]]
             index = index + 1
     # fill out doubles
     for a in range(na_virt):
         for b in range(socc):
             for i in range(socc):
-                for j in range(i-1):
+                for j in range(i):
                     # i->a, j->b
-                    det_list[index] = [[nb_occ+i, nb_occ+j], [na_occ+a, nbf+nb_occ+b]]
-                    index = index + 1
-                    det_list[index] = [[nb_occ+i, nb_occ+j], [nbf+nb_occ+b, na_occ+a]]
-                    index = index + 1
+                    if(not i==j):
+                        det_list[index] = [[nb_occ+i, nb_occ+j], [na_occ+a, nbf+nb_occ+b]]
+                        index = index + 1
+                        print(det_list)
+                        #det_list[index] = [[nb_occ+i, nb_occ+j], [nbf+nb_occ+b, na_occ+a]]
+                        #index = index + 1
+                        #print(det_list)
     print(det_list)
     return det_list
 
@@ -157,20 +155,19 @@ def get_sf_H(wfn, conf_space):
                     # first added same
                     if(a1 == a2):
                         # all added same -> D0
-                        if(b1 == b2):
+                        if(b1 == b2): #OK
                             H[d1index, d2index] = F[a1, a2] - F[i1,i2] + tei[a1, i2, i1, a2]
                         # differ by b excited orbital -> D1
                         else:
-                            H[d1index, d2index] = F[a1, a2] + tei[a1, i2, i1, a2]
+                            H[d1index, d2index] = F[a1, a2] + F[b1, b2] + tei[a1, i2, i1, a2] + tei[b1, j2, j1, b2]
                     # differ by a excited orbital
                     else:
                         # differ by a only -> D1
-                        if(b1 == b2):
+                        if(b1 == b2): #OK
                             H[d1index, d2index] = F[a1, a2] + tei[a1, i2, i1, a2]
                         # differ by a+b excited orbital -> D2
                         else:
-                            H[d1index, d2index] = tei[a1, i2, i1, a2] 
-
+                            H[d1index, d2index] = tei[a1, i2, i1, a2] + tei[b1, j2, j1, b2]
                 # differ in second elimination j
                 else:
                     # first added same
