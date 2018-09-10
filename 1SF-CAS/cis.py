@@ -72,9 +72,9 @@ def generate_sf_p_dets(na_occ, na_virt, nb_occ, nb_virt):
     socc = na_occ - nb_occ
     #det_list = np.zeros((n_dets, 2, 2)).astype(int)
     n_dets_singles = socc * nb_virt
-    print(n_dets_singles)
+    #print(n_dets_singles)
     n_dets_doubles = socc * na_virt * (math.factorial(socc)/(2*math.factorial(socc-2)))
-    print(n_dets_doubles)
+    #print(n_dets_doubles)
     det_list = np.zeros((n_dets_singles + n_dets_doubles, 2, 2)).astype(int)
     index = 0
     # fill out singles
@@ -92,11 +92,11 @@ def generate_sf_p_dets(na_occ, na_virt, nb_occ, nb_virt):
                     if(not i==j):
                         det_list[index] = [[nb_occ+i, nb_occ+j], [na_occ+a, nbf+nb_occ+b]]
                         index = index + 1
-                        print(det_list)
+                        #print(det_list)
                         #det_list[index] = [[nb_occ+i, nb_occ+j], [nbf+nb_occ+b, na_occ+a]]
                         #index = index + 1
                         #print(det_list)
-    print(det_list)
+    #print(det_list)
     return det_list
 
 # Forms the CIS Hamiltonian (not spin adapted)
