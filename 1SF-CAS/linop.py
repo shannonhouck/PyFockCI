@@ -17,7 +17,6 @@ class LinOpH (LinearOperator):
     def _matvec(self, v):
         F = self.F
         tei = self.tei
-        out_ref = np.zeros((v.shape[0], 1))
         out = np.zeros((v.shape[0], 1))
         conf_space = self.conf_space
         na_occ = self.na_occ
@@ -26,48 +25,49 @@ class LinOpH (LinearOperator):
         nb_virt = self.nb_virt
         nbf = na_occ + na_virt
         socc = na_occ - nb_occ
+        if(conf_space==""):
+            v_ref = np.reshape(v, (socc, socc))
+        if(conf_space=="p"):
+            v_ref = np.reshape(v, (socc, nb_virt))
         # excited states
-        '''
-        for i1 in range(nb_occ, na_occ):
-            for a1 in range(nbf+nb_occ, nbf+na_occ):
-                tmp = 0
-                for i2 in range(nb_occ, na_occ):
-                    for a2 in range(nbf+nb_occ, nbf+na_occ):
-                        Ftmp = 0
-                        if(i1==i2):
-                            Ftmp = Ftmp + F[a1, a2]
-                        if(a1==a2):
-                            Ftmp = Ftmp - F[i1, i2]
-                        tmp = tmp + v[(i2-nb_occ)*(na_occ - nb_occ)+(a2-(nbf+nb_occ))]*(Ftmp + tei[a1, i2, i1, a2])
-                out_ref[(i1-nb_occ)*(na_occ - nb_occ)+(a1-(nbf+nb_occ))] = tmp
-        '''
-        v_tmp = np.reshape(v, (socc, socc)) # [i, a]
-        # one-electron part
-        Fi_tmp = F[nb_occ:na_occ, nb_occ:na_occ]
-        Fa_tmp = F[nbf+nb_occ:nbf+na_occ, nbf+nb_occ:nbf+na_occ]
-        F_tmp = np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp)
-        F_tmp = np.reshape(F_tmp, out.shape)
-        # two-electron part
-        tei_tmp = tei[nbf+nb_occ:nbf+na_occ, nb_occ:na_occ, nb_occ:na_occ, nbf+nb_occ:nbf+na_occ]
-        tei_tmp = np.reshape(np.einsum("ia,bija->jb", v_tmp, tei_tmp), out.shape)
-        out = F_tmp + tei_tmp
-        ''' DETERMINANT BASED
-        for d1_index, det1 in enumerate(dets[1:, :]):
-            i = det1[0]
-            a = det1[1]
-            tmp = v[0]*F[i, a]
-            for d2_index, det2 in enumerate(dets[1:, :]):
-                j = det2[0]
-                b = det2[1]
-                Ftmp = 0
-                if(i==j):
-                    Ftmp = Ftmp + F[a,b]
-                if(a==b):
-                    Ftmp = Ftmp - F[i,j]
-                tmp = tmp + v[d2_index+1]*(Ftmp + tei[a,j,i,b])
-            out[d1_index+1] = tmp
-        '''
-        return np.array(out)
+        out1 = None
+        out2 = None
+        out3 = None
+        # RAS2 -> RAS2
+        if(conf_space==""):
+            # one-electron part
+            v_tmp = v_ref[:socc, :socc]
+            Fi_tmp = F[nb_occ:na_occ, nb_occ:na_occ]
+            Fa_tmp = F[nbf+nb_occ:nbf+na_occ, nbf+nb_occ:nbf+na_occ]
+            F_tmp = np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp)
+            F_tmp = np.reshape(F_tmp, (v.shape[0], 1))
+            # two-electron part
+            tei_tmp = tei[nbf+nb_occ:nbf+na_occ, nb_occ:na_occ, nb_occ:na_occ, nbf+nb_occ:nbf+na_occ]
+            tei_tmp = np.reshape(np.einsum("ia,bija->jb", v_tmp, tei_tmp), (v.shape[0], 1))
+            #tei_tmp = np.einsum("ia,bija->jb", v_tmp, tei_tmp).flatten()
+            out = F_tmp + tei_tmp
+        # RAS2 -> RAS3
+        if(conf_space=="p"):
+            # one-electron part
+            v_tmp = v_ref[:socc, :nb_virt]
+            Fi_tmp = F[nb_occ:na_occ, nb_occ:na_occ]
+            Fa_tmp = F[nbf+nb_occ:nbf+nbf, nbf+nb_occ:nbf+nbf]
+            F_tmp = np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp)
+            F_tmp = F_tmp.flatten()
+            # two-electron part
+            tei_tmp = tei[nbf+nb_occ:nbf+nbf, nb_occ:na_occ, nb_occ:na_occ, nbf+nb_occ:nbf+nbf]
+            tei_tmp = np.einsum("ia,bija->jb", v_tmp, tei_tmp).flatten()
+            #tei_tmp = np.einsum("jl,ijkl->ki", v_tmp, tei_tmp).flatten()
+            out = F_tmp + tei_tmp
+        #if(conf_space=="p"):
+        #    v_tmp = v_ref[socc+socc:, socc+na_virt:]
+        #    # RAS2 -> RAS3 and RAS2(a) -> RAS2(beta)
+        #    for i in range(nb_occ, na_occ):
+        #        for a in range(nbf+na_occ, nbf+nbf):
+        #            for j in range(nb_occ, i):
+        #                for b in range(nbf+na_occ, nbf+nbf):
+        #                    out3[] += v_tmp[a,i]*tei[a,i,j,b]
+        return out
     
     def _rmatvec(self, v):
         print("rmatvec function called -- not implemented yet!!")

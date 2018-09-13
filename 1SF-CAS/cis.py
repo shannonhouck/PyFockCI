@@ -212,6 +212,41 @@ def get_sf_H(wfn, conf_space):
             #H[d1index, d2index] = F[a, b]*kdel(i,j) - F[i,j]*kdel(a,b) + tei[a, j, i, b]
     return (H, dets, F, tei)
 
+def get_nsa_F(wfn):
+    # get necessary integrals/matrices from Psi4 (AO basis)
+    # References: Psi4NumPy tutorials
+    Ca = psi4.core.Matrix.to_array(wfn.Ca())
+    Cb = psi4.core.Matrix.to_array(wfn.Cb())
+    C = np.block([[Ca, np.zeros_like(Cb)],
+                      [np.zeros_like(Ca), Cb]])
+    # one-electron part
+    Fa = psi4.core.Matrix.to_array(wfn.Fa(), copy=True)
+    Fb = psi4.core.Matrix.to_array(wfn.Fb(), copy=True)
+    F = np.block([[Fa, np.zeros_like(Fa)],
+                  [np.zeros_like(Fb), Fb]])
+    F = np.dot(C.T, np.dot(F, C)) 
+    return F
+
+def get_nsa_tei(wfn):
+    # get necessary integrals/matrices from Psi4 (AO basis)
+    # References: Psi4NumPy tutorials
+    Ca = psi4.core.Matrix.to_array(wfn.Ca())
+    Cb = psi4.core.Matrix.to_array(wfn.Cb())
+    C = np.block([[Ca, np.zeros_like(Cb)],
+                      [np.zeros_like(Ca), Cb]])
+    # two-electron part
+    mints = psi4.core.MintsHelper(wfn.basisset())
+    tei = psi4.core.Matrix.to_array(mints.ao_eri(), copy=True)
+    I = np.eye(2)
+    tei = np.kron(I, tei)
+    tei = np.kron(I, tei.T)
+    tei = tei.transpose(0, 2, 1, 3) - tei.transpose(0, 2, 3, 1)
+    tei = np.einsum('pqrs,pa',tei,C)
+    tei = np.einsum('aqrs,qb',tei,C)
+    tei = np.einsum('abrs,rc',tei,C)
+    tei = np.einsum('abcs,sd',tei,C)
+    return tei
+
 # Forms the CIS Hamiltonian (not spin adapted)
 def get_cis_H(wfn):
     # get necessary integrals/matrices from Psi4 (AO basis)
@@ -268,8 +303,10 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
     opts.update(add_opts)
     psi4.set_options(opts)
     e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
-    H, dets, F, tei = get_sf_H(wfn, conf_space)
-    print(dets.shape)
+    #H, dets, F, tei = get_sf_H(wfn, conf_space)
+    #print(dets.shape)
+    F = get_nsa_F(wfn)
+    tei = get_nsa_tei(wfn)
     '''
     H_cis, dets_cis, F_cis, tei_cis = get_cis_H(wfn)
     tf_matrix = np.isclose(H, H_cis)
@@ -281,6 +318,12 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
             if(not tf_matrix[i, j]):
                 print(dets[j])
     '''
+    socc = wfn.soccpi()[0]
+    nb_virt = wfn.basisset().nbf() - wfn.doccpi()[0]
+    if(conf_space==""):
+        n_dets = socc * socc
+    if(conf_space=="p"):
+        n_dets = socc * nb_virt
     if(sf_diag_method == "RSP"):
         print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
         print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
@@ -291,9 +334,8 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
         b_occ = wfn.doccpi()[0]
         a_virt = wfn.basisset().nbf() - a_occ
         b_virt = wfn.basisset().nbf() - b_occ
-        print(a_virt)
-        print(b_virt)
-        A = LinOpH(H.shape, a_occ, b_occ, a_virt, b_virt, F, tei)
+        print("Number of determinants:", n_dets)
+        A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, F, tei, conf_space_in=conf_space)
         vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         print("FROM LinOp:  ", vals)
         return(e + vals[0])
