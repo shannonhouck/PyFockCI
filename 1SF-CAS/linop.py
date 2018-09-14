@@ -28,7 +28,9 @@ class LinOpH (LinearOperator):
         if(conf_space==""):
             v_ref = np.reshape(v, (socc, socc))
         if(conf_space=="p"):
-            v_ref = np.reshape(v, (socc, nb_virt))
+            v_b12 = v[:(socc*np_virt), :] # v for block 1 and block 2
+            v_b3 = v[(socc*np_virt):, :] # v for block 3
+            v_ref12 = np.reshape(v, (socc, nb_virt))
         # excited states
         out1 = None
         out2 = None
@@ -43,22 +45,33 @@ class LinOpH (LinearOperator):
             F_tmp = np.reshape(F_tmp, (v.shape[0], 1))
             # two-electron part
             tei_tmp = tei[nbf+nb_occ:nbf+na_occ, nb_occ:na_occ, nb_occ:na_occ, nbf+nb_occ:nbf+na_occ]
-            tei_tmp = np.reshape(np.einsum("ia,bija->jb", v_tmp, tei_tmp), (v.shape[0], 1))
-            #tei_tmp = np.einsum("ia,bija->jb", v_tmp, tei_tmp).flatten()
+            tei_tmp = np.reshape(np.einsum("jb,jabi->ia", v_tmp, tei_tmp), (v.shape[0], 1))
             out = F_tmp + tei_tmp
         # RAS2 -> RAS3
+        '''
         if(conf_space=="p"):
+            # blocks 1+2
             # one-electron part
-            v_tmp = v_ref[:socc, :nb_virt]
+            v_tmp = v_ref12
             Fi_tmp = F[nb_occ:na_occ, nb_occ:na_occ]
             Fa_tmp = F[nbf+nb_occ:nbf+nbf, nbf+nb_occ:nbf+nbf]
             F_tmp = np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp)
             F_tmp = F_tmp.flatten()
             # two-electron part
             tei_tmp = tei[nbf+nb_occ:nbf+nbf, nb_occ:na_occ, nb_occ:na_occ, nbf+nb_occ:nbf+nbf]
-            tei_tmp = np.einsum("ia,bija->jb", v_tmp, tei_tmp).flatten()
-            #tei_tmp = np.einsum("jl,ijkl->ki", v_tmp, tei_tmp).flatten()
-            out = F_tmp + tei_tmp
+            tei_tmp = np.reshape(np.einsum("jb,jabi->ia", v_tmp, tei_tmp), (v.shape[0], 1))
+            out1 = F_tmp + tei_tmp
+            # block 3
+            v_tmp = v_ref3
+            out2 = np.zeros((socc*factorial(socc)/(2*factorial(socc)), 1))
+            for i in range(nb_occ, nb_occ+socc):
+                for j in range(nb_occ, i):
+                    for a in range(nbf+nb_occ, nbf+na_occ): # to beta (socc)
+                        # B in alpha virtual, c in beta RAS2
+                        for B in range(na_occ, nbf): # to alpha virtual
+                            for c in range(nbf+nb_occ, nbf+socc): # to beta in RAS2
+                                out2[] = t[]*tei[a,j,B,c] - t[]*tei[a,j,c,b]
+        '''
         #if(conf_space=="p"):
         #    v_tmp = v_ref[socc+socc:, socc+na_virt:]
         #    # RAS2 -> RAS3 and RAS2(a) -> RAS2(beta)

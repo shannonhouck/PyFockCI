@@ -156,6 +156,18 @@ def sf_cas( new_charge, new_multiplicity, ref_mol, conf_space="", add_opts={}, r
       opts.update({'ras2': [soccpi]})
       opts.update({'ras3': [nmo - soccpi - doccpi]})
       opts.update({'ras4': [0]})
+    # just (p) excitations
+    elif(conf_space == "p_special"):
+      opts.update({'mixed': True})
+      opts.update({'frozen_docc': [0]})
+      opts.update({'ex_level': 0}) 
+      opts.update({'val_ex_level': 0}) 
+      opts.update({'a_ras3_max': 0}) 
+      opts.update({'b_ras3_max': 1}) 
+      opts.update({'ras1': [doccpi]})
+      opts.update({'ras2': [soccpi]})
+      opts.update({'ras3': [nmo - soccpi - doccpi]})
+      opts.update({'ras4': [0]})
     # includes (h, p) excitations
     elif(conf_space == "1x"):
       opts.update({'frozen_docc': [0]})
