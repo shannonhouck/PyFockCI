@@ -48,19 +48,70 @@ class LinOpH (LinearOperator):
             tei_tmp = np.reshape(np.einsum("jb,jabi->ia", v_tmp, tei_tmp), (v.shape[0], 1))
             out = F_tmp + tei_tmp
         # RAS2 -> RAS3
-        '''
         if(conf_space=="p"):
-            # blocks 1+2
+            """
+                definitions:
+                I      doubly occupied
+                i,a    singly occupied
+                A      doubly unoccupied
+                i'     alpha occupied
+                a'     beta unuoccupied
+
+
+                block1 = v(ai:ba)
+                block2 = v(Ai:ba)
+                block3 = v(Aaij:abaa)
+
+                Because block1 and block2 contain topologically equivalent diagrams, combine and redefine:  
+
+                block1 = v(a'i:ba)
+                block2 = v(Aaij:abaa)
+
+                Evaluate the following matrix vector multiply:
+
+                | H(1,1) H(1,2) | * v(1) = sig(1)
+                | H(2,1) H(2,2) | * v(2) = sig(2)
+           
+            """
+            ################################################ 
+            # Do the following term:
+            #       H(1,1) v(1) = sig(1)
+            ################################################ 
+           
             # one-electron part
             v_tmp = v_ref12
             Fi_tmp = F[nb_occ:na_occ, nb_occ:na_occ]
             Fa_tmp = F[nbf+nb_occ:nbf+nbf, nbf+nb_occ:nbf+nbf]
             F_tmp = np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp)
             F_tmp = F_tmp.flatten()
+            
             # two-electron part
+            #   sig(a'i:ba) += -v(b'j:ba) I(ja'ib':abab)
+
+            # get sublock of integrals
             tei_tmp = tei[nbf+nb_occ:nbf+nbf, nb_occ:na_occ, nb_occ:na_occ, nbf+nb_occ:nbf+nbf]
-            tei_tmp = np.reshape(np.einsum("jb,jabi->ia", v_tmp, tei_tmp), (v.shape[0], 1))
+            out1 = np.einsum("jb,jabi->ia", v_tmp, tei_tmp)
+            out1.shape = (v.shape[0], 1)
+            #out1 = np.einsum("jb,jabi->ia", v_tmp, tei_tmp), (v.shape[0], 1))
+
             out1 = F_tmp + tei_tmp
+            
+            ################################################ 
+            # Do the following term:
+            #       H(1,2) v(2) = sig(1)
+            ################################################ 
+            
+            ################################################ 
+            # Do the following term:
+            #       H(2,1) v(1) = sig(2)
+            ################################################ 
+            
+            ################################################ 
+            # Do the following term:
+            #       H(2,2) v(2) = sig(2)
+            ################################################ 
+
+
             # block 3
             v_tmp = v_ref3
             out2 = np.zeros((socc*factorial(socc)/(2*factorial(socc)), 1))
@@ -71,7 +122,6 @@ class LinOpH (LinearOperator):
                         for B in range(na_occ, nbf): # to alpha virtual
                             for c in range(nbf+nb_occ, nbf+socc): # to beta in RAS2
                                 out2[] = t[]*tei[a,j,B,c] - t[]*tei[a,j,c,b]
-        '''
         #if(conf_space=="p"):
         #    v_tmp = v_ref[socc+socc:, socc+na_virt:]
         #    # RAS2 -> RAS3 and RAS2(a) -> RAS2(beta)
