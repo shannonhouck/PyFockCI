@@ -50016,3 +50016,243 @@ Wall Time:        1.12 seconds
 -----------------------------------------------------------
 
 ***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Mon Sep 17 11:31:36 2018
+Timers Off: Mon Sep 17 11:31:41 2018
+
+Wall Time:        4.74 seconds
+
+Total PK formation time     :      0.100u      0.000s      0.074w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.004w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.007w     17 calls
+JK: D                       :      0.000u      0.000s      0.000w     17 calls
+JK: USO2AO                  :      0.017u      0.000s      0.000w     17 calls
+JK: JK                      :      0.000u      0.000s      0.006w     17 calls
+PK computes JK              :      0.000u      0.000s      0.006w     17 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.000w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.000s      0.074w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.004w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.007w     17 calls
+| JK: D                     :      0.000u      0.000s      0.000w     17 calls
+| JK: USO2AO                :      0.017u      0.000s      0.000w     17 calls
+| JK: JK                    :      0.000u      0.000s      0.006w     17 calls
+| | PK computes JK          :      0.000u      0.000s      0.006w     17 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.000w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Mon Sep 17 11:32:41 2018
+Timers Off: Mon Sep 17 11:32:45 2018
+
+Wall Time:        4.86 seconds
+
+Total PK formation time     :      0.117u      0.000s      0.074w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.006w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.006w     17 calls
+JK: D                       :      0.000u      0.000s      0.000w     17 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     17 calls
+JK: JK                      :      0.017u      0.000s      0.006w     17 calls
+PK computes JK              :      0.017u      0.000s      0.006w     17 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.000w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.117u      0.000s      0.074w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.006w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.006w     17 calls
+| JK: D                     :      0.000u      0.000s      0.000w     17 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     17 calls
+| JK: JK                    :      0.017u      0.000s      0.006w     17 calls
+| | PK computes JK          :      0.017u      0.000s      0.006w     17 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.000w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Mon Sep 17 11:56:31 2018
+Timers Off: Mon Sep 17 11:56:33 2018
+
+Wall Time:        1.54 seconds
+
+Total PK formation time     :      0.100u      0.000s      0.068w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.008w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.007w     17 calls
+JK: D                       :      0.000u      0.000s      0.000w     17 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     17 calls
+JK: JK                      :      0.017u      0.000s      0.006w     17 calls
+PK computes JK              :      0.017u      0.000s      0.006w     17 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.001w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.000s      0.068w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.008w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.007w     17 calls
+| JK: D                     :      0.000u      0.000s      0.000w     17 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     17 calls
+| JK: JK                    :      0.017u      0.000s      0.006w     17 calls
+| | PK computes JK          :      0.017u      0.000s      0.006w     17 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.001w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Mon Sep 17 11:57:16 2018
+Timers Off: Mon Sep 17 11:57:17 2018
+
+Wall Time:        1.52 seconds
+
+Total PK formation time     :      0.100u      0.000s      0.073w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.010w     17 calls
+JK: D                       :      0.000u      0.000s      0.000w     17 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     17 calls
+JK: JK                      :      0.017u      0.000s      0.009w     17 calls
+PK computes JK              :      0.017u      0.000s      0.009w     17 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.001w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.000s      0.073w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.003w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.010w     17 calls
+| JK: D                     :      0.000u      0.000s      0.000w     17 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     17 calls
+| JK: JK                    :      0.017u      0.000s      0.009w     17 calls
+| | PK computes JK          :      0.017u      0.000s      0.009w     17 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.001w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Mon Sep 17 12:05:09 2018
+Timers Off: Mon Sep 17 12:05:11 2018
+
+Wall Time:        1.54 seconds
+
+Total PK formation time     :      0.100u      0.000s      0.076w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.004w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.017u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.007w     17 calls
+JK: D                       :      0.000u      0.000s      0.000w     17 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     17 calls
+JK: JK                      :      0.000u      0.000s      0.006w     17 calls
+PK computes JK              :      0.000u      0.000s      0.006w     17 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.000w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.000s      0.076w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.004w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.017u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.007w     17 calls
+| JK: D                     :      0.000u      0.000s      0.000w     17 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     17 calls
+| JK: JK                    :      0.000u      0.000s      0.006w     17 calls
+| | PK computes JK          :      0.000u      0.000s      0.006w     17 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.000w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Mon Sep 17 12:05:32 2018
+Timers Off: Mon Sep 17 12:05:33 2018
+
+Wall Time:        1.51 seconds
+
+Total PK formation time     :      0.100u      0.000s      0.065w      1 calls
+HF: Form H                  :      0.000u      0.017s      0.004w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.007w     17 calls
+JK: D                       :      0.000u      0.000s      0.000w     17 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     17 calls
+JK: JK                      :      0.017u      0.000s      0.006w     17 calls
+PK computes JK              :      0.017u      0.000s      0.006w     17 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.000w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.100u      0.000s      0.065w      1 calls
+HF: Form H                  :      0.000u      0.017s      0.004w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.007w     17 calls
+| JK: D                     :      0.000u      0.000s      0.000w     17 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     17 calls
+| JK: JK                    :      0.017u      0.000s      0.006w     17 calls
+| | PK computes JK          :      0.017u      0.000s      0.006w     17 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     17 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     17 calls
+HF: DIIS                    :      0.000u      0.000s      0.000w     17 calls
+HF: Form C                  :      0.000u      0.000s      0.002w     17 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     17 calls
+
+***********************************************************

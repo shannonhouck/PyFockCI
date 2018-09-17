@@ -4,18 +4,20 @@ from scipy.sparse.linalg import LinearOperator
 
 class LinOpH (LinearOperator):
     
-    def __init__(self, shape_in, na_occ_in, nb_occ_in, na_virt_in, nb_virt_in, F_in, tei_in, conf_space_in=""):
+    def __init__(self, shape_in, na_occ_in, nb_occ_in, na_virt_in, nb_virt_in, Fa_in, Fb_in, tei_in, conf_space_in=""):
         super(LinOpH, self).__init__(dtype=np.dtype('float64'), shape=shape_in)
         self.na_occ = na_occ_in
         self.nb_occ = nb_occ_in
         self.na_virt = na_virt_in
         self.nb_virt = nb_virt_in
         self.conf_space = conf_space_in
-        self.F = F_in
+        self.Fa = Fa_in
+        self.Fb = Fb_in
         self.tei = tei_in
 
     def _matvec(self, v):
-        F = self.F
+        Fa = self.Fa
+        Fb = self.Fb
         tei = self.tei
         out = np.zeros((v.shape[0], 1))
         conf_space = self.conf_space
@@ -25,29 +27,50 @@ class LinOpH (LinearOperator):
         nb_virt = self.nb_virt
         nbf = na_occ + na_virt
         socc = na_occ - nb_occ
-        if(conf_space==""):
-            v_ref = np.reshape(v, (socc, socc))
         if(conf_space=="p"):
             v_b12 = v[:(socc*np_virt), :] # v for block 1 and block 2
             v_b3 = v[(socc*np_virt):, :] # v for block 3
             v_ref12 = np.reshape(v, (socc, nb_virt))
-        # excited states
-        out1 = None
-        out2 = None
-        out3 = None
-        # RAS2 -> RAS2
+        # Excitation Scheme: 1SF-CAS
         if(conf_space==""):
-            # one-electron part
-            v_tmp = v_ref[:socc, :socc]
-            Fi_tmp = F[nb_occ:na_occ, nb_occ:na_occ]
-            Fa_tmp = F[nbf+nb_occ:nbf+na_occ, nbf+nb_occ:nbf+na_occ]
-            F_tmp = np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp)
-            F_tmp = np.reshape(F_tmp, (v.shape[0], 1))
-            # two-electron part
-            tei_tmp = tei[nbf+nb_occ:nbf+na_occ, nb_occ:na_occ, nb_occ:na_occ, nbf+nb_occ:nbf+na_occ]
-            tei_tmp = np.reshape(np.einsum("jb,jabi->ia", v_tmp, tei_tmp), (v.shape[0], 1))
+            """ 
+                definitions:
+                I      doubly occupied
+                i,a    singly occupied
+                A      doubly unoccupied
+
+                block1 = v(ai:ba)
+
+                Evaluate the following matrix vector multiply:
+
+                | H(1,1) | * v(1) = sig(1)
+           
+            """
+            ################################################ 
+            # Separate guess vector into 1 blocks
+            ################################################ 
+            # using reshape because otherwise we can't use v.shape[0] later
+            # shouldn't affect too much but if it's an issue, store that value as a variable
+            v_b1 = np.reshape(v, (socc,socc)) # v for block 1
+            
+            ################################################ 
+            # Do the following term:
+            #       H(1,1) v(1) = sig(1)
+            ################################################ 
+            # one-electron part (OK!!)
+            #   sig(ia:ba) += -v(ia:ba) (eps(a:b)-eps(i:a))
+            Fi_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            Fa_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            F_tmp = np.einsum("ia,aa->ia", v_b1, Fa_tmp) - np.einsum("ia,ii->ia", v_b1, Fi_tmp)
+            F_tmp.shape = (v.shape[0], 1)
+            # two-electron part (OK!!)
+            #   sig(ai:ba) += -v(bj:ba) I(jaib:abab)
+            tei_tmp = -1.0*tei[nb_occ:na_occ, nb_occ:na_occ, nb_occ:na_occ, nb_occ:na_occ]
+            # using reshape because tei is non-contiguous in memory (look into this while doing speedup)
+            tei_tmp = np.reshape(np.einsum("jb,jaib->ia", v_b1, tei_tmp), (v.shape[0], 1))
             out = F_tmp + tei_tmp
-        # RAS2 -> RAS3
+
+        # Excitation Scheme: 1SF-CAS + h
         if(conf_space=="p"):
             """
                 definitions:
@@ -74,6 +97,14 @@ class LinOpH (LinearOperator):
            
             """
             ################################################ 
+            # Separate guess vector into blocks 1 and 2
+            ################################################ 
+            v_b1 = v[:(socc*np_virt), :] # v for block 1
+            v_b2 = v[(socc*np_virt):, :] # v for block 2
+            v_ref1 = np.reshape(v_b1, (socc, nb_virt))
+            v_ref2 = np.reshape(v_b2, (socc, nb_virt, socc, socc))
+
+            ################################################ 
             # Do the following term:
             #       H(1,1) v(1) = sig(1)
             ################################################ 
@@ -82,7 +113,7 @@ class LinOpH (LinearOperator):
             v_tmp = v_ref12
             Fi_tmp = F[nb_occ:na_occ, nb_occ:na_occ]
             Fa_tmp = F[nbf+nb_occ:nbf+nbf, nbf+nb_occ:nbf+nbf]
-            F_tmp = np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp)
+            F_tmp = 0.5*(np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp))
             F_tmp = F_tmp.flatten()
             
             # two-electron part
@@ -113,6 +144,7 @@ class LinOpH (LinearOperator):
 
 
             # block 3
+            '''
             v_tmp = v_ref3
             out2 = np.zeros((socc*factorial(socc)/(2*factorial(socc)), 1))
             for i in range(nb_occ, nb_occ+socc):
@@ -122,6 +154,7 @@ class LinOpH (LinearOperator):
                         for B in range(na_occ, nbf): # to alpha virtual
                             for c in range(nbf+nb_occ, nbf+socc): # to beta in RAS2
                                 out2[] = t[]*tei[a,j,B,c] - t[]*tei[a,j,c,b]
+            '''
         #if(conf_space=="p"):
         #    v_tmp = v_ref[socc+socc:, socc+na_virt:]
         #    # RAS2 -> RAS3 and RAS2(a) -> RAS2(beta)
