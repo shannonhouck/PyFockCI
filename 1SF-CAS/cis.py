@@ -6,22 +6,24 @@ from scipy.sparse import linalg as SPLIN
 from linop import LinOpH
 import psi4
 
-'''
+"""
+1SF-CAS PROGRAM
+
+Runs the 1SF-CAS calculation. The (h), (p), and (h,p) excitations are still in development. 
+
 Refs:
 Crawford Tutorials (http://sirius.chem.vt.edu/wiki/doku.php?id=crawdad:programming:project12)
 DePrince Tutorials (https://www.chem.fsu.edu/~deprince/programming_projects/cis/)
 Sherrill Notes (http://vergil.chemistry.gatech.edu/notes/cis/cis.html)
 Psi4NumPy Tutorials
-'''
+"""
 
 ###############################################################################################
 # Classes
 ###############################################################################################
 
-'''
-Class for two-electron integral object handling.
-Handles full ERIs.
-'''
+# Class for two-electron integral object handling.
+# Handles full ERIs.
 class ERI_Full:
     def __init__(self, eri_in):
         self.eri = eri_in
@@ -106,6 +108,24 @@ def get_spatial_tei(wfn):
     tei = np.einsum('abcs,sd',tei,C)
     return tei 
 
+# Performs the 1SF-CAS calculation.
+# Parameters:
+#    charge          The desired charge (nIP/EA determining, for later use)
+#    mult            The desired multiplicity (nSF determining, for later use)
+#    mol             Molecule to run calculation on
+#    conf_space      Desired excitation scheme:
+#                        ""       1SF-CAS
+#                        "h"      1SF-CAS + h
+#                        "p"      1SF-CAS + p
+#                        "1x"     1SF-CAS + (h,p)
+#    add_opts        Additional options (to be passed on to Psi4)
+#    sf_diag_method  Diagonalization method to use.
+#                        "RSP"    Direct
+#                        "LinOp"  LinOp
+#    num_roots       Number of roots to solve for.
+#
+# Returns:
+#    energy          Lowest root found by eigensolver (energy of system)
 def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6 ):
     psi4.core.clean()
     opts = {'basis': 'cc-pvdz',
