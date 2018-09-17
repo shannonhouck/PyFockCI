@@ -16,10 +16,10 @@ class LinOpH (LinearOperator):
         self.tei = tei_in
 
     def _matvec(self, v):
+        # grabbing necessary info from self
         Fa = self.Fa
         Fb = self.Fb
         tei = self.tei
-        out = np.zeros((v.shape[0], 1))
         conf_space = self.conf_space
         na_occ = self.na_occ
         nb_occ = self.nb_occ
@@ -27,11 +27,7 @@ class LinOpH (LinearOperator):
         nb_virt = self.nb_virt
         nbf = na_occ + na_virt
         socc = na_occ - nb_occ
-        if(conf_space=="p"):
-            v_b12 = v[:(socc*np_virt), :] # v for block 1 and block 2
-            v_b3 = v[(socc*np_virt):, :] # v for block 3
-            v_ref12 = np.reshape(v, (socc, nb_virt))
-        # Excitation Scheme: 1SF-CAS
+        # do excitation scheme: 1SF-CAS
         if(conf_space==""):
             """ 
                 definitions:
@@ -46,13 +42,14 @@ class LinOpH (LinearOperator):
                 | H(1,1) | * v(1) = sig(1)
            
             """
+
             ################################################ 
-            # Separate guess vector into 1 blocks
+            # Put guess vector into block 1
             ################################################ 
             # using reshape because otherwise we can't use v.shape[0] later
             # shouldn't affect too much but if it's an issue, store that value as a variable
             v_b1 = np.reshape(v, (socc,socc)) # v for block 1
-            
+
             ################################################ 
             # Do the following term:
             #       H(1,1) v(1) = sig(1)
@@ -65,12 +62,12 @@ class LinOpH (LinearOperator):
             F_tmp.shape = (v.shape[0], 1)
             # two-electron part (OK!!)
             #   sig(ai:ba) += -v(bj:ba) I(jaib:abab)
-            tei_tmp = -1.0*tei[nb_occ:na_occ, nb_occ:na_occ, nb_occ:na_occ, nb_occ:na_occ]
+            tei_tmp = -1.0*self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
             # using reshape because tei is non-contiguous in memory (look into this while doing speedup)
             tei_tmp = np.reshape(np.einsum("jb,jaib->ia", v_b1, tei_tmp), (v.shape[0], 1))
-            out = F_tmp + tei_tmp
-
-        # Excitation Scheme: 1SF-CAS + h
+            return F_tmp + tei_tmp
+        '''
+        # do excitation scheme: 1SF-CAS + h
         if(conf_space=="p"):
             """
                 definitions:
@@ -109,28 +106,24 @@ class LinOpH (LinearOperator):
             #       H(1,1) v(1) = sig(1)
             ################################################ 
            
-            # one-electron part
-            v_tmp = v_ref12
-            Fi_tmp = F[nb_occ:na_occ, nb_occ:na_occ]
-            Fa_tmp = F[nbf+nb_occ:nbf+nbf, nbf+nb_occ:nbf+nbf]
-            F_tmp = 0.5*(np.einsum("ia,aa->ia", v_tmp, Fa_tmp) - np.einsum("ia,ii->ia", v_tmp, Fi_tmp))
-            F_tmp = F_tmp.flatten()
-            
-            # two-electron part
+            # one-electron part (probably ok but wip)
+            #   sig(ia':ba) += -v(ia':ba) (eps(a':b)-eps(i:a))
+            Fi_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            Fa_tmp = Fb[nb_occ:nbf, nb_occ:nbf]
+            F_tmp = np.einsum("ia,aa->ia", v_b1, Fa_tmp) - np.einsum("ia,ii->ia", v_b1, Fi_tmp)
+            F_tmp.shape = (v.shape[0], 1)
+            # two-electron part (probably ok but wip)
             #   sig(a'i:ba) += -v(b'j:ba) I(ja'ib':abab)
-
-            # get sublock of integrals
-            tei_tmp = tei[nbf+nb_occ:nbf+nbf, nb_occ:na_occ, nb_occ:na_occ, nbf+nb_occ:nbf+nbf]
-            out1 = np.einsum("jb,jabi->ia", v_tmp, tei_tmp)
+            tei_tmp = tei[nb_occ:nbf, nb_occ:na_occ, nb_occ:na_occ, nb_occ:nbf]
+            out1 = np.einsum("jb,jabi->ia", v_tmp, tei_tmp) - np.einsum("jb,jaib->ia", v_tmp, tei_tmp)
             out1.shape = (v.shape[0], 1)
-            #out1 = np.einsum("jb,jabi->ia", v_tmp, tei_tmp), (v.shape[0], 1))
-
             out1 = F_tmp + tei_tmp
             
             ################################################ 
             # Do the following term:
             #       H(1,2) v(2) = sig(1)
             ################################################ 
+            
             
             ################################################ 
             # Do the following term:
@@ -141,10 +134,21 @@ class LinOpH (LinearOperator):
             # Do the following term:
             #       H(2,2) v(2) = sig(2)
             ################################################ 
+            # one-electron part
+            #Fi_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            for i in range(nb_occ, nb_occ+socc):
+                for j in range(nb_occ, i):
+                    for a in range(nb_occ, na_occ): # to beta (socc)
+                        # B in alpha virtual, c in beta RAS2
+                        for B in range(na_occ, nbf): # to alpha virtual
+                            for c in range(nb_occ, socc): # to beta in RAS2
+                                out2[B, c, i, j] = out2[B, c, i, j] + t[B, c, i, j]*(tei[a,j,B,c]-tei[a,j,c,B])
+                                out2[B, c, j, i] = -out2[B, c, i, j]
+                        for C in range(na_occ, nbf):
+                            for c in range(nb_occ, socc): # to beta in RAS2
 
 
-            # block 3
-            '''
+            # block 3 (comment out)
             v_tmp = v_ref3
             out2 = np.zeros((socc*factorial(socc)/(2*factorial(socc)), 1))
             for i in range(nb_occ, nb_occ+socc):
@@ -154,7 +158,6 @@ class LinOpH (LinearOperator):
                         for B in range(na_occ, nbf): # to alpha virtual
                             for c in range(nbf+nb_occ, nbf+socc): # to beta in RAS2
                                 out2[] = t[]*tei[a,j,B,c] - t[]*tei[a,j,c,b]
-            '''
         #if(conf_space=="p"):
         #    v_tmp = v_ref[socc+socc:, socc+na_virt:]
         #    # RAS2 -> RAS3 and RAS2(a) -> RAS2(beta)
@@ -163,6 +166,7 @@ class LinOpH (LinearOperator):
         #            for j in range(nb_occ, i):
         #                for b in range(nbf+na_occ, nbf+nbf):
         #                    out3[] += v_tmp[a,i]*tei[a,i,j,b]
+        '''
         return out
     
     def _rmatvec(self, v):
