@@ -65,7 +65,7 @@ def sf_cas( new_charge, new_multiplicity, ref_mol, conf_space="", add_opts={}, r
     opts = {'scf_type': 'direct',
             'basis': 'cc-pvdz',
             'reference': 'rohf',
-            'guess': 'sad',
+            'guess': 'gwh',
             'maxiter': 1000,
             'ci_maxiter': 50,
             'mixed': False}
