@@ -1,4 +1,4 @@
-from cis import do_sf_cas
+from sf import do_sf_cas
 import psi4
 
 n2 = psi4.core.Molecule.create_molecule_from_string("""

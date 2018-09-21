@@ -3,8 +3,8 @@ import psi4
 sys.path.insert(1, '../')
 import spinflip
 from spinflip import sf_cas as sf_cas_ref
-import cis
-from cis import do_sf_cas
+import sf
+from sf import do_sf_cas
 
 # threshold for value equality
 threshold = 1e-7
