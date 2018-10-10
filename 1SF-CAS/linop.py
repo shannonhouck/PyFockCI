@@ -233,8 +233,8 @@ class LinOpH (LinearOperator):
             # sig(1) is complete-- free to reshape!
             ################################################ 
             sig_1 = np.reshape(sig_1, (v_b1.shape[0], 1))
-            sig_2 = 0*np.reshape(sig_2, (v_b2.shape[0], 1))
-            sig_3 = 0*np.reshape(sig_3, (v_b3.shape[0], 1))
+            sig_2 = np.reshape(sig_2, (v_b2.shape[0], 1))
+            sig_3 = np.reshape(sig_3, (v_b3.shape[0], 1))
 
             # combine and return
             return np.vstack((sig_1, sig_2, sig_3))
