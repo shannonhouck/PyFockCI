@@ -308,23 +308,14 @@ class LinOpH (LinearOperator):
             print(asymm)
             """
 
-            sig_3 = 0.5*(sig_3 - sig_3.transpose((1, 0, 2, 3)))
-
-            '''
-            print("Is sig_3 antisymmetric now?")
-            asymm = True
-            for i in np.nditer(sig_3 + sig_3.transpose((1,0,2,3))):
-                if not i == 0:
-                    asymm = False
-            print(asymm)
-            '''
+            sig_3 = 0.25*(sig_3 - sig_3.transpose((1, 0, 2, 3)))
 
             ################################################ 
             # sigs complete-- free to reshape!
             ################################################ 
             sig_1 = np.reshape(sig_1, (v_b1.shape[0], 1))
             sig_2 = np.reshape(sig_2, (v_b2.shape[0], 1))
-            sig_3 = 0.5*np.reshape(sig_3, (v_b3.shape[0], 1))
+            sig_3 = np.reshape(sig_3, (v_b3.shape[0], 1))
 
             # combine and return
             return np.vstack((sig_1, sig_2, sig_3))
