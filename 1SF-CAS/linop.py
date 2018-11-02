@@ -102,25 +102,28 @@ class LinOpH (LinearOperator):
             v_b1 = v[:(socc*socc)] # v for block 1
             v_b2 = v[(socc*socc):(socc*nb_virt)] # v for block 2
             v_b3 = v[(socc*nb_virt):] # v for block 3
-            # sig(1) indexing: (ia:ab)
+            # v(1) indexing: (ia:ab)
             v_ref1 = np.reshape(v_b1, (socc, socc))
-            # sig(2) indexing: (iA:ab)
+            # v(2) indexing: (iA:ab)
             v_ref2 = np.reshape(v_b2, (socc, na_virt))
-            # sig(3) indexing: (ijBc:aaab)
-            v_ref3_1 = np.reshape(v_b3, (socc, socc, na_virt, socc))
-            v_ref3_2 = np.reshape(v_b3, (socc, socc, na_virt, socc))
 
-            # enforce antisymmetry
-            v_ref3 = 0.5*(v_ref3_1 - v_ref3_2.transpose((1, 0, 2, 3)))
+            # unpack v(3)
+            v_ref3 = np.zeros((socc, socc, na_virt, socc))
+            index = 0
+            for i in range(socc):
+                for j in range(i):
+                    for k in range(na_virt):
+                        for l in range(socc):
+                            v_ref3[j, i, k, l] = -1.0*v_b3[index]
+                            v_ref3[i, j, k, l] = v_b3[index]
+                            index = index + 1
 
-            """
             print("Is v_ref3 antisymmetric now?")
             asymm = True
 	    for i in np.nditer(v_ref3 + v_ref3.transpose((1,0,2,3))):
                 if not i == 0:
                     asymm = False
             print(asymm)
-            """
 
             ################################################ 
             # Do the following term:
@@ -308,17 +311,25 @@ class LinOpH (LinearOperator):
             print(asymm)
             """
 
-            sig_3 = 0.25*(sig_3 - sig_3.transpose((1, 0, 2, 3)))
+            # unpack v(3)
+            sig_3_out = np.zeros((v_b3.shape[0], 1)) # add 0.5
+            index = 0
+            for i in range(socc):
+                for j in range(i):
+                    for k in range(na_virt):
+                        for l in range(socc):
+                            sig_3_out[index] = sig_3[i, j, k, l] 
+                            index = index + 1 
 
             ################################################ 
             # sigs complete-- free to reshape!
             ################################################ 
             sig_1 = np.reshape(sig_1, (v_b1.shape[0], 1))
             sig_2 = np.reshape(sig_2, (v_b2.shape[0], 1))
-            sig_3 = np.reshape(sig_3, (v_b3.shape[0], 1))
+            #sig_3 = 0.5*np.reshape(sig_3, (v_b3.shape[0], 1)) # add 0.5
 
             # combine and return
-            return np.vstack((sig_1, sig_2, sig_3))
+            return np.vstack((sig_1, sig_2, sig_3_out))
 
     # These two are vestigial-- I'm sure they served some purpose in the parent class,
     # but we only really need matvec for our purposes!
