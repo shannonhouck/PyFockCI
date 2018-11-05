@@ -71,33 +71,217 @@ class LinOpH (LinearOperator):
             return F_tmp + tei_tmp
 
         # do excitation scheme: 1SF-CAS + h
+        if(conf_space=="h"):
+            """ 
+                definitions:
+                I      doubly occupied
+                i,a    singly occupied
+                A      doubly unoccupied
+
+                block1 = v(ai:ba)
+                block2 = v(Ia:ab)
+                block3 = v(Iiab:babb)
+
+                Evaluate the following matrix vector multiply:
+
+                H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
+                H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
+                H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)
+            """
+            ################################################ 
+            # Separate guess vector into blocks 1, 2, and 3
+            ################################################ 
+            v_b1 = v[:(socc*socc)] # v for block 1
+            v_b2 = v[(socc*socc):((socc*socc)+(socc*nb_occ))] # v for block 2
+            v_b3 = v[((socc*socc)+(socc*nb_occ)):] # v for block 3
+            # v(1) indexing: (ia:ab)
+            v_ref1 = np.reshape(v_b1, (socc, socc))
+            # v(2) indexing: (Ia:ab)
+            v_ref2 = np.reshape(v_b2, (nb_occ, socc))
+            # v(3) unpack to indexing: (Iiab:babb)
+            v_ref3 = np.zeros((nb_occ, socc, socc, socc))
+            index = 0
+            for I in range(nb_occ):
+                for i in range(socc):
+                    for a in range(socc):
+                        for b in range(a):
+                            v_ref3[I, i, a, b] = v_b3[index]
+                            v_ref3[I, i, b, a] = -1.0*v_b3[index]
+                            index = index + 1
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,1) v(1) = sig(1)
+            ################################################ 
+
+            #   sig(ia:ab) += v(ib:ab)*F(ab:bb) - v(ja:ab)*F(ij:aa)
+            Fa_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            Fb_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_1 = np.einsum("ib,ab->ia", v_ref1, Fb_tmp) - np.einsum("ja,ji->ia", v_ref1, Fa_tmp)
+            #   sig(ia:ab) += v(jb:ab)*I(ajbi:baba)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_1 = sig_1 - np.einsum("jb,ajbi->ia", v_ref1, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,2) v(2) = sig(1)
+            ################################################ 
+
+            #   sig(ia:ab) += sig(Ia:ab)*F(iI:aa)
+            Fa_tmp = Fa[nb_occ:na_occ, :nb_occ]
+            sig_1 = sig_1 - np.einsum("Ia,iI->ia", v_ref2, Fa_tmp)
+            #   sig(ia:ab) += -1.0*sig(jB:ab)*I(Iaib:abab)
+            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_1 = sig_1 - np.einsum("Ib,Iaib->ia", v_ref2, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,3) v(3) = sig(1)
+            ################################################ 
+
+            #   sig(ia:ab) += v(Iiba:babb)*F(Ib:bb)
+            Fb_tmp = Fb[0:nb_occ, nb_occ:na_occ]
+            sig_1 = sig_1 + np.einsum("Iiba,Ib->ia", v_ref3, Fb_tmp)
+            #   sig(iA:ab) += -1.0*v(Ijba:babb)*I(Ijbi:baba)
+            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_1 = sig_1 - np.einsum("Ijba,Ijbi->ia", v_ref3, tei_tmp)
+            #   sig(iA:ab) += 0.5*v(Iicb:babb)*I(Iacb:bbbb)
+            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_1 = sig_1 + 0.5*(np.einsum("Iicb,Iacb->ia", v_ref3, tei_tmp) - np.einsum("Iicb,Iabc->ia", v_ref3, tei_tmp))
+
+            ################################################ 
+            # Do the following term:
+            #       H(2,1) v(1) = sig(2)
+            ################################################ 
+
+            #   sig(Ia:ab) += -1.0*v(ia:ab)*F(iI:aa)
+            Fa_tmp = Fa[nb_occ:na_occ, 0:nb_occ]
+            sig_2 = -1.0*np.einsum("ia,iI->Ia", v_ref1, Fa_tmp)
+            #   sig(iA:ab) += -1.0*v(jb:ab)*t(ib:ab)*I(iaIb:abab)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            sig_2 = sig_2 - np.einsum("ib,iaIb->Ia", v_ref1, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(2,2) v(2) = sig(2)
+            ################################################ 
+
+            #   sig(Ia:ab) += sig(Ia:ab)*F(ab:bb) - sig(Ja:ab)*F(IJ:aa)
+            Fa_tmp = Fa[0:nb_occ, 0:nb_occ]
+            Fb_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_2 = sig_2 + np.einsum("Ib,ab->Ia", v_ref2, Fb_tmp) - np.einsum("Ja,IJ->Ia", v_ref2, Fa_tmp)
+            #   sig(Ia:ab) += v(Jb:ab)*I(JaIb:abab)
+            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            sig_2 = sig_2 - np.einsum("Jb,JaIb->Ia", v_ref2, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(2,3) v(3) = sig(2)
+            ################################################ 
+
+            #   sig(Ia:ab) += - v(Jiab:babb)*I(JibI:baba)
+            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_2 = sig_2 - np.einsum("Jiab,JibI->Ia", v_ref3, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(3,1) v(1) = sig(3)
+            ################################################ 
+
+            #   sig(Iiab:babb) += v(ib:ab)*F(Ia:bb) - v(ia:ab)*F(Ib:bb)
+            Fb_tmp = Fb[0:nb_occ, nb_occ:na_occ]
+            sig_3 = (np.einsum("ib,Ia->Iiab", v_ref1, Fb_tmp) - np.einsum("ia,Ib->Iiab", v_ref1, Fb_tmp))
+            #   sig(Iiab:babb) += v(ja:ab)*I(jbiI:abab) - v(jb:ab)*I(jaiI:abab)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_3 = sig_3 + np.einsum("ja,jbiI->Iiab", v_ref1, tei_tmp) - np.einsum("jb,jaiI->Iiab", v_ref1, tei_tmp)
+            #   sig(Iiab:aaab) += v(ic:ab)*I(abIc:bbbb)
+            tei_tmp_J = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            tei_tmp_K = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_3 = sig_3 + np.einsum("ic,abIc->Iiab", v_ref1, tei_tmp_J) - np.einsum("ic,abcI->Iiab", v_ref1, tei_tmp_K)
+
+            ################################################ 
+            # Do the following term:
+            #       H(3,2) v(2) = sig(3)
+            ################################################ 
+
+            #   sig(Iiab:babb) += v(Ja:ab)*I(JbiI:abab) - v(Jb:ab)*I(JaiI:abab)
+            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_3 = sig_3 + np.einsum("Ja,JbiI->Iiab", v_ref2, tei_tmp)
+            sig_3 = sig_3 - np.einsum("Jb,JaiI->Iiab", v_ref2, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(3,3) v(3) = sig(3)
+            ################################################ 
+
+            #   sig(Iiab:babb) += t(Iiac:babb)*F(bc:bb) - t(Iibc:babb)*F(ac:bb)
+            F_ac_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_3 = sig_3 + np.einsum("Iiac,bc->Iiab", v_ref3, F_ac_tmp) - np.einsum("Iibc,ac->Iiab", v_ref3, F_ac_tmp)
+            #   sig(Iiab:babb) += -1.0*t(Ijab:babb)*F(ij:aa)
+            F_ij_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            sig_3 = sig_3 - np.einsum("Ijab,ij->Iiab", v_ref3, F_ij_tmp)
+            #   sig(Iiab:babb) += -1.0*t(Jiab:babb)*F(IJ:bb)
+            F_IJ_tmp = Fb[0:nb_occ, 0:nb_occ]
+            sig_3 = sig_3 - np.einsum("Jiab,IJ->Iiab", v_ref3, F_IJ_tmp)
+            #   sig(Iiab:babb) += 0.5*v(Iicd:babb)*I(abcd:bbbb)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_3 = sig_3 + 0.5*(np.einsum("Iicd,abcd->Iiab", v_ref3, tei_tmp) - np.einsum("Iicd,abdc->Iiab", v_ref3, tei_tmp))
+            #   sig(Iiab:babb) += -1.0*v(Ijcb:babb)*I(ajci:baba) + v(Ijca:babb)*I(bjci:baba)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_3 = sig_3 - np.einsum("Ijcb,ajci->Iiab", v_ref3, tei_tmp) + np.einsum("Ijca,bjci->Iiab", v_ref3, tei_tmp)
+            #   sig(Iiab:babb) += -1.0*v(Jiac:babb)*I(JbIc:bbbb)
+            tei_tmp_J = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            tei_tmp_K = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_3 = sig_3 - (np.einsum("Jiac,JbIc->Iiab", v_ref3, tei_tmp_J) - np.einsum("Jiac,JbcI->Iiab", v_ref3, tei_tmp_K))
+            #   sig(Iiab:babb) += v(Jibc:babb)*I(JaIc:bbbb)
+            tei_tmp_J = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            tei_tmp_K = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_3 = sig_3 + (np.einsum("Jibc,JaIc->Iiab", v_ref3, tei_tmp_J) - np.einsum("Jibc,JacI->Iiab", v_ref3, tei_tmp_K))
+            #   sig(Iiab:babb) += v(Jjab:babb)*I(JjIi:baba)
+            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            sig_3 = sig_3 + np.einsum("Jjab,JjIi->Iiab", v_ref3, tei_tmp)
+
+            ################################################ 
+            # sigs complete-- free to reshape!
+            ################################################ 
+            sig_1 = np.reshape(sig_1, (v_b1.shape[0], 1))
+            sig_2 = np.reshape(sig_2, (v_b2.shape[0], 1))
+            # pack sig(3) vector for returning
+            sig_3_out = np.zeros((v_b3.shape[0], 1))
+            index = 0
+            for I in range(nb_occ):
+                for i in range(socc):
+                    for a in range(socc):
+                        for b in range(a):
+                            sig_3_out[index] = sig_3[I, i, a, b]
+                            index = index + 1
+
+            # combine and return
+            return np.vstack((sig_1, sig_2, sig_3_out))
+
+
+        # do excitation scheme: 1SF-CAS + p
+        # rearrange later to take advantage of Aaij indexing
         if(conf_space=="p"):
             """
                 definitions:
                 I      doubly occupied
                 i,a    singly occupied
                 A      doubly unoccupied
-                i'     alpha occupied
-                a'     beta unuoccupied
-
 
                 block1 = v(ai:ba)
                 block2 = v(Ai:ba)
                 block3 = v(Aaij:abaa)
 
-                Because block1 and block2 contain topologically equivalent diagrams, combine and redefine:  
-
-                block1 = v(a'i:ba)
-                block2 = v(Aaij:abaa)
-
                 Evaluate the following matrix vector multiply:
 
-                | H(1,1) H(1,2) | * v(1) = sig(1)
-                | H(2,1) H(2,2) | * v(2) = sig(2)
+                H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
+                H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
+                H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)
            
             """
             ################################################ 
-            # Separate guess vector into blocks 1 and 2
+            # Separate guess vector into blocks 1, 2, and 3
             ################################################ 
             v_b1 = v[:(socc*socc)] # v for block 1
             v_b2 = v[(socc*socc):(socc*nb_virt)] # v for block 2
@@ -106,16 +290,15 @@ class LinOpH (LinearOperator):
             v_ref1 = np.reshape(v_b1, (socc, socc))
             # v(2) indexing: (iA:ab)
             v_ref2 = np.reshape(v_b2, (socc, na_virt))
-
-            # unpack v(3) to indexing: (ijAb:aaab)
+            # v(3) unpack to indexing: (ijAb:aaab)
             v_ref3 = np.zeros((socc, socc, na_virt, socc))
             index = 0
             for i in range(socc):
                 for j in range(i):
                     for k in range(na_virt):
                         for l in range(socc):
-                            v_ref3[j, i, k, l] = -1.0*v_b3[index]
                             v_ref3[i, j, k, l] = v_b3[index]
+                            v_ref3[j, i, k, l] = -1.0*v_b3[index]
                             index = index + 1
 
             ################################################ 
