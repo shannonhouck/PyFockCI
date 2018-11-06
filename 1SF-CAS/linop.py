@@ -128,8 +128,8 @@ class LinOpH (LinearOperator):
             ################################################ 
 
             #   sig(ia:ab) += sig(Ia:ab)*F(iI:aa)
-            Fa_tmp = Fa[nb_occ:na_occ, :nb_occ]
-            sig_1 = sig_1 - np.einsum("Ia,iI->ia", v_ref2, Fa_tmp)
+            Fa_tmp = Fa[0:nb_occ, nb_occ:na_occ]
+            sig_1 = sig_1 - np.einsum("Ia,Ii->ia", v_ref2, Fa_tmp)
             #   sig(ia:ab) += -1.0*sig(jB:ab)*I(Iaib:abab)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
             sig_1 = sig_1 - np.einsum("Ib,Iaib->ia", v_ref2, tei_tmp)
@@ -140,8 +140,8 @@ class LinOpH (LinearOperator):
             ################################################ 
 
             #   sig(ia:ab) += v(Iiba:babb)*F(Ib:bb)
-            Fb_tmp = Fb[0:nb_occ, nb_occ:na_occ]
-            sig_1 = sig_1 + np.einsum("Iiba,Ib->ia", v_ref3, Fb_tmp)
+            Fb_tmp = Fb[nb_occ:na_occ, 0:nb_occ]
+            sig_1 = sig_1 + np.einsum("Iiba,bI->ia", v_ref3, Fb_tmp)
             #   sig(iA:ab) += -1.0*v(Ijba:babb)*I(Ijbi:baba)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
             sig_1 = sig_1 - np.einsum("Ijba,Ijbi->ia", v_ref3, tei_tmp)
@@ -181,7 +181,7 @@ class LinOpH (LinearOperator):
 
             #   sig(Ia:ab) += - v(Jiab:babb)*I(JibI:baba)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
-            sig_2 = sig_2 - np.einsum("Jiab,JibI->Ia", v_ref3, tei_tmp)
+            sig_2 = sig_2 + np.einsum("Jiab,JibI->Ia", v_ref3, tei_tmp)
 
             ################################################ 
             # Do the following term:
