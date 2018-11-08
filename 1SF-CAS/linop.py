@@ -429,15 +429,6 @@ class LinOpH (LinearOperator):
             #   sig(ijAb:aaab) += v(jkCb:aaab)*I(AkCi:aaaa)
             sig_3 = sig_3 + (np.einsum("jkCb,AkCi->ijAb", v_ref3, tei_tmp_J) - np.einsum("jkCb,AkiC->ijAb", v_ref3, tei_tmp_K))
 
-            """
-            print("Is sig_3 antisymmetric now?")
-            asymm = True
-            for i in np.nditer(sig_3 + sig_3.transpose((1,0,2,3))):
-                if not i == 0:
-                    asymm = False
-            print(asymm)
-            """
-
             ################################################ 
             # sigs complete-- free to reshape!
             ################################################ 
@@ -620,8 +611,6 @@ class LinOpH (LinearOperator):
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf), (0, nb_occ))
             sig_2 = sig_2 - np.einsum("iA,aiAI->Ia", v_ref3, tei_tmp)
 
-            sig_b23 = -1.0*np.einsum("iA,aiAI->Ia", v_ref3, tei_tmp)
-
             ################################################ 
             # Do the following term:
             #       H(2,4) v(4) = sig(2)
@@ -640,8 +629,6 @@ class LinOpH (LinearOperator):
             tei_tmp_J = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf), (0, nb_occ))
             tei_tmp_K = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (na_occ, nbf))
             sig_2 = sig_2 - 0.5*(np.einsum("ijAa,ijAI->Ia", v_ref5, tei_tmp_J) - np.einsum("ijAa,ijIA->Ia", v_ref5, tei_tmp_K))
-
-            sig_b25 = -1.0*(np.einsum("ijAa,ijAI->Ia", v_ref5, tei_tmp_J) - np.einsum("ijAa,ijIA->Ia", v_ref5, tei_tmp_K))
 
             ################################################ 
             # Do the following term:
@@ -664,8 +651,6 @@ class LinOpH (LinearOperator):
             tei_tmp = self.tei.get_subblock((na_occ, nbf), (0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ))
             sig_3 = sig_3 - np.einsum("Ia,AIai->iA", v_ref2, tei_tmp)
 
-            sig_b32 = -1.0*np.einsum("Ia,AIai->iA", v_ref2, tei_tmp)
-
             ################################################ 
             # Do the following term:
             #       H(3,3) v(3) = sig(3)
@@ -687,8 +672,6 @@ class LinOpH (LinearOperator):
             #   sig(iA:ab) += v(Iibc:babb)*I(IAbc:bbbb)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (na_occ, nbf), (nb_occ, na_occ), (nb_occ, na_occ))
             sig_3 = sig_3 + 0.5*(np.einsum("Iibc,IAbc->iA", v_ref4, tei_tmp) - np.einsum("Iibc,IAcb->iA", v_ref4, tei_tmp))
-
-            sig_b34 = (np.einsum("Iibc,IAbc->iA", v_ref4, tei_tmp) - np.einsum("Iibc,IAcb->iA", v_ref4, tei_tmp))
 
             ################################################ 
             # Do the following term:
@@ -735,8 +718,6 @@ class LinOpH (LinearOperator):
             tei_tmp_K = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf), (0, nb_occ))
             sig_4 = sig_4 + (np.einsum("iA,abIA->Iiab", v_ref3, tei_tmp_J) - np.einsum("iA,abAI->Iiab", v_ref3, tei_tmp_K))
 
-            sig_b43 = (np.einsum("iA,abIA->Iiab", v_ref3, tei_tmp_J) - np.einsum("iA,abAI->Iiab", v_ref3, tei_tmp_K))
-
             ################################################ 
             # Do the following term:
             #       H(4,4) v(4) = sig(4)
@@ -776,9 +757,7 @@ class LinOpH (LinearOperator):
 
             #   sig(Iiab:babb) += v(jiAa:aaab)*I(jbAI:abab)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf), (0, nb_occ))
-            sig_4 = sig_4 - np.einsum("jiAa,jbAI->Iiab", v_ref5, tei_tmp)
-
-            sig_b45 = -1.0*np.einsum("jiAa,jbAI->Iiab", v_ref5, tei_tmp)
+            sig_4 = sig_4 - (np.einsum("jiAa,jbAI->Iiab", v_ref5, tei_tmp) - np.einsum("jiAb,jaAI->Iiab", v_ref5, tei_tmp))
 
             ################################################ 
             # Do the following term:
@@ -804,8 +783,6 @@ class LinOpH (LinearOperator):
             tei_tmp = self.tei.get_subblock((na_occ, nbf), (0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ))
             sig_5 = sig_5 - (np.einsum("Ib,AIij->ijAb", v_ref2, tei_tmp) - np.einsum("Ib,AIji->ijAb", v_ref2, tei_tmp))
 
-            sig_b52 = -1.0*(np.einsum("Ib,AIij->ijAb", v_ref2, tei_tmp) - np.einsum("Ib,AIji->ijAb", v_ref2, tei_tmp))
-
             ################################################ 
             # Do the following term:
             #       H(5,3) v(3) = sig(5)
@@ -822,10 +799,8 @@ class LinOpH (LinearOperator):
             ################################################
 
             #   sig(ijAb:aaab) += - v(Iicb:babb)*I(Abjc:abab)
-            tei_tmp = self.tei.get_subblock((na_occ, nbf), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
-            sig_5 = sig_5 - np.einsum("Iicb,Abjc->ijAb", v_ref4, tei_tmp)
-
-            sig_b54 = -1.0*np.einsum("Iicb,Abjc->ijAb", v_ref4, tei_tmp)
+            tei_tmp = self.tei.get_subblock((na_occ, nbf), (0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_5 = sig_5 - (np.einsum("Iicb,AIjc->ijAb", v_ref4, tei_tmp) - np.einsum("Ijcb,AIic->ijAb", v_ref4, tei_tmp))
 
             ################################################ 
             # Do the following term:
@@ -855,26 +830,6 @@ class LinOpH (LinearOperator):
             sig_5 = sig_5 - (np.einsum("ikCb,AkCj->ijAb", v_ref5, tei_tmp_J) - np.einsum("ikCb,AkjC->ijAb", v_ref5, tei_tmp_K))
             #   sig(ijAb:aaab) += v(jkCb:aaab)*I(AkCi:aaaa)
             sig_5 = sig_5 + (np.einsum("jkCb,AkCi->ijAb", v_ref5, tei_tmp_J) - np.einsum("jkCb,AkiC->ijAb", v_ref5, tei_tmp_K))
-
-            # a few checks...
-            e_23 = np.einsum("Ia,Ia->", sig_b23, v_ref2)
-            e_25 = np.einsum("Ia,Ia->", sig_b25, v_ref2)
-            e_32 = np.einsum("iA,iA->", sig_b32, v_ref3)
-            e_34 = np.einsum("iA,iA->", sig_b34, v_ref3)
-            e_43 = np.einsum("Iiab,Iiab->", sig_b43, v_ref4)
-            e_45 = np.einsum("Iiab,Iiab->", sig_b45, v_ref4)
-            e_52 = np.einsum("ijAb,ijAb->", sig_b52, v_ref5)
-            e_54 = np.einsum("ijAb,ijAb->", sig_b54, v_ref5)
-            print("Are 2,3 terms correct?")
-            print(np.isclose(e_23, e_32))
-            print("Are 2,5 terms correct?")
-            print(np.isclose(e_25, e_52))
-            print("Are 3,4 terms correct?")
-            print(np.isclose(e_43, e_34))
-            print("Are 4,5 terms correct?")
-            print(np.isclose(e_45, e_54))
-            print(e_45)
-            print(e_54)
 
             ################################################ 
             # sigs complete-- free to reshape!

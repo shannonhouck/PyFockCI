@@ -26194,3 +26194,335 @@ CIWave: opdm                :      0.000u      0.000s      0.005w      2 calls
 | CIWave: CIvect read       :      0.000u      0.000s      0.000w     26 calls
 
 ***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Thu Nov  8 15:24:39 2018
+Timers Off: Thu Nov  8 15:25:41 2018
+
+Wall Time:       61.80 seconds
+
+JK: (A|mn)                  :      0.050u      0.000s      0.029w      2 calls
+JK: (A|Q)^-1/2              :      0.033u      0.017s      0.023w      2 calls
+JK: (Q|mn)                  :      0.000u      0.000s      0.001w      2 calls
+HF: Form H                  :      0.000u      0.017s      0.018w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      1.333u      0.000s      0.777w    126 calls
+JK: D                       :      0.000u      0.000s      0.001w    126 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w    126 calls
+JK: JK                      :      1.317u      0.000s      0.774w    126 calls
+JK: J                       :      0.017u      0.000s      0.003w     42 calls
+JK: J1                      :      0.000u      0.000s      0.001w     84 calls
+JK: J2                      :      0.017u      0.000s      0.001w     84 calls
+JK: K                       :      0.033u      0.000s      0.025w     42 calls
+JK: K1                      :      0.033u      0.000s      0.021w     84 calls
+JK: K2                      :      0.000u      0.000s      0.004w     84 calls
+PK computes JK              :      0.017u      0.000s      0.021w     67 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w    126 calls
+HF: Form F                  :      0.000u      0.000s      0.003w    126 calls
+HF: DIIS                    :      0.000u      0.000s      0.008w    126 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.003w     35 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.002w     31 calls
+bMatrix setup               :      0.000u      0.000s      0.001w     31 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.001w     31 calls
+New vector                  :      0.000u      0.000s      0.001w     31 calls
+HF: Form C                  :      0.033u      0.000s      0.013w    126 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    126 calls
+CIWave: CIvect write        :      0.000u      0.017s      0.005w    735 calls
+CIWave: CIvect read         :      0.000u      0.050s      0.061w  16880 calls
+CIWave: s2                  :      0.200u      0.000s      0.114w    704 calls
+CIWave: s1                  :      0.050u      0.000s      0.030w   1600 calls
+CIWave: s3                  :      0.433u      0.117s      0.331w   1344 calls
+CIWave: s3_mt               :      0.267u      0.100s      0.210w  72896 calls
+CIWave: opdm                :      0.033u      0.000s      0.004w      6 calls
+Total PK formation time     :      0.350u      0.000s      0.219w      4 calls
+
+-----------------------------------------------------------
+JK: (A|mn)                  :      0.050u      0.000s      0.029w      2 calls
+JK: (A|Q)^-1/2              :      0.033u      0.017s      0.023w      2 calls
+JK: (Q|mn)                  :      0.000u      0.000s      0.001w      2 calls
+HF: Form H                  :      0.000u      0.017s      0.018w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      1.333u      0.000s      0.777w    126 calls
+| JK: D                     :      0.000u      0.000s      0.001w    126 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w    126 calls
+| JK: JK                    :      1.317u      0.000s      0.774w    126 calls
+| | JK: J                   :      0.017u      0.000s      0.003w     42 calls
+| | | JK: J1                :      0.000u      0.000s      0.001w     84 calls
+| | | JK: J2                :      0.017u      0.000s      0.001w     84 calls
+| | JK: K                   :      0.033u      0.000s      0.025w     42 calls
+| | | JK: K1                :      0.033u      0.000s      0.021w     84 calls
+| | | JK: K2                :      0.000u      0.000s      0.004w     84 calls
+| | PK computes JK          :      0.017u      0.000s      0.021w     67 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w    126 calls
+HF: Form F                  :      0.000u      0.000s      0.003w    126 calls
+HF: DIIS                    :      0.000u      0.000s      0.008w    126 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.003w     35 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.002w     31 calls
+| | bMatrix setup           :      0.000u      0.000s      0.001w     31 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.001w     31 calls
+| | New vector              :      0.000u      0.000s      0.001w     31 calls
+HF: Form C                  :      0.033u      0.000s      0.013w    126 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    126 calls
+CIWave: CIvect write        :      0.000u      0.017s      0.005w    735 calls
+CIWave: CIvect read         :      0.000u      0.050s      0.061w  16838 calls
+CIWave: s2                  :      0.200u      0.000s      0.114w    704 calls
+CIWave: s1                  :      0.050u      0.000s      0.030w   1600 calls
+CIWave: s3                  :      0.433u      0.117s      0.331w   1344 calls
+| CIWave: s3_mt             :      0.267u      0.100s      0.210w  72896 calls
+CIWave: opdm                :      0.033u      0.000s      0.004w      6 calls
+| CIWave: CIvect read       :      0.000u      0.000s      0.000w     42 calls
+Total PK formation time     :      0.350u      0.000s      0.219w      4 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Thu Nov  8 15:39:07 2018
+Timers Off: Thu Nov  8 15:40:12 2018
+
+Wall Time:       64.97 seconds
+
+JK: (A|mn)                  :      0.050u      0.000s      0.040w      2 calls
+JK: (A|Q)^-1/2              :      0.050u      0.000s      0.025w      2 calls
+JK: (Q|mn)                  :      0.000u      0.000s      0.001w      2 calls
+HF: Form H                  :      0.000u      0.033s      0.021w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      1.583u      0.017s      1.179w    126 calls
+JK: D                       :      0.000u      0.000s      0.001w    126 calls
+JK: USO2AO                  :      0.000u      0.000s      0.001w    126 calls
+JK: JK                      :      1.567u      0.017s      1.176w    126 calls
+JK: J                       :      0.000u      0.000s      0.003w     42 calls
+JK: J1                      :      0.000u      0.000s      0.001w     84 calls
+JK: J2                      :      0.000u      0.000s      0.001w     84 calls
+JK: K                       :      0.033u      0.000s      0.028w     42 calls
+JK: K1                      :      0.017u      0.000s      0.023w     84 calls
+JK: K2                      :      0.017u      0.000s      0.005w     84 calls
+PK computes JK              :      0.050u      0.000s      0.022w     67 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w    126 calls
+HF: Form F                  :      0.000u      0.000s      0.004w    126 calls
+HF: DIIS                    :      0.000u      0.017s      0.010w    126 calls
+DIISManager::add_entry      :      0.000u      0.017s      0.004w     35 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.003w     31 calls
+bMatrix setup               :      0.000u      0.000s      0.001w     31 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.001w     31 calls
+New vector                  :      0.000u      0.000s      0.001w     31 calls
+HF: Form C                  :      0.017u      0.000s      0.015w    126 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    126 calls
+CIWave: CIvect write        :      0.017u      0.000s      0.005w    655 calls
+CIWave: CIvect read         :      0.000u      0.050s      0.049w  12933 calls
+CIWave: s2                  :      0.167u      0.000s      0.104w    638 calls
+CIWave: s1                  :      0.050u      0.000s      0.029w   1450 calls
+CIWave: s3                  :      0.400u      0.083s      0.300w   1218 calls
+CIWave: s3_mt               :      0.250u      0.083s      0.191w  65858 calls
+CIWave: opdm                :      0.017u      0.000s      0.007w      6 calls
+Total PK formation time     :      0.367u      0.000s      0.228w      4 calls
+
+-----------------------------------------------------------
+JK: (A|mn)                  :      0.050u      0.000s      0.040w      2 calls
+JK: (A|Q)^-1/2              :      0.050u      0.000s      0.025w      2 calls
+JK: (Q|mn)                  :      0.000u      0.000s      0.001w      2 calls
+HF: Form H                  :      0.000u      0.033s      0.021w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      1.583u      0.017s      1.179w    126 calls
+| JK: D                     :      0.000u      0.000s      0.001w    126 calls
+| JK: USO2AO                :      0.000u      0.000s      0.001w    126 calls
+| JK: JK                    :      1.567u      0.017s      1.176w    126 calls
+| | JK: J                   :      0.000u      0.000s      0.003w     42 calls
+| | | JK: J1                :      0.000u      0.000s      0.001w     84 calls
+| | | JK: J2                :      0.000u      0.000s      0.001w     84 calls
+| | JK: K                   :      0.033u      0.000s      0.028w     42 calls
+| | | JK: K1                :      0.017u      0.000s      0.023w     84 calls
+| | | JK: K2                :      0.017u      0.000s      0.005w     84 calls
+| | PK computes JK          :      0.050u      0.000s      0.022w     67 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w    126 calls
+HF: Form F                  :      0.000u      0.000s      0.004w    126 calls
+HF: DIIS                    :      0.000u      0.017s      0.010w    126 calls
+| DIISManager::add_entry    :      0.000u      0.017s      0.004w     35 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.003w     31 calls
+| | bMatrix setup           :      0.000u      0.000s      0.001w     31 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.001w     31 calls
+| | New vector              :      0.000u      0.000s      0.001w     31 calls
+HF: Form C                  :      0.017u      0.000s      0.015w    126 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    126 calls
+CIWave: CIvect write        :      0.017u      0.000s      0.005w    655 calls
+CIWave: CIvect read         :      0.000u      0.050s      0.049w  12891 calls
+CIWave: s2                  :      0.167u      0.000s      0.104w    638 calls
+CIWave: s1                  :      0.050u      0.000s      0.029w   1450 calls
+CIWave: s3                  :      0.400u      0.083s      0.300w   1218 calls
+| CIWave: s3_mt             :      0.250u      0.083s      0.191w  65858 calls
+CIWave: opdm                :      0.017u      0.000s      0.007w      6 calls
+| CIWave: CIvect read       :      0.000u      0.000s      0.000w     42 calls
+Total PK formation time     :      0.367u      0.000s      0.228w      4 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Thu Nov  8 16:19:02 2018
+Timers Off: Thu Nov  8 16:20:35 2018
+
+Wall Time:       92.96 seconds
+
+JK: (A|mn)                  :      0.067u      0.000s      0.029w      2 calls
+JK: (A|Q)^-1/2              :      0.033u      0.000s      0.024w      2 calls
+JK: (Q|mn)                  :      0.000u      0.000s      0.001w      2 calls
+HF: Form H                  :      0.000u      0.017s      0.018w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      1.283u      0.000s      0.783w    126 calls
+JK: D                       :      0.000u      0.000s      0.001w    126 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w    126 calls
+JK: JK                      :      1.283u      0.000s      0.780w    126 calls
+JK: J                       :      0.000u      0.000s      0.003w     42 calls
+JK: J1                      :      0.000u      0.000s      0.001w     84 calls
+JK: J2                      :      0.000u      0.000s      0.001w     84 calls
+JK: K                       :      0.067u      0.000s      0.025w     42 calls
+JK: K1                      :      0.050u      0.000s      0.021w     84 calls
+JK: K2                      :      0.017u      0.000s      0.004w     84 calls
+PK computes JK              :      0.017u      0.000s      0.020w     67 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w    126 calls
+HF: Form F                  :      0.017u      0.000s      0.003w    126 calls
+HF: DIIS                    :      0.000u      0.017s      0.008w    126 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.003w     35 calls
+DIISManager::extrapolate    :      0.000u      0.017s      0.002w     31 calls
+bMatrix setup               :      0.000u      0.017s      0.001w     31 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.001w     31 calls
+New vector                  :      0.000u      0.000s      0.001w     31 calls
+HF: Form C                  :      0.033u      0.000s      0.013w    126 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    126 calls
+CIWave: CIvect write        :      0.000u      0.017s      0.003w    525 calls
+CIWave: CIvect read         :      0.000u      0.050s      0.029w   8333 calls
+CIWave: s2                  :      0.117u      0.000s      0.085w    517 calls
+CIWave: s1                  :      0.033u      0.000s      0.021w   1175 calls
+CIWave: s3                  :      0.400u      0.067s      0.239w    987 calls
+CIWave: s3_mt               :      0.283u      0.033s      0.154w  52955 calls
+CIWave: opdm                :      0.000u      0.000s      0.004w      6 calls
+Total PK formation time     :      0.350u      0.000s      0.211w      4 calls
+
+-----------------------------------------------------------
+JK: (A|mn)                  :      0.067u      0.000s      0.029w      2 calls
+JK: (A|Q)^-1/2              :      0.033u      0.000s      0.024w      2 calls
+JK: (Q|mn)                  :      0.000u      0.000s      0.001w      2 calls
+HF: Form H                  :      0.000u      0.017s      0.018w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      1.283u      0.000s      0.783w    126 calls
+| JK: D                     :      0.000u      0.000s      0.001w    126 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w    126 calls
+| JK: JK                    :      1.283u      0.000s      0.780w    126 calls
+| | JK: J                   :      0.000u      0.000s      0.003w     42 calls
+| | | JK: J1                :      0.000u      0.000s      0.001w     84 calls
+| | | JK: J2                :      0.000u      0.000s      0.001w     84 calls
+| | JK: K                   :      0.067u      0.000s      0.025w     42 calls
+| | | JK: K1                :      0.050u      0.000s      0.021w     84 calls
+| | | JK: K2                :      0.017u      0.000s      0.004w     84 calls
+| | PK computes JK          :      0.017u      0.000s      0.020w     67 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w    126 calls
+HF: Form F                  :      0.017u      0.000s      0.003w    126 calls
+HF: DIIS                    :      0.000u      0.017s      0.008w    126 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.003w     35 calls
+| DIISManager::extrapolate  :      0.000u      0.017s      0.002w     31 calls
+| | bMatrix setup           :      0.000u      0.017s      0.001w     31 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.001w     31 calls
+| | New vector              :      0.000u      0.000s      0.001w     31 calls
+HF: Form C                  :      0.033u      0.000s      0.013w    126 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    126 calls
+CIWave: CIvect write        :      0.000u      0.017s      0.003w    525 calls
+CIWave: CIvect read         :      0.000u      0.050s      0.029w   8291 calls
+CIWave: s2                  :      0.117u      0.000s      0.085w    517 calls
+CIWave: s1                  :      0.033u      0.000s      0.021w   1175 calls
+CIWave: s3                  :      0.400u      0.067s      0.239w    987 calls
+| CIWave: s3_mt             :      0.283u      0.033s      0.154w  52955 calls
+CIWave: opdm                :      0.000u      0.000s      0.004w      6 calls
+| CIWave: CIvect read       :      0.000u      0.000s      0.000w     42 calls
+Total PK formation time     :      0.350u      0.000s      0.211w      4 calls
+
+***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Thu Nov  8 16:37:06 2018
+Timers Off: Thu Nov  8 16:38:18 2018
+
+Wall Time:       72.24 seconds
+
+JK: (A|mn)                  :      0.083u      0.000s      0.056w      2 calls
+JK: (A|Q)^-1/2              :      0.050u      0.000s      0.047w      2 calls
+JK: (Q|mn)                  :      0.000u      0.000s      0.003w      2 calls
+HF: Form H                  :      0.000u      0.017s      0.039w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      1.583u      0.017s      1.087w    126 calls
+JK: D                       :      0.000u      0.000s      0.001w    126 calls
+JK: USO2AO                  :      0.017u      0.000s      0.001w    126 calls
+JK: JK                      :      1.567u      0.017s      1.081w    126 calls
+JK: J                       :      0.000u      0.000s      0.006w     42 calls
+JK: J1                      :      0.000u      0.000s      0.003w     84 calls
+JK: J2                      :      0.000u      0.000s      0.002w     84 calls
+JK: K                       :      0.083u      0.000s      0.046w     42 calls
+JK: K1                      :      0.067u      0.000s      0.040w     84 calls
+JK: K2                      :      0.017u      0.000s      0.006w     84 calls
+PK computes JK              :      0.017u      0.000s      0.025w     67 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w    126 calls
+HF: Form F                  :      0.000u      0.000s      0.007w    126 calls
+HF: DIIS                    :      0.017u      0.017s      0.023w    126 calls
+DIISManager::add_entry      :      0.000u      0.017s      0.013w     35 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.005w     31 calls
+bMatrix setup               :      0.000u      0.000s      0.002w     31 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.001w     31 calls
+New vector                  :      0.000u      0.000s      0.001w     31 calls
+HF: Form C                  :      0.017u      0.000s      0.030w    126 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    126 calls
+CIWave: CIvect write        :      0.000u      0.000s      0.004w    541 calls
+CIWave: CIvect read         :      0.033u      0.067s      0.031w   8533 calls
+CIWave: s2                  :      0.133u      0.000s      0.085w    539 calls
+CIWave: s1                  :      0.033u      0.000s      0.022w   1225 calls
+CIWave: s3                  :      0.333u      0.067s      0.248w   1029 calls
+CIWave: s3_mt               :      0.133u      0.050s      0.155w  55301 calls
+CIWave: opdm                :      0.000u      0.000s      0.006w      6 calls
+Total PK formation time     :      0.383u      0.000s      0.245w      4 calls
+
+-----------------------------------------------------------
+JK: (A|mn)                  :      0.083u      0.000s      0.056w      2 calls
+JK: (A|Q)^-1/2              :      0.050u      0.000s      0.047w      2 calls
+JK: (Q|mn)                  :      0.000u      0.000s      0.003w      2 calls
+HF: Form H                  :      0.000u      0.017s      0.039w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.002w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      1.583u      0.017s      1.087w    126 calls
+| JK: D                     :      0.000u      0.000s      0.001w    126 calls
+| JK: USO2AO                :      0.017u      0.000s      0.001w    126 calls
+| JK: JK                    :      1.567u      0.017s      1.081w    126 calls
+| | JK: J                   :      0.000u      0.000s      0.006w     42 calls
+| | | JK: J1                :      0.000u      0.000s      0.003w     84 calls
+| | | JK: J2                :      0.000u      0.000s      0.002w     84 calls
+| | JK: K                   :      0.083u      0.000s      0.046w     42 calls
+| | | JK: K1                :      0.067u      0.000s      0.040w     84 calls
+| | | JK: K2                :      0.017u      0.000s      0.006w     84 calls
+| | PK computes JK          :      0.017u      0.000s      0.025w     67 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w    126 calls
+HF: Form F                  :      0.000u      0.000s      0.007w    126 calls
+HF: DIIS                    :      0.017u      0.017s      0.023w    126 calls
+| DIISManager::add_entry    :      0.000u      0.017s      0.013w     35 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.005w     31 calls
+| | bMatrix setup           :      0.000u      0.000s      0.002w     31 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.001w     31 calls
+| | New vector              :      0.000u      0.000s      0.001w     31 calls
+HF: Form C                  :      0.017u      0.000s      0.030w    126 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    126 calls
+CIWave: CIvect write        :      0.000u      0.000s      0.004w    541 calls
+CIWave: CIvect read         :      0.033u      0.067s      0.030w   8491 calls
+CIWave: s2                  :      0.133u      0.000s      0.085w    539 calls
+CIWave: s1                  :      0.033u      0.000s      0.022w   1225 calls
+CIWave: s3                  :      0.333u      0.067s      0.248w   1029 calls
+| CIWave: s3_mt             :      0.133u      0.050s      0.155w  55301 calls
+CIWave: opdm                :      0.000u      0.000s      0.006w      6 calls
+| CIWave: CIvect read       :      0.000u      0.000s      0.001w     42 calls
+Total PK formation time     :      0.383u      0.000s      0.245w      4 calls
+
+***********************************************************
