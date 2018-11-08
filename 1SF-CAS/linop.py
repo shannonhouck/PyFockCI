@@ -181,7 +181,7 @@ class LinOpH (LinearOperator):
 
             #   sig(Ia:ab) += -v(Jiab:babb)*I(JibI:baba)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
-            sig_2 = sig_2 - np.einsum("Jiab,JibI->Ia", v_ref3, tei_tmp)
+            sig_2 = sig_2 + np.einsum("Jiab,JibI->Ia", v_ref3, tei_tmp)
 
             ################################################ 
             # Do the following term:

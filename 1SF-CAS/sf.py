@@ -120,16 +120,17 @@ def get_spatial_tei(wfn):
 #                        ""       1SF-CAS
 #                        "h"      1SF-CAS + h
 #                        "p"      1SF-CAS + p
-#                        "1x"     1SF-CAS + (h,p)
+#                        "h,p"    1SF-CAS + (h,p)
 #    add_opts        Additional options (to be passed on to Psi4)
 #    sf_diag_method  Diagonalization method to use.
 #                        "RSP"    Direct
 #                        "LinOp"  LinOp
 #    num_roots       Number of roots to solve for.
+#    guess_type      Type of guess vector to use (CAS vs. RANDOM)
 #
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
-def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6 ):
+def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS" ):
     psi4.core.clean()
     opts = {'basis': 'cc-pvdz',
             'scf_type': 'pk',
@@ -167,16 +168,17 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
             A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
             vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         else:
-            #cas_A = LinOpH((socc*socc,socc*socc), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in="")
-            #cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=num_roots)
-            #print(cas_vects.shape)
-            #socc = wfn.soccpi()[0]
-            #v3_guess = np.zeros((a_virt*socc*socc*socc+socc*na_virt, num_roots))
-            #guess_vect = np.vstack((cas_vects, v3_guess)).T
-            #print(n_dets)
-            #print(guess_vect.shape)
-            A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
-            vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
+            if("guess_type"=="CAS"):
+                cas_A = LinOpH((socc*socc,socc*socc), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in="")
+                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=num_roots)
+                socc = wfn.soccpi()[0]
+                v3_guess = np.zeros((n_dets-(socc*socc), num_roots))
+                guess_vect = np.vstack((cas_vects, v3_guess)).T
+                A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
+                vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect[0, :])
+            else:
+                A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
+                vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         for i, corr in enumerate(vals):
             print("ROOT %i: %6.6f" % (i, e + corr))
         return(e + vals[0])
