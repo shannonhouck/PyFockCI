@@ -153,6 +153,12 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
         n_dets = (socc * nb_virt) + (((socc-1)*(socc)/2) * socc * na_virt)
     if(conf_space=="h,p"):
         n_dets = (socc * nb_virt) + (((socc-1)*(socc)/2) * socc * na_virt) + (socc * wfn.doccpi()[0]) + (((socc-1)*(socc)/2) * socc * wfn.doccpi()[0])
+    if(conf_space=="EA" or conf_space=="IP"):
+        guess_type = ""
+        n_dets = socc
+    if(conf_space=="CAS_IP"):
+        guess_type = ""
+        n_dets = socc * ((socc-1)*(socc)/2)
     #if(sf_diag_method == "RSP"):
     #    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
     #    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
@@ -164,18 +170,20 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
         a_virt = wfn.basisset().nbf() - a_occ
         b_virt = wfn.basisset().nbf() - b_occ
         print("Number of determinants:", n_dets)
+        if( num_roots >= n_dets ):
+            num_roots = n_dets - 1
         if(conf_space==""):
             A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
             vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         else:
             if("guess_type"=="CAS"):
                 cas_A = LinOpH((socc*socc,socc*socc), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in="")
-                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=num_roots)
+                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1)
                 socc = wfn.soccpi()[0]
-                v3_guess = np.zeros((n_dets-(socc*socc), num_roots))
+                v3_guess = np.zeros((n_dets-(socc*socc), 1))
                 guess_vect = np.vstack((cas_vects, v3_guess)).T
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
-                vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect[0, :])
+                vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
             else:
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
