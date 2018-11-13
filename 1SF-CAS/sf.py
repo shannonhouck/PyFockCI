@@ -113,8 +113,8 @@ def get_spatial_tei(wfn):
 
 # Performs the 1SF-CAS calculation.
 # Parameters:
-#    charge          The desired charge (nIP/EA determining, for later use)
-#    mult            The desired multiplicity (nSF determining, for later use)
+#    delta_a         Desired number of alpha electrons to remove
+#    delta_b         Desired number of beta electrons to add
 #    mol             Molecule to run calculation on
 #    conf_space      Desired excitation scheme:
 #                        ""       1SF-CAS
@@ -130,7 +130,7 @@ def get_spatial_tei(wfn):
 #
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
-def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS" ):
+def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS" ):
     psi4.core.clean()
     opts = {'basis': 'cc-pvdz',
             'scf_type': 'pk',
@@ -145,20 +145,30 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
     socc = wfn.soccpi()[0]
     na_virt = wfn.basisset().nbf() - (wfn.soccpi()[0] + wfn.doccpi()[0])
     nb_virt = wfn.basisset().nbf() - wfn.doccpi()[0]
-    if(conf_space==""):
+    # determine number of spin-flips and total change in electron count
+    delta_ec = delta_b - delta_a
+    n_SF = min(delta_a, delta_b)
+    # determine number of determinants
+    # RAS-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space==""):
         n_dets = socc * socc
-    if(conf_space=="h"):
+    elif(n_SF==1 and delta_ec==0 and conf_space=="h"):
         n_dets = (socc * socc) + (socc * wfn.doccpi()[0]) + (((socc-1)*(socc)/2) * socc * wfn.doccpi()[0])
-    if(conf_space=="p"):
+    elif(n_SF==1 and delta_ec==0 and conf_space=="p"):
         n_dets = (socc * nb_virt) + (((socc-1)*(socc)/2) * socc * na_virt)
-    if(conf_space=="h,p"):
+    elif(n_SF==1 and delta_ec==0 and (conf_space=="h,p" or conf_space=="1x")):
         n_dets = (socc * nb_virt) + (((socc-1)*(socc)/2) * socc * na_virt) + (socc * wfn.doccpi()[0]) + (((socc-1)*(socc)/2) * socc * wfn.doccpi()[0])
-    if(conf_space=="EA" or conf_space=="IP"):
+    # CAS-IP/EA
+    elif(n_SF==0 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
         guess_type = ""
         n_dets = socc
-    if(conf_space=="CAS_IP" or conf_space=="CAS_EA"):
+    # CAS-1SF-IP/EA
+    elif(n_SF==1 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
         guess_type = ""
         n_dets = socc * ((socc-1)*(socc)/2)
+    else:
+        print("Sorry, %iSF with electron count change of %i not yet supported. Exiting..." %(n_SF, delta_ec) )
+        exit()
     #if(sf_diag_method == "RSP"):
     #    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
     #    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
@@ -173,19 +183,19 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
         if( num_roots >= n_dets ):
             num_roots = n_dets - 1
         if(conf_space==""):
-            A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
+            A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
             vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         else:
             if("guess_type"=="CAS"):
-                cas_A = LinOpH((socc*socc,socc*socc), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in="")
+                cas_A = LinOpH((socc*socc,socc*socc), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in="")
                 cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1)
                 socc = wfn.soccpi()[0]
                 v3_guess = np.zeros((n_dets-(socc*socc), 1))
                 guess_vect = np.vstack((cas_vects, v3_guess)).T
-                A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
+                A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
             else:
-                A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, conf_space_in=conf_space)
+                A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         for i, corr in enumerate(vals):
             print("ROOT %i: %6.6f" % (i, e + corr))

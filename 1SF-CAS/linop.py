@@ -4,15 +4,17 @@ from scipy.sparse.linalg import LinearOperator
 
 class LinOpH (LinearOperator):
     
-    def __init__(self, shape_in, na_occ_in, nb_occ_in, na_virt_in, nb_virt_in, Fa_in, Fb_in, tei_in, conf_space_in=""):
+    def __init__(self, shape_in, na_occ_in, nb_occ_in, na_virt_in, nb_virt_in, Fa_in, Fb_in, tei_in, n_SF_in, delta_ec_in, conf_space_in=""):
         super(LinOpH, self).__init__(dtype=np.dtype('float64'), shape=shape_in)
         # getting the numbers of orbitals
         self.na_occ = na_occ_in # number of alpha occupied
         self.nb_occ = nb_occ_in # number of beta occupied
         self.na_virt = na_virt_in # number of alpha virtual
         self.nb_virt = nb_virt_in # number of beta virtual
-        # excitation scheme to use
-        self.conf_space = conf_space_in
+        # setting useful parameters
+        self.n_SF = n_SF_in # number of spin-flips
+        self.delta_ec = delta_ec_in # change in electron count
+        self.conf_space = conf_space_in # excitation rank
         # getting integrals
         self.Fa = Fa_in
         self.Fb = Fb_in
@@ -28,10 +30,12 @@ class LinOpH (LinearOperator):
         nb_occ = self.nb_occ
         na_virt = self.na_virt
         nb_virt = self.nb_virt
+        n_SF = self.n_SF
+        delta_ec = self.delta_ec
         nbf = na_occ + na_virt
         socc = na_occ - nb_occ
         # do excitation scheme: 1SF-CAS
-        if(conf_space==""):
+        if(n_SF==1 and delta_ec==0 and conf_space==""):
             """ 
                 definitions:
                 I      doubly occupied
@@ -71,7 +75,7 @@ class LinOpH (LinearOperator):
             return F_tmp + tei_tmp
 
         # do excitation scheme: 1SF-CAS + h
-        if(conf_space=="h"):
+        if(n_SF==1 and delta_ec==0 and conf_space=="h"):
             """ 
                 definitions:
                 I      doubly occupied
@@ -261,7 +265,7 @@ class LinOpH (LinearOperator):
 
         # do excitation scheme: 1SF-CAS + p
         # rearrange later to take advantage of Aaij indexing
-        if(conf_space=="p"):
+        if(n_SF==1 and delta_ec==0 and conf_space=="p"):
             """
                 definitions:
                 I      doubly occupied
@@ -448,7 +452,7 @@ class LinOpH (LinearOperator):
             return np.vstack((sig_1, sig_2, sig_3_out))
 
         # do excitation scheme: RAS(h,p)-1SF
-        if(conf_space=="h,p"):
+        if(n_SF==1 and delta_ec==0 and conf_space=="h,p"):
             """
                 definitions:
                 I      doubly occupied
@@ -860,7 +864,8 @@ class LinOpH (LinearOperator):
             # combine and return
             return np.vstack((sig_1, sig_2, sig_3, sig_4_out, sig_5_out))
 
-        if(conf_space=="EA"):
+        # doing EA calculation
+        if(n_SF==0 and delta_ec==1 and conf_space==""):
             """ 
                 definitions:
                 I      doubly occupied
@@ -878,7 +883,8 @@ class LinOpH (LinearOperator):
             sig_1 = np.einsum("b,ab->a", v, F_tmp)
             return sig_1
 
-        if(conf_space=="IP"):
+        # doing IP calculation
+        if(n_SF==0 and delta_ec==-1 and conf_space==""):
             """ 
                 definitions:
                 I      doubly occupied
@@ -897,7 +903,7 @@ class LinOpH (LinearOperator):
             return sig_1
 
         # do excitation scheme: 1SF-CAS-EA
-        if(conf_space=="CAS_EA"):
+        if(n_SF==1 and delta_ec==1 and conf_space==""):
             """ 
                 definitions:
                 I      doubly occupied
@@ -947,7 +953,7 @@ class LinOpH (LinearOperator):
             return sig_1_out
 
         # do excitation scheme: 1SF-CAS-IP
-        if(conf_space=="CAS_IP"):
+        if(n_SF==1 and delta_ec==-1 and conf_space==""):
             """ 
                 definitions:
                 I      doubly occupied

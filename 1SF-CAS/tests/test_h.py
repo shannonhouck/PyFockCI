@@ -40,20 +40,20 @@ def test_1():
     psi4.core.clean()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     expected = sf_cas_ref( 0, 5, n2_7, conf_space="h", add_opts=options )
-    e = do_sf_cas( 0, 5, n2_7, conf_space="h", add_opts=options )
+    e = do_sf_cas( 1, 1, n2_7, conf_space="h", add_opts=options )
     assert abs(e - expected) < threshold
 
 def test_2():
     psi4.core.clean()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'calc_s_squared': True, 'scf_type': 'pk'}
     expected = sf_cas_ref( 0, 3, n2_3, conf_space="h", add_opts=options )
-    e = do_sf_cas( 0, 3, n2_3, conf_space="h", add_opts=options )
+    e = do_sf_cas( 1, 1, n2_3, conf_space="h", add_opts=options )
     assert abs(e - expected) < threshold
 
 def test_3():
     psi4.core.clean()
     options = {"basis": "cc-pvdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'diag_method': 'rsp'}
     expected = sf_cas_ref( 0, 1, o2, conf_space="h", add_opts=options )
-    e = do_sf_cas( 0, 1, o2, conf_space="h", add_opts=options, num_roots=2 )
+    e = do_sf_cas( 1, 1, o2, conf_space="h", add_opts=options, num_roots=2 )
     assert abs(e - expected) < threshold
 
