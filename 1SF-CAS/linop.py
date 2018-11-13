@@ -896,6 +896,55 @@ class LinOpH (LinearOperator):
             sig_1 = -1.0*np.einsum("j,ji->i", v, F_tmp)
             return sig_1
 
+        # do excitation scheme: 1SF-CAS-EA
+        if(conf_space=="CAS_EA"):
+            """ 
+                definitions:
+                I      doubly occupied
+                i,a    singly occupied
+                A      doubly unoccupied
+
+                block1 = v(ija:aab)
+
+                Evaluate the following matrix vector multiply:
+
+                | H(1,1) | * v(1) = sig(1)
+           
+            """
+            # v(1) unpack to indexing: (ija:aab)
+            v_ref1 = np.zeros((socc,socc,socc))
+            index = 0
+            for i in range(socc):
+                for a in range(socc):
+                    for b in range(a):
+                        v_ref1[i, a, b] = v[index]
+                        v_ref1[i, b, a] = -1.0*v[index]
+                        index = index + 1 
+            ################################################ 
+            # Do the following term:
+            #       H(1,1) v(1) = sig(1)
+            ################################################ 
+            #   sig(ija:aab) += -P(ab)*t(ibc:abb)*F(bc:bb)
+            Fb_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_1 = -1.0*(np.einsum("iac,bc->iab", v_ref1, Fb_tmp) - np.einsum("ibc,ac->iab", v_ref1, Fb_tmp))
+            #   sig(ija:aab) += t(jab:abb)*F(ji:aa)
+            Fa_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            sig_1 = sig_1 - np.einsum("jab,ji->iab", v_ref1, Fa_tmp)
+            #   sig(ija:aab) += -1.0*t(jac:abb)*I(jbic:abab)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_1 = sig_1 - np.einsum("jac,jbic->iab", v_ref1, tei_tmp)
+            #   sig(ija:aab) += 0.5*t(icd:abb)*I(abcd:abab)
+            sig_1 = sig_1 - 0.5*(np.einsum("icd,abcd->iab", v_ref1, tei_tmp) - np.einsum("icd,abdc->iab", v_ref1, tei_tmp))
+
+            sig_1_out = np.zeros((v.shape[0], 1))
+            index = 0
+            for i in range(socc):
+                for a in range(socc):
+                    for b in range(a):
+                        sig_1_out[index] = sig_1[i, a, b]
+                        index = index + 1
+
+            return sig_1_out
 
         # do excitation scheme: 1SF-CAS-IP
         if(conf_space=="CAS_IP"):
@@ -926,21 +975,22 @@ class LinOpH (LinearOperator):
             # Do the following term:
             #       H(1,1) v(1) = sig(1)
             ################################################ 
-            #   sig(ija:aab) += -P(ij)*v(ika:aab)*F(kj:aa)
-            Fa_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
-            sig_1 = np.einsum("ika,kj->ija", v_ref1, Fa_tmp) - np.einsum("jka,ki->ija", v_ref1, Fa_tmp)
+            #   sig(ija:aab) += -P(ij)*v(kja:aab)*F(ki:aa)
+            #Fa_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            #sig_1 = -1.0*(np.einsum("ika,kj->ija", v_ref1, Fa_tmp) - np.einsum("jka,ki->ija", v_ref1, Fa_tmp))
             #   sig(ija:aab) += P(ij)*v(kja:aab)*F(ki:aa)
-            sig_1 = sig_1 + (np.einsum("kja,ki->ija", v_ref1, Fa_tmp) - np.einsum("kia,kj->ija", v_ref1, Fa_tmp))
+            Fa_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            sig_1 = -1.0*(np.einsum("kja,ki->ija", v_ref1, Fa_tmp) - np.einsum("kia,kj->ija", v_ref1, Fa_tmp))
             #   sig(ija:aab) += v(ijb:aab)*F(ab:bb)
             Fb_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
-            sig_1 = sig_1 - np.einsum("ijb,ab->ija", v_ref1, Fb_tmp)
+            sig_1 = sig_1 + np.einsum("ijb,ab->ija", v_ref1, Fb_tmp)
             #   sig(ija:aab) += -P(ij)*v(ikb:aab)*I(akbj:baba)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
-            sig_1 = sig_1 + (np.einsum("ikb,akbj->ija", v_ref1, tei_tmp) - np.einsum("jkb,akbi->ija", v_ref1, tei_tmp))
+            #sig_1 = sig_1 - (np.einsum("ikb,akbj->ija", v_ref1, tei_tmp) - np.einsum("jkb,akbi->ija", v_ref1, tei_tmp))
             #   sig(ija:aab) += P(ij)*v(kjb:aab)*I(akbi:baba)
-            #sig_1 = sig_1 + (np.einsum("kjb,akbi->ija", v_ref1, tei_tmp) - np.einsum("kib,akbj->ija", v_ref1, tei_tmp))
+            sig_1 = sig_1 - (np.einsum("kjb,kaib->ija", v_ref1, tei_tmp) - np.einsum("kib,kajb->ija", v_ref1, tei_tmp))
             #   sig(ija:aab) += 0.5*v(kla:aab)*I(klij:aaaa)
-            sig_1 = sig_1 - 0.5*(np.einsum("kla,klij->ija", v_ref1, tei_tmp) - np.einsum("kla,klji->ija", v_ref1, tei_tmp))
+            sig_1 = sig_1 + 0.5*(np.einsum("lka,klji->ija", v_ref1, tei_tmp) - np.einsum("lka,klij->ija", v_ref1, tei_tmp))
 
             sig_1_out = np.zeros((v.shape[0], 1))
             index = 0 
