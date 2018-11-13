@@ -156,7 +156,7 @@ def do_sf_cas( charge, mult, mol, conf_space="", add_opts={}, sf_diag_method="Li
     if(conf_space=="EA" or conf_space=="IP"):
         guess_type = ""
         n_dets = socc
-    if(conf_space=="CAS_IP"):
+    if(conf_space=="CAS_IP" or conf_space=="CAS_EA"):
         guess_type = ""
         n_dets = socc * ((socc-1)*(socc)/2)
     #if(sf_diag_method == "RSP"):
