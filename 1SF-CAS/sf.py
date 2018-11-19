@@ -166,6 +166,20 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     elif(n_SF==1 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
         guess_type = ""
         n_dets = socc * ((socc-1)*(socc)/2)
+    elif(n_SF==1 and (delta_ec==-1 or delta_ec==1) and conf_space=="h"):
+        guess_type = ""
+        b_occ = wfn.doccpi()[0]
+        # this is the MOST hack-ish way to get the triangle number of a traingle number. Fix later
+        count = 0 
+        for a in range(socc):
+            for b in range(a):
+                for c in range(b):
+                    count = count + 1
+        # correct number of dets
+        n_dets = (socc * ((socc-1)*(socc)/2)) 
+        # guessing this is also right
+        n_dets = n_dets + (b_occ * ((socc-1)*(socc)/2))
+        n_dets = n_dets + (b_occ * socc * count)
     else:
         print("Sorry, %iSF with electron count change of %i not yet supported. Exiting..." %(n_SF, delta_ec) )
         exit()
@@ -173,6 +187,7 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     #    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
     #    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
     #    return(e + np.sort(LIN.eigvalsh(H))[0])
+    print("Performing %iSF with electron count change of %i..." %(n_SF, delta_ec) )
     if(sf_diag_method == "LinOp"):
         #A = SPLIN.LinearOperator(H.shape, matvec=mv)
         a_occ = wfn.doccpi()[0] + wfn.soccpi()[0]
