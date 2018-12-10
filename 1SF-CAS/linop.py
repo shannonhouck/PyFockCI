@@ -74,6 +74,69 @@ class LinOpH (LinearOperator):
             tei_tmp = np.reshape(-1.0*np.einsum("jb,ajbi->ia", v_b1, tei_tmp), (v.shape[0], 1))
             return F_tmp + tei_tmp
 
+        # do excitation scheme: 2SF-CAS
+        if(n_SF==2 and delta_ec==0 and conf_space==""):
+            """  
+                definitions:
+                I      doubly occupied
+                i,a    singly occupied
+                A      doubly unoccupied
+
+                block1 = v(ijab:aabb)
+
+                Evaluate the following matrix vector multiply:
+
+                | H(1,1) | * v(1) = sig(1)
+           
+            """
+            # v(1) unpack to indexing: (Iiab:babb)
+            v_ref1 = np.zeros((socc, socc, socc, socc))
+            index = 0
+            for i in range(socc):
+                for j in range(i):
+                    for a in range(socc):
+                        for b in range(a):
+                            v_ref1[i, j, a, b] = v[index]
+                            v_ref1[i, j, b, a] = -1.0*v[index]
+                            v_ref1[j, i, a, b] = -1.0*v[index]
+                            v_ref1[j, i, b, a] = v[index]
+                            index = index + 1
+            print(index)
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,1) v(1) = sig(1)
+            ################################################ 
+            #   sig(ijab:aabb) += -v(kjab:aabb) F(ik:aa)
+            Fa_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            sig_1 = -1.0*np.einsum("kjab,ki->ijab", v_ref1, Fa_tmp)
+            sig_1 = sig_1 + np.einsum("kiab,kj->ijab", v_ref1, Fa_tmp) #P(ij)
+            #   sig(ijab:aabb) += v(ijcb:aabb) F(ac:bb)
+            Fb_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_1 = sig_1 + np.einsum("ijcb,ac->ijab", v_ref1, Fb_tmp)
+            sig_1 = sig_1 - np.einsum("ijca,bc->ijab", v_ref1, Fb_tmp) #P(ab)
+            #   sig(ijab:aabb) += 0.5*v(ijcd:aabb) I(abcd:bbbb)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_1 = sig_1 + 0.5*(np.einsum("ijcd,abcd->ijab", v_ref1, tei_tmp) - np.einsum("ijcd,abdc->ijab", v_ref1, tei_tmp))
+            #   sig(ijab:aabb) += 0.5*v(klab:aabb) I(klij:aaaa)
+            sig_1 = sig_1 + 0.5*(np.einsum("klab,klij->ijab", v_ref1, tei_tmp) - np.einsum("klab,klji->ijab", v_ref1, tei_tmp))
+            #   sig(ijab:aabb) += - P(ij)P(ab) v(ikcb:aabb) I(akcj:baba)
+            sig_1 = sig_1 - (np.einsum("ikcb,akcj->ijab", v_ref1, tei_tmp))
+            sig_1 = sig_1 + (np.einsum("jkcb,akci->ijab", v_ref1, tei_tmp)) #P(ij)
+            sig_1 = sig_1 + (np.einsum("ikca,bkcj->ijab", v_ref1, tei_tmp)) #P(ab)
+            sig_1 = sig_1 - (np.einsum("jkca,bkci->ijab", v_ref1, tei_tmp)) #P(ij)P(ab)
+
+            sig_1_out = np.zeros((v.shape[0], 1))
+            index = 0
+            for i in range(socc):
+                for j in range(i):
+                    for a in range(socc):
+                        for b in range(a):
+                            sig_1_out[index] = sig_1[i, j, a, b]
+                            index = index + 1
+
+            return sig_1_out
+
         # do excitation scheme: 1SF-CAS + h
         if(n_SF==1 and delta_ec==0 and conf_space=="h"):
             """ 
@@ -614,6 +677,8 @@ class LinOpH (LinearOperator):
             #   sig(Ia:ab) += -1.0*v(iA:ab)*I(aiAI:baba)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf), (0, nb_occ))
             sig_2 = sig_2 - np.einsum("iA,aiAI->Ia", v_ref3, tei_tmp)
+            # for testing
+            sig_2_1 = -1.0*np.einsum("iA,aiAI->Ia", v_ref3, tei_tmp)
 
             ################################################ 
             # Do the following term:
@@ -654,6 +719,8 @@ class LinOpH (LinearOperator):
             #   sig(iA:ab) += -v(Ia:ab)*I(AIai:baba)
             tei_tmp = self.tei.get_subblock((na_occ, nbf), (0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ))
             sig_3 = sig_3 - np.einsum("Ia,AIai->iA", v_ref2, tei_tmp)
+            # for testing
+            sig_3 = -1.0*np.einsum("Ia,AIai->iA", v_ref2, tei_tmp)
 
             ################################################ 
             # Do the following term:
@@ -1084,6 +1151,11 @@ class LinOpH (LinearOperator):
             #   sig(iab:abb) += -P(ab)*t(Iac:abb)*I(Ibic:abab)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
             sig_1 = sig_1 - (np.einsum("Iac,Ibic->iab", v_ref2, tei_tmp) - np.einsum("Ibc,Iaic->iab", v_ref2, tei_tmp))
+            '''
+            # for testing!
+            sig_1_2 = -1.0*np.einsum("Iab,Ii->iab", v_ref2, Fa_tmp)
+            sig_1_2 = sig_1_2 - (np.einsum("Iac,Ibic->iab", v_ref2, tei_tmp) - np.einsum("Ibc,Iaic->iab", v_ref2, tei_tmp))
+            '''
 
             ################################################ 
             # Do the following term:
@@ -1094,7 +1166,16 @@ class LinOpH (LinearOperator):
             sig_1 = sig_1 + np.einsum("Iicab,Ic->iab", v_ref3, Fb_tmp)
             #   sig(iab:abb) += -t(Ijacb:abb)*I(Ijci:baba)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
-            sig_1 = sig_1 - np.einsum("Ijacb,Ijci->iab", v_ref3, tei_tmp)
+            sig_1 = sig_1 + np.einsum("Ijacb,Ijci->iab", v_ref3, tei_tmp)
+            sig_1 = sig_1 + (np.einsum("Iicdb,Idca->iab", v_ref3, tei_tmp) - np.einsum("Iicdb,Idac->iab", v_ref3, tei_tmp))
+            sig_1 = sig_1 - (np.einsum("Iicda,Idcb->iab", v_ref3, tei_tmp) - np.einsum("Iicda,Idbc->iab", v_ref3, tei_tmp)) #P(ab)
+            '''
+            # for testing!
+            sig_1_3 = np.einsum("Iicab,Ic->iab", v_ref3, Fb_tmp)
+            sig_1_3 = sig_1_3 + np.einsum("Ijacb,Ijci->iab", v_ref3, tei_tmp)
+            sig_1_3 = sig_1_3 + (np.einsum("Iicdb,Idca->iab", v_ref3, tei_tmp) - np.einsum("Iicdb,Idac->iab", v_ref3, tei_tmp))
+            sig_1_3 = sig_1_3 - (np.einsum("Iicda,Idcb->iab", v_ref3, tei_tmp) - np.einsum("Iicda,Idbc->iab", v_ref3, tei_tmp)) #P(ab)
+            '''
 
             ################################################ 
             # Do the following term:
@@ -1106,6 +1187,11 @@ class LinOpH (LinearOperator):
             #   sig(Iab:abb) += -P(ab)*t(iac:abb)*I(ibIc:abab)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
             sig_2 = sig_2 - (np.einsum("iac,ibIc->Iab", v_ref1, tei_tmp) - np.einsum("ibc,iaIc->Iab", v_ref1, tei_tmp))
+            '''
+            # for testing!
+            sig_2_1 = -1.0*np.einsum("iab,iI->Iab", v_ref1, Fa_tmp)
+            sig_2_1 = sig_2_1 - (np.einsum("iac,ibIc->Iab", v_ref1, tei_tmp) - np.einsum("ibc,iaIc->Iab", v_ref1, tei_tmp))
+            '''
 
             ################################################ 
             # Do the following term:
@@ -1131,6 +1217,10 @@ class LinOpH (LinearOperator):
             #   sig(Iab:abb) += t(Jiacb:babbb)*I(JicI:baba)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
             sig_2 = sig_2 + np.einsum("Jiacb,JicI->Iab", v_ref3, tei_tmp)
+            '''
+            # for testing
+            sig_2_3 = np.einsum("Jiacb,JicI->Iab", v_ref3, tei_tmp)
+            '''
 
             ################################################ 
             # Do the following term:
@@ -1138,20 +1228,44 @@ class LinOpH (LinearOperator):
             ################################################ 
             #   sig(Iiabc:babbb) += P(ab)*P(ac)*t(ibc:abb)*F(aI:bb)
             Fb_tmp = Fb[nb_occ:na_occ, 0:nb_occ]
-            sig_3 = np.einsum("ibc,aI->Iiabc", v_ref1, Fb_tmp) - np.einsum("iac,bI->Iiabc", v_ref1, Fb_tmp)
-            sig_3 = sig_3 - (np.einsum("iba,cI->Iiabc", v_ref1, Fb_tmp) - np.einsum("ica,bI->Iiabc", v_ref1, Fb_tmp))
+            sig_3 = np.einsum("ibc,aI->Iiabc", v_ref1, Fb_tmp)
+            sig_3 = sig_3 - np.einsum("iac,bI->Iiabc", v_ref1, Fb_tmp) #P(ab)
+            sig_3 = sig_3 - np.einsum("iba,cI->Iiabc", v_ref1, Fb_tmp) #P(ac)
+            sig_3 = sig_3 + np.einsum("ica,bI->Iiabc", v_ref1, Fb_tmp) #P(ab)P(ac)
             #   sig(Iiabc:babbb) += P(ac)*P(bc)*t(idc:abb)*I(abId:bbbb)
-            # CHECK THESE SIGNS
             tei_tmp_J = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
             tei_tmp_K = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
             sig_3 = sig_3 + (np.einsum("idc,abId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("idc,abdI->Iiabc", v_ref1, tei_tmp_K))
-            sig_3 = sig_3 - (np.einsum("ida,cbId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("ida,cbdI->Iiabc", v_ref1, tei_tmp_K))
-            sig_3 = sig_3 - (np.einsum("idb,acId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("idb,acdI->Iiabc", v_ref1, tei_tmp_K))
-            sig_3 = sig_3 + (np.einsum("ida,bcId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("ida,bcdI->Iiabc", v_ref1, tei_tmp_K))
+            sig_3 = sig_3 - (np.einsum("ida,cbId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("ida,cbdI->Iiabc", v_ref1, tei_tmp_K)) # P(ac)
+            sig_3 = sig_3 - (np.einsum("idb,acId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("idb,acdI->Iiabc", v_ref1, tei_tmp_K)) # P(bc)
+            sig_3 = sig_3 + (np.einsum("idb,caId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("idb,cadI->Iiabc", v_ref1, tei_tmp_K)) # P(bc)P(ac)
             #   sig(Iiabc:babbb) += -P(ac)*P(ab)*t(jbc:abb)*I(ajIi:baba)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
-            sig_3 = sig_3 - (np.einsum("jbc,ajIi->Iiabc", v_ref1, tei_tmp) - np.einsum("jac,bjIi->Iiabc", v_ref1, tei_tmp))
-            sig_3 = sig_3 + (np.einsum("jba,cjIi->Iiabc", v_ref1, tei_tmp) - np.einsum("jca,bjIi->Iiabc", v_ref1, tei_tmp))
+            sig_3 = sig_3 - np.einsum("jbc,ajIi->Iiabc", v_ref1, tei_tmp)
+            sig_3 = sig_3 + np.einsum("jac,bjIi->Iiabc", v_ref1, tei_tmp) # P(ab)
+            sig_3 = sig_3 + np.einsum("jba,cjIi->Iiabc", v_ref1, tei_tmp) # P(ac)
+            sig_3 = sig_3 - np.einsum("jca,bjIi->Iiabc", v_ref1, tei_tmp) # P(ab) P(ac)
+
+            '''
+            # for testing
+            sig_3_1 = np.einsum("ibc,aI->Iiabc", v_ref1, Fb_tmp)
+            sig_3_1 = sig_3_1 - np.einsum("iac,bI->Iiabc", v_ref1, Fb_tmp) #P(ab)
+            sig_3_1 = sig_3_1 - np.einsum("iba,cI->Iiabc", v_ref1, Fb_tmp) #P(ac)
+            sig_3_1 = sig_3_1 + np.einsum("ica,bI->Iiabc", v_ref1, Fb_tmp) #P(ab)P(ac)
+            #   sig(Iiabc:babbb) += P(ac)*P(bc)*t(idc:abb)*I(abId:bbbb)
+            tei_tmp_J = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            tei_tmp_K = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_3_1 = sig_3_1 + (np.einsum("idc,abId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("idc,abdI->Iiabc", v_ref1, tei_tmp_K))
+            sig_3_1 = sig_3_1 - (np.einsum("ida,cbId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("ida,cbdI->Iiabc", v_ref1, tei_tmp_K)) # P(ac)
+            sig_3_1 = sig_3_1 - (np.einsum("idb,acId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("idb,acdI->Iiabc", v_ref1, tei_tmp_K)) # P(bc)
+            sig_3_1 = sig_3_1 + (np.einsum("idb,caId->Iiabc", v_ref1, tei_tmp_J) - np.einsum("idb,cadI->Iiabc", v_ref1, tei_tmp_K)) # P(bc)P(ac)
+            #   sig(Iiabc:babbb) += -P(ac)*P(ab)*t(jbc:abb)*I(ajIi:baba)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            sig_3_1 = sig_3_1 - np.einsum("jbc,ajIi->Iiabc", v_ref1, tei_tmp)
+            sig_3_1 = sig_3_1 + np.einsum("jac,bjIi->Iiabc", v_ref1, tei_tmp) # P(ab)
+            sig_3_1 = sig_3_1 + np.einsum("jba,cjIi->Iiabc", v_ref1, tei_tmp) # P(ac)
+            sig_3_1 = sig_3_1 - np.einsum("jca,bjIi->Iiabc", v_ref1, tei_tmp) # P(ab) P(ac)
+            '''
 
             ################################################ 
             # Do the following term:
@@ -1159,8 +1273,18 @@ class LinOpH (LinearOperator):
             ################################################ 
             #   sig(Iiabc:babbb) += -P(ab)*P(ac)*t(Jbc:abb)*F(aJIi:baba)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (0, nb_occ), (0, nb_occ), (nb_occ, na_occ))
-            sig_3 = sig_3 - (np.einsum("Jbc,aJIi->Iiabc", v_ref2, tei_tmp) - np.einsum("Jba,cJIi->Iiabc", v_ref2, tei_tmp))
-            sig_3 = sig_3 + (np.einsum("Jac,bJIi->Iiabc", v_ref2, tei_tmp) - np.einsum("Jab,cJIi->Iiabc", v_ref2, tei_tmp))
+            # for testing
+            sig_3 = sig_3 - (np.einsum("Jbc,aJIi->Iiabc", v_ref2, tei_tmp))
+            sig_3 = sig_3 + (np.einsum("Jac,bJIi->Iiabc", v_ref2, tei_tmp)) #P(ab)
+            sig_3 = sig_3 + (np.einsum("Jba,cJIi->Iiabc", v_ref2, tei_tmp)) #P(ac)
+            sig_3 = sig_3 - (np.einsum("Jca,bJIi->Iiabc", v_ref2, tei_tmp)) #P(ab)P(ac)
+            '''
+            # for testing
+            sig_3_2 = -1.0*(np.einsum("Jbc,aJIi->Iiabc", v_ref2, tei_tmp))
+            sig_3_2 = sig_3_2 + (np.einsum("Jac,bJIi->Iiabc", v_ref2, tei_tmp)) #P(ab)
+            sig_3_2 = sig_3_2 + (np.einsum("Jba,cJIi->Iiabc", v_ref2, tei_tmp)) #P(ac)
+            sig_3_2 = sig_3_2 - (np.einsum("Jca,bJIi->Iiabc", v_ref2, tei_tmp)) #P(ab)P(ac)
+            '''
 
             ################################################ 
             # Do the following term:
@@ -1174,39 +1298,70 @@ class LinOpH (LinearOperator):
             sig_3 = sig_3 - np.einsum("Ijabc,ji->Iiabc", v_ref3, Fa_tmp)
             #   sig(Iiabc:babbb) += P(ab)*P(ac)*t(Iidbc:babbb)*F(ad:bb)
             Fb_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
-            sig_3 = sig_3 + (np.einsum("Iidbc,ad->Iiabc", v_ref3, Fb_tmp) - np.einsum("Iidba,cd->Iiabc", v_ref3, Fb_tmp))
-            sig_3 = sig_3 - (np.einsum("Iidac,bd->Iiabc", v_ref3, Fb_tmp) - np.einsum("Iidab,cd->Iiabc", v_ref3, Fb_tmp))
+            sig_3 = sig_3 + np.einsum("Iidbc,ad->Iiabc", v_ref3, Fb_tmp)
+            sig_3 = sig_3 - np.einsum("Iidac,bd->Iiabc", v_ref3, Fb_tmp) #P(ab)
+            sig_3 = sig_3 - np.einsum("Iidba,cd->Iiabc", v_ref3, Fb_tmp) #P(ac)
+            sig_3 = sig_3 + np.einsum("Iidca,bd->Iiabc", v_ref3, Fb_tmp) #P(ab)P(ac)
             #   sig(Iiabc:babbb) += P(ab)*P(ac)*t(Jidbc:babbb)*I(aJId:bbbb)
             tei_tmp_J = self.tei.get_subblock((nb_occ, na_occ), (0, nb_occ), (0, nb_occ), (nb_occ, na_occ))
             tei_tmp_K = self.tei.get_subblock((nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ), (0, nb_occ))
             sig_3 = sig_3 + (np.einsum("Jidbc,aJId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jidbc,aJdI->Iiabc", v_ref3, tei_tmp_K))
-            sig_3 = sig_3 - (np.einsum("Jidba,cJId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jidba,cJdI->Iiabc", v_ref3, tei_tmp_K))
-            sig_3 = sig_3 - (np.einsum("Jidac,bJId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jidac,bJdI->Iiabc", v_ref3, tei_tmp_K))
-            sig_3 = sig_3 + (np.einsum("Jidab,cJId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jidab,cJdI->Iiabc", v_ref3, tei_tmp_K))
+            sig_3 = sig_3 - (np.einsum("Jidac,bJId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jidac,bJdI->Iiabc", v_ref3, tei_tmp_K)) #P(ab)
+            sig_3 = sig_3 - (np.einsum("Jidba,cJId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jidba,cJdI->Iiabc", v_ref3, tei_tmp_K)) #P(ac)
+            sig_3 = sig_3 + (np.einsum("Jidca,bJId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jidca,bJdI->Iiabc", v_ref3, tei_tmp_K)) #P(ab)P(ac)
             #   sig(Iiabc:babbb) += -P(ab)*P(bc)*t(Ijadc:babbb)*I(bjdi:baba)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
-            sig_3 = sig_3 + (np.einsum("Ijadc,bjdi->Iiabc", v_ref3, tei_tmp) - np.einsum("Ijadb,cjdi->Iiabc", v_ref3, tei_tmp))
-            sig_3 = sig_3 - (np.einsum("Ijbdc,ajdi->Iiabc", v_ref3, tei_tmp) - np.einsum("Ijbda,cjdi->Iiabc", v_ref3, tei_tmp))
+            sig_3 = sig_3 - np.einsum("Ijadc,bjdi->Iiabc", v_ref3, tei_tmp)
+            sig_3 = sig_3 + np.einsum("Ijbdc,ajdi->Iiabc", v_ref3, tei_tmp) #P(ab)
+            sig_3 = sig_3 + np.einsum("Ijadb,cjdi->Iiabc", v_ref3, tei_tmp) #P(bc)
+            sig_3 = sig_3 - np.einsum("Ijcdb,ajdi->Iiabc", v_ref3, tei_tmp) #P(ab)P(bc)
             #   sig(Iiabc:babbb) += 0.5*P(ac)*P(bc)*t(Iidec:babbb)*I(abde:bbbb)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
-            sig_3 = sig_3 + (np.einsum("Iidec,abde->Iiabc", v_ref3, tei_tmp) - np.einsum("Iidec,abed->Iiabc", v_ref3, tei_tmp))
-            sig_3 = sig_3 - (np.einsum("Iideb,acde->Iiabc", v_ref3, tei_tmp) - np.einsum("Iideb,aced->Iiabc", v_ref3, tei_tmp))
-            sig_3 = sig_3 - (np.einsum("Iidea,cbde->Iiabc", v_ref3, tei_tmp) - np.einsum("Iidea,cbed->Iiabc", v_ref3, tei_tmp))
-            sig_3 = sig_3 + (np.einsum("Iideb,cade->Iiabc", v_ref3, tei_tmp) - np.einsum("Iideb,caed->Iiabc", v_ref3, tei_tmp))
+            sig_3 = sig_3 + 0.5*(np.einsum("Iidec,abde->Iiabc", v_ref3, tei_tmp) - np.einsum("Iidec,abed->Iiabc", v_ref3, tei_tmp))
+            sig_3 = sig_3 - 0.5*(np.einsum("Iidea,cbde->Iiabc", v_ref3, tei_tmp) - np.einsum("Iidea,cbed->Iiabc", v_ref3, tei_tmp)) #P(ac)
+            sig_3 = sig_3 - 0.5*(np.einsum("Iideb,acde->Iiabc", v_ref3, tei_tmp) - np.einsum("Iideb,aced->Iiabc", v_ref3, tei_tmp)) #P(bc)
+            sig_3 = sig_3 + 0.5*(np.einsum("Iidea,bcde->Iiabc", v_ref3, tei_tmp) - np.einsum("Iidea,bced->Iiabc", v_ref3, tei_tmp)) #P(ac)P(bc)
             #   sig(Iiabc:babbb) += -P(ba)*P(bc)*t(Jiadc:babbb)*I(JbId:bbbb)
             tei_tmp_J = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
             tei_tmp_K = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
             sig_3 = sig_3 - (np.einsum("Jiadc,JbId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jiadc,JbdI->Iiabc", v_ref3, tei_tmp_K))
-            sig_3 = sig_3 + (np.einsum("Jiadb,JcId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jiadb,JcdI->Iiabc", v_ref3, tei_tmp_K))
-            sig_3 = sig_3 + (np.einsum("Jibdc,JaId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jibdc,JadI->Iiabc", v_ref3, tei_tmp_K))
-            sig_3 = sig_3 - (np.einsum("Jibda,JcId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jibda,JcdI->Iiabc", v_ref3, tei_tmp_K))
+            sig_3 = sig_3 + (np.einsum("Jibdc,JaId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jibdc,JadI->Iiabc", v_ref3, tei_tmp_K)) #P(ba)
+            sig_3 = sig_3 + (np.einsum("Jiadb,JcId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jiadb,JcdI->Iiabc", v_ref3, tei_tmp_K)) #P(bc)
+            sig_3 = sig_3 - (np.einsum("Jicdb,JaId->Iiabc", v_ref3, tei_tmp_J) - np.einsum("Jicdb,JadI->Iiabc", v_ref3, tei_tmp_K)) #P(ba)P(bc)
             #   sig(Iiabc:babbb) += -P(ab)*P(ac)*t(Ijdbc:babbb)*I(ajdi:baba)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
-            sig_3 = sig_3 - (np.einsum("Ijdbc,ajdi->Iiabc", v_ref3, tei_tmp) - np.einsum("Ijdba,cjdi->Iiabc", v_ref3, tei_tmp))
-            sig_3 = sig_3 + (np.einsum("Ijdac,bjdi->Iiabc", v_ref3, tei_tmp) - np.einsum("Ijdab,cjdi->Iiabc", v_ref3, tei_tmp))
+            sig_3 = sig_3 - np.einsum("Ijdbc,ajdi->Iiabc", v_ref3, tei_tmp)
+            sig_3 = sig_3 + np.einsum("Ijdac,bjdi->Iiabc", v_ref3, tei_tmp) #P(ab)
+            sig_3 = sig_3 + np.einsum("Ijdba,cjdi->Iiabc", v_ref3, tei_tmp) #P(ac)
+            sig_3 = sig_3 - np.einsum("Ijdca,bjdi->Iiabc", v_ref3, tei_tmp) #P(ab)P(ac)
             #   sig(Iiabc:babbb) += t(Jjabc:babbb)*I(JjIi:baba)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
             sig_3 = sig_3 + (np.einsum("Jjabc,JjIi->Iiabc", v_ref3, tei_tmp))
+            #   sig(Iiabc:babbb) += -P(ac)*P(bc)*t(Ijabd:babbb)*I(jcid:abab)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_3 = sig_3 + np.einsum("Ijabd,jcid->Iiabc", v_ref3, tei_tmp)
+            sig_3 = sig_3 - np.einsum("Ijcbd,jaid->Iiabc", v_ref3, tei_tmp) #P(ac)
+            sig_3 = sig_3 - np.einsum("Ijacd,jbid->Iiabc", v_ref3, tei_tmp) #P(bc)
+            sig_3 = sig_3 + np.einsum("Ijbcd,jaid->Iiabc", v_ref3, tei_tmp) #P(ac)P(bc)
+
+            '''
+            e1_2 = np.einsum("iab,iab->", sig_1_2, v_ref1)
+            e1_3 = np.einsum("iab,iab->", sig_1_3, v_ref1)
+
+            e2_1 = np.einsum("Iab,Iab->", sig_2_1, v_ref2)
+            e2_3 = np.einsum("Iab,Iab->", sig_2_3, v_ref2)
+
+            e3_1 = 0.25*np.einsum("Iiabc,Iiabc->", sig_3_1, v_ref3)
+            e3_2 = 0.25*np.einsum("Iiabc,Iiabc->", sig_3_2, v_ref3)
+
+            print("Are E1 and E2 close?")
+            print(np.isclose(e1_2, e2_1))
+            print("Are E1 and E3 close?")
+            print(np.isclose(e1_3, e3_1))
+            print(e1_3, e3_1)
+            print("Are E2 and E3 close?")
+            print(np.isclose(e2_3, e3_2))
+            '''
 
             sig_1_out = np.zeros((v_b1.shape[0], 1))
             v_ref1 = np.zeros((socc,socc,socc))

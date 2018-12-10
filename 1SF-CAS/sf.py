@@ -9,7 +9,7 @@ import psi4
 """
 1SF-CAS PROGRAM
 
-Runs the 1SF-CAS calculation. The (h), (p), and (h,p) excitations are still in development. 
+Runs the 1SF-CAS calculation. Currently implementing 1SF-IP/EA methods.
 
 Refs:
 Crawford Tutorials (http://sirius.chem.vt.edu/wiki/doku.php?id=crawdad:programming:project12)
@@ -111,6 +111,24 @@ def get_spatial_tei(wfn):
     tei = np.einsum('abcs,sd',tei,C)
     return tei 
 
+# calculates S**2
+def calc_s_squared(n_SF, delta_ec, conf_space, vect, socc):
+    if(n_SF==1 and delta_ec==0 and conf_space==""):
+        s2_vect = np.zeros(vect.shape)
+        count = 0
+        for i in range(socc):
+            for a in range(socc):
+                if(i==a): # to same orbital, no mult lost
+                    s = (socc)/2.0
+                else: # to different orbital, S-1
+                    s = (socc - 1.0)/2.0
+                s2_vect[count] = vect[count]*(s*(s+1.0))
+                count = count+1
+        return np.einsum("i,i->", vect, s2_vect)
+    else:
+        print("S**2 value for %iSF with electron count change of %i not yet supported." %(n_SF, delta_ec) )
+        return 0
+
 # Performs the 1SF-CAS calculation.
 # Parameters:
 #    delta_a         Desired number of alpha electrons to remove
@@ -152,6 +170,14 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     # RAS-1SF
     if(n_SF==1 and delta_ec==0 and conf_space==""):
         n_dets = socc * socc
+    elif(n_SF==2 and delta_ec==0 and conf_space==""):
+        guess_type = ""
+        n_dets = 0
+        for i in range(socc):
+            for j in range(i):
+                for a in range(socc):
+                    for b in range(a):
+                        n_dets = n_dets + 1 
     elif(n_SF==1 and delta_ec==0 and conf_space=="h"):
         n_dets = (socc * socc) + (socc * wfn.doccpi()[0]) + (((socc-1)*(socc)/2) * socc * wfn.doccpi()[0])
     elif(n_SF==1 and delta_ec==0 and conf_space=="p"):
@@ -212,7 +238,10 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
             else:
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
+        print("\nROOT No.\tEnergy\t\tS**2")
+        print("------------------------------------------------")
         for i, corr in enumerate(vals):
-            print("ROOT %i: %6.6f" % (i, e + corr))
+            print("   %i\t\t%6.6f\t%8.6f" % (i, e + corr, calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], socc)))
+        print("------------------------------------------------\n")
         return(e + vals[0])
 
