@@ -677,8 +677,6 @@ class LinOpH (LinearOperator):
             #   sig(Ia:ab) += -1.0*v(iA:ab)*I(aiAI:baba)
             tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf), (0, nb_occ))
             sig_2 = sig_2 - np.einsum("iA,aiAI->Ia", v_ref3, tei_tmp)
-            # for testing
-            sig_2_1 = -1.0*np.einsum("iA,aiAI->Ia", v_ref3, tei_tmp)
 
             ################################################ 
             # Do the following term:
@@ -719,8 +717,6 @@ class LinOpH (LinearOperator):
             #   sig(iA:ab) += -v(Ia:ab)*I(AIai:baba)
             tei_tmp = self.tei.get_subblock((na_occ, nbf), (0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ))
             sig_3 = sig_3 - np.einsum("Ia,AIai->iA", v_ref2, tei_tmp)
-            # for testing
-            sig_3 = -1.0*np.einsum("Ia,AIai->iA", v_ref2, tei_tmp)
 
             ################################################ 
             # Do the following term:
