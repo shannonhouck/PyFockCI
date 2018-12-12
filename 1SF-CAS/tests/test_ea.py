@@ -38,6 +38,8 @@ symmetry c1
 # Test: 1SF-CAS
 def test_1():
     psi4.core.clean()
+    psi4.core.clean_options()
+    psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     expected = sf_cas_ref( -1, 6, n2_7, conf_space="", add_opts=options )
     e = do_sf_cas( 0, 1, n2_7, conf_space="", add_opts=options )
@@ -45,6 +47,8 @@ def test_1():
 
 def test_2():
     psi4.core.clean()
+    psi4.core.clean_options()
+    psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'calc_s_squared': True, 'scf_type': 'pk'}
     expected = sf_cas_ref( -1, 4, n2_3, conf_space="", add_opts=options )
     e = do_sf_cas( 0, 1, n2_3, conf_space="", add_opts=options )
@@ -52,6 +56,8 @@ def test_2():
 
 def test_3():
     psi4.core.clean()
+    psi4.core.clean_options()
+    psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'diag_method': 'rsp'}
     expected = sf_cas_ref( -1, 2, o2, conf_space="", add_opts=options )
     e = do_sf_cas( 0, 1, o2, conf_space="", add_opts=options, num_roots=2 )
