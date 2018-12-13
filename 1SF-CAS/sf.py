@@ -188,6 +188,14 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     elif(n_SF==0 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
         guess_type = ""
         n_dets = socc
+    # RAS(h)-EA
+    elif(n_SF==0 and delta_ec==1 and conf_space=="h"):
+        guess_type = ""
+        n_dets = socc
+        for I in range(wfn.doccpi()[0]):
+            for a in range(socc):
+                for b in range(a):
+                    n_dets = n_dets + 1
     # RAS(h)-IP
     elif(n_SF==0 and delta_ec==-1 and conf_space=="h"):
         guess_type = ""

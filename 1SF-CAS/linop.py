@@ -945,6 +945,101 @@ class LinOpH (LinearOperator):
             sig_1 = np.einsum("b,ab->a", v, F_tmp)
             return sig_1
 
+        # doing RAS(h)-EA calculation
+        if(n_SF==0 and delta_ec==1 and conf_space=="h"):
+            """  
+                definitions:
+                I      doubly occupied
+                i,a    singly occupied
+                A      doubly unoccupied
+
+                block1 = v(a:b)
+                block2 = v(Iab:bbb)
+
+                Evaluate the following matrix vector multiply:
+
+                | H(1,1) | * v(1) + | H(1,2) | * v(2) = sig(1)
+                | H(2,1) | * v(1) + | H(2,2) | * v(2) = sig(2)
+           
+            """
+            v_b1 = v[0:socc] # v for block 1
+            v_b2 = v[socc:] # v for block 2
+            # v(1) indexing: (a:b)
+            v_ref1 = np.reshape(v_b1, (socc))
+            # v(2) indexing: (Iab:bbb)
+            v_ref2 = np.zeros((nb_occ, socc, socc))
+            index = 0
+            for I in range(nb_occ):
+                for a in range(socc):
+                    for b in range(a):
+                        v_ref2[I, a, b] = v_b2[index]
+                        v_ref2[I, b, a] = -1.0*v_b2[index]
+                        index = index + 1
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,1) v(1) = sig(1)
+            ################################################ 
+            #   sig(a:b) += v(a:b)*F(ab:bb)
+            F_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_1 = np.einsum("b,ab->a", v_ref1, F_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,1) v(1) = sig(1)
+            ################################################ 
+            #   sig(a:b) += v(a:b)*F(ab:bb)
+            F_tmp = Fb[0:nb_occ, nb_occ:na_occ]
+            sig_1 = sig_1 + np.einsum("Iba,Ib->a", v_ref2, F_tmp)
+            #   sig(a:b) += 0.5*v(Ibc:bbb)*I(Iabc:bbbb)
+            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_1 = sig_1 + 0.5*(np.einsum("Ibc,Iabc->a", v_ref2, tei_tmp) - np.einsum("Ibc,Iacb->a", v_ref2, tei_tmp))
+
+            ################################################ 
+            # Do the following term:
+            #       H(2,1) v(1) = sig(2)
+            ################################################ 
+            #   sig(Iab:bbb) += P(ab)*v(b:b)*F(aI:bb)
+            F_tmp = Fb[nb_occ:na_occ, 0:nb_occ]
+            sig_2 = np.einsum("b,aI->Iab", v_ref1, F_tmp)
+            sig_2 = sig_2 - np.einsum("a,bI->Iab", v_ref1, F_tmp) #P(ab)
+            #   sig(Iab:bbb) += v(c:b)*I(abIc:bbbb)
+            tei_tmp_J = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            tei_tmp_K = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_2 = sig_2 + (np.einsum("c,abIc->Iab", v_ref1, tei_tmp_J) - np.einsum("c,abcI->Iab", v_ref1, tei_tmp_K))
+
+            ################################################ 
+            # Do the following term:
+            #       H(2,2) v(2) = sig(2)
+            ################################################ 
+            #   sig(Iab:bbb) += -v(Jab:bbb)*F(JI:bb)
+            F_tmp = Fb[0:nb_occ, 0:nb_occ]
+            sig_2 = sig_2 - np.einsum("Jab,JI->Iab", v_ref2, F_tmp)
+            #   sig(Iab:bbb) += P(ab)*v(Icb:bbb)*F(ac:bb)
+            F_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_2 = sig_2 + np.einsum("Icb,ac->Iab", v_ref2, F_tmp)
+            sig_2 = sig_2 - np.einsum("Ica,bc->Iab", v_ref2, F_tmp) #P(ab)
+            #   sig(Iab:bbb) += -P(ab)*v(Jac:bbb)*I(JbIc:bbbb)
+            tei_tmp_J = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            tei_tmp_K = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_2 = sig_2 - (np.einsum("Jac,JbIc->Iab", v_ref2, tei_tmp_J) - np.einsum("Jac,JbcI->Iab", v_ref2, tei_tmp_K))
+            sig_2 = sig_2 + (np.einsum("Jbc,JaIc->Iab", v_ref2, tei_tmp_J) - np.einsum("Jbc,JacI->Iab", v_ref2, tei_tmp_K)) #P(ab)
+            #   sig(Iab:bbb) += 0.5*v(Icd:bbb)*I(abcd:bbbb)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_2 = sig_2 + 0.5*(np.einsum("Icd,abcd->Iab", v_ref2, tei_tmp) - np.einsum("Icd,abdc->Iab", v_ref2, tei_tmp))
+
+            # Sigma evaluations done! Pack back up for returning
+            sig_1 = np.reshape(sig_1, (v_b1.shape[0], 1))
+            sig_2_out = np.zeros((v_b2.shape[0], 1))
+            index = 0
+            for I in range(nb_occ):
+                for a in range(socc):
+                    for b in range(a):
+                        sig_2_out[index] = sig_2[I, a, b]
+                        index = index + 1
+
+            return np.vstack((sig_1, sig_2_out))
+
         # doing IP calculation
         if(n_SF==0 and delta_ec==-1 and conf_space==""):
             """ 
@@ -978,7 +1073,9 @@ class LinOpH (LinearOperator):
 
                 Evaluate the following matrix vector multiply:
 
-                | H(1,1) | * v(1) = sig(1)
+                | H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)
+                | H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)
+                | H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(2)
            
             """
             v_b1 = v[0:socc] # v for block 1
@@ -1076,7 +1173,7 @@ class LinOpH (LinearOperator):
 
             return np.vstack((sig_1, sig_2, sig_3))
 
-        # doing RAS(h)-IP calculation
+        # doing RAS(p)-IP calculation
         if(n_SF==0 and delta_ec==-1 and conf_space=="p"):
             """  
                 definitions:
@@ -1089,10 +1186,8 @@ class LinOpH (LinearOperator):
 
                 Evaluate the following matrix vector multiply:
 
-                | H(1,1) | * v(1) = sig(1)
-                | H(1,2) | * v(2) = sig(1)
-                | H(2,1) | * v(1) = sig(2)
-                | H(2,2) | * v(2) = sig(2)
+                | H(1,1) | * v(1) + | H(1,2) | * v(2) = sig(1)
+                | H(2,1) | * v(1) + | H(2,2) | * v(2) = sig(2)
            
             """
             v_b1 = v[0:socc] # v for block 1
