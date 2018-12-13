@@ -983,7 +983,7 @@ class LinOpH (LinearOperator):
             """
             v_b1 = v[0:socc] # v for block 1
             v_b2 = v[socc:nb_occ+socc] # v for block 2
-            v_b3 = v[nb_occ+socc:nb_occ+socc+(nb_occ*socc*socc)] # v for block 3
+            v_b3 = v[nb_occ+socc:] # v for block 3
             # v(1) indexing: (i:a)
             v_ref1 = np.reshape(v_b1, (socc))
             # v(2) indexing: (I:a)
@@ -1041,8 +1041,8 @@ class LinOpH (LinearOperator):
             ################################################ 
             F_tmp = Fb[nb_occ:na_occ, 0:nb_occ]
             sig_3 = np.einsum("i,aI->Iia", v_ref1, F_tmp)
-            tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
-            sig_3 = sig_3 - np.einsum("j,Ijai->Iia", v_ref1, tei_tmp)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
+            sig_3 = sig_3 - np.einsum("j,ajIi->Iia", v_ref1, tei_tmp)
 
             ################################################ 
             # Do the following term:
@@ -1053,7 +1053,7 @@ class LinOpH (LinearOperator):
 
             ################################################ 
             # Do the following term:
-            #       H(3,1) v(1) = sig(3)
+            #       H(3,3) v(3) = sig(3)
             ################################################
             F_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
             sig_3 = sig_3 - np.einsum("Ija,ji->Iia", v_ref3, F_tmp)
@@ -1066,6 +1066,9 @@ class LinOpH (LinearOperator):
             sig_3 = sig_3 - np.einsum("Ijb,ajbi->Iia", v_ref3, tei_tmp)
             tei_tmp = self.tei.get_subblock((0, nb_occ), (nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ))
             sig_3 = sig_3 + np.einsum("Jja,JjIi->Iia", v_ref3, tei_tmp)
+            tei_tmp_J = self.tei.get_subblock((nb_occ, na_occ), (0, nb_occ), (0, nb_occ), (nb_occ, na_occ))
+            tei_tmp_K = self.tei.get_subblock((nb_occ, na_occ), (0, nb_occ), (nb_occ, na_occ), (0, nb_occ))
+            sig_3 = sig_3 + (np.einsum("Jib,aJIb->Iia", v_ref3, tei_tmp_J) - np.einsum("Jib,aJbI->Iia", v_ref3, tei_tmp_K))
 
             sig_1 = np.reshape(sig_1, (v_b1.shape[0], 1))
             sig_2 = np.reshape(sig_2, (v_b2.shape[0], 1))
