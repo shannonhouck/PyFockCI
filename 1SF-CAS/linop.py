@@ -1040,6 +1040,119 @@ class LinOpH (LinearOperator):
 
             return np.vstack((sig_1, sig_2_out))
 
+        # doing RAS(p)-EA calculation
+        if(n_SF==0 and delta_ec==1 and conf_space=="p"):
+            """  
+                definitions:
+                I      doubly occupied
+                i,a    singly occupied
+                A      doubly unoccupied
+
+                block1 = v(a:b)
+                block2 = v(A:b)
+                block3 = v(iAa:aab)
+
+                Evaluate the following matrix vector multiply:
+
+                | H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)
+                | H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)
+                | H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(2)
+           
+            """
+            v_b1 = v[0:socc] # v for block 1
+            v_b2 = v[socc:socc+na_virt] # v for block 2
+            v_b3 = v[socc+na_virt:] # v for block 3
+            # v(1) indexing: (a:b)
+            v_ref1 = np.reshape(v_b1, (socc))
+            # v(2) indexing: (A:b)
+            v_ref2 = np.reshape(v_b2, (na_virt))
+            # v(3) indexing: (iAa:aab)
+            v_ref3 = np.reshape(v_b3, (socc, na_virt, socc))
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,1) v(1) = sig(1)
+            ################################################ 
+            F_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_1 = np.einsum("b,ab->a", v_ref1, F_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,2) v(2) = sig(1)
+            ################################################ 
+            F_tmp = Fb[nb_occ:na_occ, na_occ:nbf]
+            sig_1 = sig_1 + np.einsum("A,aA->a", v_ref2, F_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(1,3) v(3) = sig(1)
+            ################################################ 
+            F_tmp = Fa[nb_occ:na_occ, na_occ:nbf]
+            sig_1 = sig_1 + np.einsum("iAa,iA->a", v_ref3, F_tmp)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf), (nb_occ, na_occ))
+            sig_1 = sig_1 + np.einsum("iAb,iaAb->a", v_ref3, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(2,1) v(1) = sig(2)
+            ################################################ 
+            F_tmp = Fb[na_occ:nbf, nb_occ:na_occ]
+            sig_2 = np.einsum("a,Aa->A", v_ref1, F_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(2,2) v(2) = sig(2)
+            ################################################ 
+            F_tmp = Fb[na_occ:nbf, na_occ:nbf]
+            sig_2 = sig_2 + np.einsum("B,AB->A", v_ref2, F_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(2,3) v(3) = sig(2)
+            ################################################ 
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (na_occ, nbf), (na_occ, nbf), (nb_occ, na_occ))
+            sig_2 = sig_2 + np.einsum("iBa,iABa->A", v_ref3, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(3,1) v(1) = sig(3)
+            ################################################ 
+            F_tmp = Fa[na_occ:nbf, nb_occ:na_occ]
+            sig_3 = np.einsum("a,Ai->iAa", v_ref1, F_tmp)
+            tei_tmp = self.tei.get_subblock((na_occ, nbf), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_3 = sig_3 + np.einsum("b,Aaib->iAa", v_ref1, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(3,2) v(2) = sig(3)
+            ################################################ 
+            tei_tmp = self.tei.get_subblock((na_occ, nbf), (nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf))
+            sig_3 = sig_3 + np.einsum("B,AaiB->iAa", v_ref2, tei_tmp)
+
+            ################################################ 
+            # Do the following term:
+            #       H(3,3) v(3) = sig(3)
+            ################################################ 
+            F_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
+            sig_3 = sig_3 - np.einsum("jAa,ji->iAa", v_ref3, F_tmp)
+            F_tmp = Fa[na_occ:nbf, na_occ:nbf]
+            sig_3 = sig_3 + np.einsum("iBa,AB->iAa", v_ref3, F_tmp)
+            F_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
+            sig_3 = sig_3 + np.einsum("iAb,ab->iAa", v_ref3, F_tmp)
+            tei_tmp = self.tei.get_subblock((nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ), (nb_occ, na_occ))
+            sig_3 = sig_3 - np.einsum("jAb,jaib->iAa", v_ref3, tei_tmp)
+            tei_tmp = self.tei.get_subblock((na_occ, nbf), (nb_occ, na_occ), (na_occ, nbf), (nb_occ, na_occ))
+            sig_3 = sig_3 + np.einsum("iBb,AaBb->iAa", v_ref3, tei_tmp)
+            tei_tmp_J = self.tei.get_subblock((na_occ, nbf), (nb_occ, na_occ), (nb_occ, na_occ), (na_occ, nbf))
+            tei_tmp_K = self.tei.get_subblock((na_occ, nbf), (nb_occ, na_occ), (na_occ, nbf), (nb_occ, na_occ))
+            sig_3 = sig_3 + (np.einsum("jBa,AjiB->iAa", v_ref3, tei_tmp_J) - np.einsum("jBa,AjBi->iAa", v_ref3, tei_tmp_K))
+
+            sig_1 = np.reshape(sig_1, (v_b1.shape[0], 1))
+            sig_2 = np.reshape(sig_2, (v_b2.shape[0], 1))
+            sig_3 = np.reshape(sig_3, (v_b3.shape[0], 1))
+
+            return np.vstack((sig_1, sig_2, sig_3))
+
         # doing IP calculation
         if(n_SF==0 and delta_ec==-1 and conf_space==""):
             """ 

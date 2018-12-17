@@ -196,6 +196,10 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
             for a in range(socc):
                 for b in range(a):
                     n_dets = n_dets + 1
+    # RAS(p)-EA
+    elif(n_SF==0 and delta_ec==1 and conf_space=="p"):
+        guess_type = ""
+        n_dets = socc + na_virt + (na_virt*socc*socc)
     # RAS(h)-IP
     elif(n_SF==0 and delta_ec==-1 and conf_space=="h"):
         guess_type = ""
@@ -256,6 +260,7 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
             else:
+                print("uhhhh")
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         print("\nROOT No.\tEnergy\t\tS**2")
