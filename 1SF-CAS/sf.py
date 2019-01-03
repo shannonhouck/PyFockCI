@@ -215,7 +215,23 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     elif(n_SF==0 and delta_ec==1 and conf_space=="p"):
         guess_type = ""
         n_dets = socc + na_virt + (na_virt*socc*socc)
-    # RAS(p)-SF-EA
+    # RAS(h)-IP
+    elif(n_SF==0 and delta_ec==-1 and conf_space=="h"):
+        guess_type = ""
+        n_dets = socc + wfn.doccpi()[0] + (wfn.doccpi()[0]*socc*socc)
+    # RAS(p)-IP
+    elif(n_SF==0 and delta_ec==-1 and conf_space=="p"):
+        guess_type = ""
+        n_dets = socc
+        for i in range(socc):
+            for j in range(i):
+                for A in range(na_virt):
+                    n_dets = n_dets + 1
+    # CAS-1SF-IP/EA
+    elif(n_SF==1 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
+        guess_type = ""
+        n_dets = socc * ((socc-1)*(socc)/2)
+    # RAS(p)-1SF-EA
     elif(n_SF==1 and delta_ec==1 and conf_space=="p"):
             n_dets = socc * na_virt * socc
             for i in range(socc):
@@ -228,36 +244,21 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
                         for a in range(socc):
                             for b in range(a):
                                 n_dets = n_dets + 1
-    # RAS(h)-IP
-    elif(n_SF==0 and delta_ec==-1 and conf_space=="h"):
+    # RAS(h)-1SF-IP
+    elif(n_SF==1 and delta_ec==-1 and conf_space=="h"):
         guess_type = ""
-        n_dets = socc + wfn.doccpi()[0] + (wfn.doccpi()[0]*socc*socc)
-    # RAS(h)-IP
-    elif(n_SF==0 and delta_ec==-1 and conf_space=="p"):
-        guess_type = ""
-        n_dets = socc
-        for i in range(socc):
-            for j in range(i):
-                for A in range(na_virt):
-                    n_dets = n_dets + 1
-    # CAS-1SF-IP/EA
-    elif(n_SF==1 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
-        guess_type = ""
+        nb_occ = wfn.doccpi()[0]
         n_dets = socc * ((socc-1)*(socc)/2)
-    elif(n_SF==1 and (delta_ec==-1 or delta_ec==1) and conf_space=="h"):
-        guess_type = ""
-        b_occ = wfn.doccpi()[0]
+        n_dets = n_dets + (socc * nb_occ * socc)
         # this is the MOST hack-ish way to get the triangle number of a traingle number. Fix later
         count = 0 
-        for a in range(socc):
-            for b in range(a):
-                for c in range(b):
-                    count = count + 1
-        # correct number of dets
-        n_dets = (socc * ((socc-1)*(socc)/2)) 
-        # guessing this is also right
-        n_dets = n_dets + (b_occ * ((socc-1)*(socc)/2))
-        n_dets = n_dets + (b_occ * socc * count)
+        for I in range(nb_occ):
+            for i in range(socc):
+                for j in range(i):
+                    for a in range(socc):
+                        for b in range(a):
+                            count = count + 1
+        n_dets = n_dets + count
     else:
         print("Sorry, %iSF with electron count change of %i not yet supported. Exiting..." %(n_SF, delta_ec) )
         exit()
