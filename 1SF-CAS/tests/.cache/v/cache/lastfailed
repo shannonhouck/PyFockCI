@@ -8,8 +8,6 @@
   "test_h_sfea.py::test_1": true, 
   "test_h_sfea.py::test_2": true, 
   "test_h_sfea.py::test_3": true, 
-  "test_h_sfip.py::test_1": true, 
-  "test_h_sfip.py::test_3": true, 
   "test_hp.py": true, 
   "test_ip.py": true, 
   "test_p.py": true
