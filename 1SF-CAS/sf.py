@@ -23,15 +23,61 @@ Psi4NumPy Tutorials
 ###############################################################################################
 
 # Class for two-electron integral object handling.
-# Handles full ERIs.
-class ERI_Full:
-    def __init__(self, eri_in):
-        self.eri = eri_in
+# Handles ERIs.
+class ERI:
+    def __init__(self, wfn):
+        pass
 
     ''' 
     Returns a given subblock of the ERI matrix.
     '''
     def get_subblock(self, a, b, c, d, blocktype=""): 
+        pass
+
+# Class for full ERI integrals.
+class ERI_Full(ERI):
+    def __init__(self, wfn):
+        # get necessary integrals/matrices from Psi4 (AO basis)
+        C = psi4.core.Matrix.to_array(wfn.Ca())
+        # two-electron part
+        mints = psi4.core.MintsHelper(wfn.basisset())
+        self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
+        # put in physicists' notation
+        self.eri = self.eri.transpose(0, 2, 1, 3)
+        self.eri = np.einsum('pqrs,pa',self.eri,C)
+        self.eri = np.einsum('aqrs,qb',self.eri,C)
+        self.eri = np.einsum('abrs,rc',self.eri,C)
+        self.eri = np.einsum('abcs,sd',self.eri,C)
+
+    ''' 
+    Returns a given subblock of the ERI matrix.
+    '''
+    def get_subblock(self, a, b, c, d, blocktype=""):
+        if(blocktype==""):
+            return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
+        elif(blocktype=="JK"):
+            out = self.eri - self.eri.transpose(0, 1, 3, 2)
+            return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
+
+# Class for full ERI integrals.
+class ERI_DF(ERI):
+    def __init__(self, wfn):
+        # get necessary integrals/matrices from Psi4 (AO basis)
+        C = psi4.core.Matrix.to_array(wfn.Ca())
+        # two-electron part
+        mints = psi4.core.MintsHelper(wfn.basisset())
+        self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
+        # put in physicists' notation
+        self.eri = self.eri.transpose(0, 2, 1, 3)
+        self.eri = np.einsum('pqrs,pa',self.eri,C)
+        self.eri = np.einsum('aqrs,qb',self.eri,C)
+        self.eri = np.einsum('abrs,rc',self.eri,C)
+        self.eri = np.einsum('abcs,sd',self.eri,C)
+
+    ''' 
+    Returns a given subblock of the ERI matrix.
+    '''
+    def get_subblock(self, a, b, c, d, blocktype=""):
         if(blocktype==""):
             return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
         elif(blocktype=="JK"):
@@ -49,24 +95,8 @@ def kdel(i, j):
     else:
         return 0
 
-# Gets the non-spin-adapted Fock matrix (Fa and Fb as one)
-def get_nsa_F(wfn):
-    # get necessary integrals/matrices from Psi4 (AO basis)
-    # References: Psi4NumPy tutorials
-    Ca = psi4.core.Matrix.to_array(wfn.Ca())
-    Cb = psi4.core.Matrix.to_array(wfn.Cb())
-    C = np.block([[Ca, np.zeros_like(Cb)],
-                      [np.zeros_like(Ca), Cb]])
-    # one-electron part
-    Fa = psi4.core.Matrix.to_array(wfn.Fa(), copy=True)
-    Fb = psi4.core.Matrix.to_array(wfn.Fb(), copy=True)
-    F = np.block([[Fa, np.zeros_like(Fa)],
-                  [np.zeros_like(Fb), Fb]])
-    F = np.dot(C.T, np.dot(F, C)) 
-    return F
-
 # Gets Fa and Fb for spactial orbitals
-def get_spatial_F(wfn):
+def get_F(wfn):
     # get necessary integrals/matrices from Psi4 (AO basis)
     C = psi4.core.Matrix.to_array(wfn.Ca())
     Fa = psi4.core.Matrix.to_array(wfn.Fa(), copy=True)
@@ -74,42 +104,6 @@ def get_spatial_F(wfn):
     Fa = np.dot(C.T, np.dot(Fa, C)) 
     Fb = np.dot(C.T, np.dot(Fb, C)) 
     return (Fa, Fb)
-
-# gets the non-spin-adapted two-electron integrals (alpha and beta as one)
-def get_nsa_tei(wfn):
-    # get necessary integrals/matrices from Psi4 (AO basis)
-    # References: Psi4NumPy tutorials
-    Ca = psi4.core.Matrix.to_array(wfn.Ca())
-    Cb = psi4.core.Matrix.to_array(wfn.Cb())
-    C = np.block([[Ca, np.zeros_like(Cb)],
-                      [np.zeros_like(Ca), Cb]])
-    # two-electron part
-    mints = psi4.core.MintsHelper(wfn.basisset())
-    tei = psi4.core.Matrix.to_array(mints.ao_eri(), copy=True)
-    I = np.eye(2)
-    tei = np.kron(I, tei)
-    tei = np.kron(I, tei.T)
-    tei = tei.transpose(0, 2, 1, 3) - tei.transpose(0, 2, 3, 1)
-    tei = np.einsum('pqrs,pa',tei,C)
-    tei = np.einsum('aqrs,qb',tei,C)
-    tei = np.einsum('abrs,rc',tei,C)
-    tei = np.einsum('abcs,sd',tei,C)
-    return tei
-
-# gets the spatial two-electron integrals (alpha and beta equivalent)
-def get_spatial_tei(wfn):
-    # get necessary integrals/matrices from Psi4 (AO basis)
-    C = psi4.core.Matrix.to_array(wfn.Ca())
-    # two-electron part
-    mints = psi4.core.MintsHelper(wfn.basisset())
-    tei = psi4.core.Matrix.to_array(mints.ao_eri(), copy=True)
-    # put in physicists' notation
-    tei = tei.transpose(0, 2, 1, 3)
-    tei = np.einsum('pqrs,pa',tei,C)
-    tei = np.einsum('aqrs,qb',tei,C)
-    tei = np.einsum('abrs,rc',tei,C)
-    tei = np.einsum('abcs,sd',tei,C)
-    return tei 
 
 # calculates S**2
 def calc_s_squared(n_SF, delta_ec, conf_space, vect, socc):
@@ -148,33 +142,25 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, socc):
 #
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
-def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS" ):
+def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL" ):
+    # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
     psi4.core.clean_variables()
+    # setting default options, reading in additional options from user
     opts = {'basis': 'cc-pvdz',
-            'scf_type': 'pk',
+            'scf_type': 'direct',
             'e_convergence': 1e-10,
             'd_convergence': 1e-10,
             'reference': 'rohf'}
     opts.update(add_opts)
     psi4.set_options(opts)
+    # run ROHF
     e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
-    Fa, Fb = get_spatial_F(wfn)
-
-    '''
-    H = wfn.H().to_array()
-    #np.savetxt('H_tmp.npy', H, fmt = '%.12f')
-    H_ref = np.loadtxt('H_tmp.npy')
-    F_ref = np.loadtxt('F_tmp.npy')
-    if(not np.allclose(H, H_ref)):
-        print("they're NOT the same, confirmed")
-    print(Fa - F_ref)
-    print(H - H_ref)
-    exit()
-    '''
-
-    tei = ERI_Full(get_spatial_tei(wfn))
+    # get integrals
+    Fa, Fb = get_F(wfn)
+    tei = ERI_Full(wfn)
+    # obtain some important values
     socc = wfn.soccpi()[0]
     na_virt = wfn.basisset().nbf() - (wfn.soccpi()[0] + wfn.doccpi()[0])
     nb_virt = wfn.basisset().nbf() - wfn.doccpi()[0]

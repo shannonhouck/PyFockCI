@@ -42,7 +42,7 @@ def test_2():
     psi4.core.clean()
     psi4.core.clean_options()
     psi4.core.clean_variables()
-    options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'calc_s_squared': True, 'scf_type': 'pk'}
+    options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'calc_s_squared': True, 'scf_type': 'direct'}
     expected = sf_cas_ref( 0, 3, n2_3, conf_space="", add_opts=options )
     e = do_sf_cas( 1, 1, n2_3, conf_space="", add_opts=options )
     assert abs(e - expected) < threshold
