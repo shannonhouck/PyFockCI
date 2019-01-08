@@ -31,58 +31,118 @@ class ERI:
     ''' 
     Returns a given subblock of the ERI matrix.
     '''
-    def get_subblock(self, a, b, c, d, blocktype=""): 
+    def get_subblock(self, a, b, c, d): 
         pass
 
 # Class for full ERI integrals.
 class ERI_Full(ERI):
-    def __init__(self, wfn):
+    def __init__(self, C, basis, ras1, ras2, ras3):
         # get necessary integrals/matrices from Psi4 (AO basis)
-        C = psi4.core.Matrix.to_array(wfn.Ca())
-        # two-electron part
-        mints = psi4.core.MintsHelper(wfn.basisset())
+        mints = psi4.core.MintsHelper(basis)
         self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
         # put in physicists' notation
         self.eri = self.eri.transpose(0, 2, 1, 3)
+        # move to MO basis
         self.eri = np.einsum('pqrs,pa',self.eri,C)
         self.eri = np.einsum('aqrs,qb',self.eri,C)
         self.eri = np.einsum('abrs,rc',self.eri,C)
         self.eri = np.einsum('abcs,sd',self.eri,C)
 
-    ''' 
-    Returns a given subblock of the ERI matrix.
-    '''
-    def get_subblock(self, a, b, c, d, blocktype=""):
-        if(blocktype==""):
-            return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
-        elif(blocktype=="JK"):
-            out = self.eri - self.eri.transpose(0, 1, 3, 2)
-            return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
+    def get_subblock(self, a, b, c, d):
+        return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
 
 # Class for full ERI integrals.
 class ERI_DF(ERI):
-    def __init__(self, wfn):
-        # get necessary integrals/matrices from Psi4 (AO basis)
-        C = psi4.core.Matrix.to_array(wfn.Ca())
-        # two-electron part
-        mints = psi4.core.MintsHelper(wfn.basisset())
-        self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
+    # Used Psi4NumPy for reference for this section
+    # ras1, ras2, ras3 indicate the number of orbitals in each section
+    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space):
+        # get info from Psi4
+        zero = psi4.core.BasisSet.zero_ao_basis_set()
+        mints = psi4.core.MintsHelper(basis)
+        # (Q|pq)
+        eri = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, basis, basis))
+        eri = np.squeeze(eri)
+        # J^-1/2 (don't need to keep)
+        J = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, zero, aux))
+        J.power(-0.5, 1e-14)
+        J = np.squeeze(J)
+        # Contract and obtain final form
+        eri = np.einsum("PQ,Qpq->Ppq", J, eri)
         # put in physicists' notation
-        self.eri = self.eri.transpose(0, 2, 1, 3)
-        self.eri = np.einsum('pqrs,pa',self.eri,C)
-        self.eri = np.einsum('aqrs,qb',self.eri,C)
-        self.eri = np.einsum('abrs,rc',self.eri,C)
-        self.eri = np.einsum('abcs,sd',self.eri,C)
+        #self.eri = self.eri.transpose(0, 2, 1, 3)
+        C_ras1 = C[:, 0:ras1]
+        C_ras2 = C[:, ras1:ras1+ras2]
+        C_ras3 = C[:, ras1+ras2:]
+        # move to MO basis
+        # Notation: ij in active space, IJ in docc, AB in virtual
+        # Bnm notation, where n and m indicate RAS space (1/2/3)
+        # all of them need RAS2
+        B2m = np.einsum('Ppq,pi->Piq', eri, C_ras2)
+        self.B22 = np.einsum('Piq,qj->Pij', B2m, C_ras2)
+        # if configuration space is "h"
+        if(conf_space == "h"):
+            B1m = np.einsum('Ppq,pI->PIq', eri, C_ras1)
+            self.B11 = np.einsum('PIq,qJ->PIJ', B1m, C_ras1)
+            self.B12 = np.einsum('PIq,qj->PIj', B1m, C_ras2)
+            self.B21 = np.einsum('Piq,qJ->PiJ', B2m, C_ras1)
+        if(conf_space == "p"):
+            B3m = np.einsum('Ppq,pA->PAq', eri, C_ras3)
+            self.B33 = np.einsum('PAq,qB->PAB', B3m, C_ras3)
+            self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
+            self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
+        if(conf_space == "h,p"):
+            B1m = np.einsum('Ppq,pI->PIq', eri, C_ras1)
+            self.B11 = np.einsum('PIq,qJ->PIJ', B1m, C_ras1)
+            self.B12 = np.einsum('PIq,qj->PIj', B1m, C_ras2)
+            self.B21 = np.einsum('Piq,qJ->PiJ', B2m, C_ras1)
+            self.B13 = np.einsum('PIq,qA->PIA', B1m, C_ras3)
+            B3m = np.einsum('Ppq,pA->PAq', eri, C_ras3)
+            self.B33 = np.einsum('PAq,qB->PAB', B3m, C_ras3)
+            self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
+            self.B31 = np.einsum('PAq,qJ->PAJ', B3m, C_ras1)
+            self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
 
-    ''' 
-    Returns a given subblock of the ERI matrix.
-    '''
-    def get_subblock(self, a, b, c, d, blocktype=""):
-        if(blocktype==""):
-            return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
-        elif(blocktype=="JK"):
-            out = self.eri - self.eri.transpose(0, 1, 3, 2)
-            return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
+    # a, b, c, d defined as RAS(1/2/3) spaces, integers
+    def get_subblock(self, bra, ket):
+        if(bra == "11"):
+            B_bra = self.B11
+        elif(bra == "12"):
+            B_bra = self.B12
+        elif(bra == "13"):
+            B_bra = self.B13
+        elif(bra == "21"):
+            B_bra = self.B21
+        elif(bra == "22"):
+            B_bra = self.B22
+        elif(bra == "23"):
+            B_bra = self.B23
+        elif(bra == "31"):
+            B_bra = self.B31
+        elif(bra == "32"):
+            B_bra = self.B31
+        elif(bra == "33"):
+            B_bra = self.B33
+
+        if(ket == "11"):
+            B_ket = self.B11
+        elif(ket == "12"):
+            B_ket = self.B12
+        elif(ket == "13"):
+            B_ket = sef.B13
+        elif(ket == "21"):
+            B_ket = self.B21
+        elif(ket == "22"):
+            B_ket = self.B22
+        elif(ket == "23"):
+            B_ket = self.B23
+        elif(ket == "31"):
+            B_ket = self.B31
+        elif(ket == "32"):
+            B_ket = self.B31
+        elif(ket == "33"):
+            B_ket = self.B33
+
+        return np.einsum("Pij,Qkl->ijkl", B_bra, B_ket)
 
 ###############################################################################################
 # Functions
@@ -159,7 +219,10 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
     # get integrals
     Fa, Fb = get_F(wfn)
-    tei = ERI_Full(wfn)
+    if(integral_type=="FULL"):
+        tei = ERI_Full(wfn.Ca(), wfn.basisset())
+    if(integral_type=="DF"):
+        tei = ERI_DF(wfn.Ca(), wfn.basisset())
     # obtain some important values
     socc = wfn.soccpi()[0]
     na_virt = wfn.basisset().nbf() - (wfn.soccpi()[0] + wfn.doccpi()[0])
