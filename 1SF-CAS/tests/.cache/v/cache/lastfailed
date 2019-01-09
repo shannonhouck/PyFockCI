@@ -1,14 +1,5 @@
 {
-  "test_2sf.py": true, 
-  "test_cas_sfip.py": true, 
-  "test_ea.py": true, 
-  "test_h.py": true, 
-  "test_h.py::test_2": true, 
-  "test_h.py::test_3": true, 
   "test_h_sfea.py::test_1": true, 
   "test_h_sfea.py::test_2": true, 
-  "test_h_sfea.py::test_3": true, 
-  "test_hp.py": true, 
-  "test_ip.py": true, 
-  "test_p.py": true
+  "test_h_sfea.py::test_3": true
 }

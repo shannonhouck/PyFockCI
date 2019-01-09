@@ -47,9 +47,11 @@ class ERI_Full(ERI):
         self.eri = np.einsum('aqrs,qb',self.eri,C)
         self.eri = np.einsum('abrs,rc',self.eri,C)
         self.eri = np.einsum('abcs,sd',self.eri,C)
+        # ind stores the indexing of ras1/ras2/ras3 for get_subblock method
+        self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[ras1+ras2,ras1+ras2+ras3]]
 
     def get_subblock(self, a, b, c, d):
-        return self.eri[a[0]:a[1], b[0]:b[1], c[0]:c[1], d[0]:d[1]]
+        return self.eri[self.ind[a][0]:self.ind[a][1], self.ind[b][0]:self.ind[b][1], self.ind[c][0]:self.ind[c][1], self.ind[d][0]:self.ind[d][1]]
 
 # Class for full ERI integrals.
 class ERI_DF(ERI):
@@ -103,7 +105,7 @@ class ERI_DF(ERI):
             self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
 
     # a, b, c, d defined as RAS(1/2/3) spaces, integers
-    def get_subblock(self, bra, ket):
+    def get_subblock(self, a, b, c, d):
         if(bra == "11"):
             B_bra = self.B11
         elif(bra == "12"):
@@ -217,16 +219,16 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     psi4.set_options(opts)
     # run ROHF
     e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
-    # get integrals
-    Fa, Fb = get_F(wfn)
-    if(integral_type=="FULL"):
-        tei = ERI_Full(wfn.Ca(), wfn.basisset())
-    if(integral_type=="DF"):
-        tei = ERI_DF(wfn.Ca(), wfn.basisset())
     # obtain some important values
     socc = wfn.soccpi()[0]
     na_virt = wfn.basisset().nbf() - (wfn.soccpi()[0] + wfn.doccpi()[0])
     nb_virt = wfn.basisset().nbf() - wfn.doccpi()[0]
+    # get integrals
+    Fa, Fb = get_F(wfn)
+    if(integral_type=="FULL"):
+        tei = ERI_Full(wfn.Ca(), wfn.basisset(), wfn.doccpi()[0], socc, na_virt)
+    if(integral_type=="DF"):
+        tei = ERI_DF(wfn.Ca(), wfn.basisset(), wfn.doccpi()[0], socc, na_virt, conf_space)
     # determine number of spin-flips and total change in electron count
     delta_ec = delta_b - delta_a
     n_SF = min(delta_a, delta_b)
