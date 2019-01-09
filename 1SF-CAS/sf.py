@@ -65,13 +65,15 @@ class ERI_DF(ERI):
         eri = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, basis, basis))
         eri = np.squeeze(eri)
         # J^-1/2 (don't need to keep)
-        J = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, zero, aux))
+        #J = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, zero, aux))
+        J = mints.ao_eri(zero, aux, zero, aux)
         J.power(-0.5, 1e-14)
         J = np.squeeze(J)
         # Contract and obtain final form
         eri = np.einsum("PQ,Qpq->Ppq", J, eri)
         # put in physicists' notation
         #self.eri = self.eri.transpose(0, 2, 1, 3)
+        C = psi4.core.Matrix.to_array(C)
         C_ras1 = C[:, 0:ras1]
         C_ras2 = C[:, ras1:ras1+ras2]
         C_ras3 = C[:, ras1+ras2:]
@@ -106,45 +108,52 @@ class ERI_DF(ERI):
 
     # a, b, c, d defined as RAS(1/2/3) spaces, integers
     def get_subblock(self, a, b, c, d):
-        if(bra == "11"):
-            B_bra = self.B11
-        elif(bra == "12"):
-            B_bra = self.B12
-        elif(bra == "13"):
-            B_bra = self.B13
-        elif(bra == "21"):
-            B_bra = self.B21
-        elif(bra == "22"):
-            B_bra = self.B22
-        elif(bra == "23"):
-            B_bra = self.B23
-        elif(bra == "31"):
-            B_bra = self.B31
-        elif(bra == "32"):
-            B_bra = self.B31
-        elif(bra == "33"):
-            B_bra = self.B33
+        # the B matrices are still in chemists' notation, don't switch b/c until end
+        if(a == 1):
+            if(c == 1):
+                B_bra = self.B11
+            if(c == 2):
+                B_bra = self.B12
+            if(c == 3):
+                B_bra = self.B13
+        if(a == 2):
+            if(c == 1):
+                B_bra = self.B21
+            if(c == 2):
+                B_bra = self.B22
+            if(c == 3):
+                B_bra = self.B23
+        if(a == 3):
+            if(c == 1):
+                B_bra = self.B31
+            if(c == 2):
+                B_bra = self.B32
+            if(c == 3):
+                B_bra = self.B33
 
-        if(ket == "11"):
-            B_ket = self.B11
-        elif(ket == "12"):
-            B_ket = self.B12
-        elif(ket == "13"):
-            B_ket = sef.B13
-        elif(ket == "21"):
-            B_ket = self.B21
-        elif(ket == "22"):
-            B_ket = self.B22
-        elif(ket == "23"):
-            B_ket = self.B23
-        elif(ket == "31"):
-            B_ket = self.B31
-        elif(ket == "32"):
-            B_ket = self.B31
-        elif(ket == "33"):
-            B_ket = self.B33
+        if(b == 1):
+            if(d == 1):
+                B_ket = self.B11
+            if(d == 2):
+                B_ket = self.B12
+            if(d == 3):
+                B_ket = self.B13
+        if(b == 2):
+            if(d == 1):
+                B_ket = self.B21
+            if(d == 2):
+                B_ket = self.B22
+            if(d == 3):
+                B_ket = self.B23
+        if(b == 3):
+            if(d == 1):
+                B_ket = self.B31
+            if(d == 2):
+                B_ket = self.B32
+            if(d == 3): 
+                B_ket = self.B33
 
-        return np.einsum("Pij,Qkl->ijkl", B_bra, B_ket)
+        return np.einsum("Pij,Pkl->ijkl", B_bra, B_ket).transpose(0, 2, 1, 3)
 
 ###############################################################################################
 # Functions
@@ -204,7 +213,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, socc):
 #
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
-def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL" ):
+def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="" ):
     # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
@@ -228,7 +237,11 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     if(integral_type=="FULL"):
         tei = ERI_Full(wfn.Ca(), wfn.basisset(), wfn.doccpi()[0], socc, na_virt)
     if(integral_type=="DF"):
-        tei = ERI_DF(wfn.Ca(), wfn.basisset(), wfn.doccpi()[0], socc, na_virt, conf_space)
+        # if user hasn't defined which aux basis to use, default behavior is to use the one from opts
+        if(aux_basis_name == ""):
+            aux_basis_name = opts['basis']
+        aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", "JKFIT", aux_basis_name)
+        tei = ERI_DF(wfn.Ca(), wfn.basisset(), aux_basis, wfn.doccpi()[0], socc, na_virt, conf_space)
     # determine number of spin-flips and total change in electron count
     delta_ec = delta_b - delta_a
     n_SF = min(delta_a, delta_b)
