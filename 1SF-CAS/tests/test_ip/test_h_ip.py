@@ -1,6 +1,7 @@
 import sys, os
 import psi4
 sys.path.insert(1, '../')
+sys.path.insert(1, '../../')
 import spinflip
 from spinflip import sf_cas as sf_cas_ref
 import sf

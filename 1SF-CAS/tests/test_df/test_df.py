@@ -1,13 +1,14 @@
 import sys, os
 import psi4
 sys.path.insert(1, '../')
+sys.path.insert(1, '../../')
 import spinflip
 from spinflip import sf_cas as sf_cas_ref
 import sf
 from sf import do_sf_cas
 
 # threshold for value equality
-threshold = 1e-7
+threshold = 1e-9
 # setting up molecule
 o2 = psi4.core.Molecule.create_molecule_from_string("""
 0 3

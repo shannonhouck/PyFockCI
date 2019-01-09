@@ -1,5 +1,23 @@
 {
+  "test_1sf/test_cas.py": true, 
+  "test_1sf/test_h.py": true, 
+  "test_1sf/test_hp.py": true, 
+  "test_1sf/test_p.py": true, 
+  "test_1sf_ea/test_cas_sfea.py": true, 
+  "test_1sf_ea/test_h_sfea.py": true, 
+  "test_1sf_ea/test_p_sfea.py": true, 
+  "test_1sf_ip/test_cas_sfip.py": true, 
+  "test_1sf_ip/test_h_sfip.py": true, 
+  "test_2sf/test_2sf.py": true, 
+  "test_df/test_df.py": true, 
+  "test_df/test_df_2.py": true, 
+  "test_ea/test_ea.py": true, 
+  "test_ea/test_h_ea.py": true, 
+  "test_ea/test_p_ea.py": true, 
   "test_h_sfea.py::test_1": true, 
   "test_h_sfea.py::test_2": true, 
-  "test_h_sfea.py::test_3": true
+  "test_h_sfea.py::test_3": true, 
+  "test_ip/test_h_ip.py": true, 
+  "test_ip/test_ip.py": true, 
+  "test_ip/test_p_ip.py": true
 }
