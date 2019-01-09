@@ -213,7 +213,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, socc):
 #
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
-def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="" ):
+def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", e_convergence=1e-10 ):
     # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
@@ -342,19 +342,19 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
             num_roots = n_dets - 1
         if(conf_space==""):
             A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
-            vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
+            vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots, tol=e_convergence)
         else:
             if("guess_type"=="CAS"):
                 cas_A = LinOpH((socc*socc,socc*socc), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in="")
-                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1)
+                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1, tol=e_convergence)
                 socc = wfn.soccpi()[0]
                 v3_guess = np.zeros((n_dets-(socc*socc), 1))
                 guess_vect = np.vstack((cas_vects, v3_guess)).T
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
-                vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
+                vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect, tol=e_convergence)
             else:
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
-                vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
+                vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots, tol=e_convergence)
         print("\nROOT No.\tEnergy\t\tS**2")
         print("------------------------------------------------")
         for i, corr in enumerate(vals):
