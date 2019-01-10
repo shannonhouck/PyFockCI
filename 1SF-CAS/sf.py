@@ -179,17 +179,30 @@ def get_F(wfn):
 # calculates S**2
 def calc_s_squared(n_SF, delta_ec, conf_space, vect, socc):
     if(n_SF==1 and delta_ec==0 and conf_space==""):
-        s2_vect = np.zeros(vect.shape)
+        na = socc - 1
+        nb = 1
         count = 0
+        s2 = 0.0
         for i in range(socc):
             for a in range(socc):
-                if(i==a): # to same orbital, no mult lost
-                    s = (socc)/2.0
-                else: # to different orbital, S-1
-                    s = (socc - 2.0)/2.0
-                s2_vect[count] = vect[count]*(s*(s+1.0))
+                # from Sz
+                s2 = s2 + vect[count]*vect[count]*(0.5*(na) - 0.5*(nb))
+                # from Sz^2
+                s2 = s2 + vect[count]*vect[count]*(0.25*(na*na) + 0.25*(nb*nb) - 0.5*(na*nb))
+                # from S-S+
+                if(i==a):
+                    s2 = s2 + vect[count]*vect[count]*1.0
+                    # from S-S+
+                    count2 = 0
+                    for j in range(socc):
+                        for b in range(socc):
+                            if(j==b and not(i==j)):
+                                s2 = s2 + vect[count]*vect[count2]*1.0
+                            count2 = count2+1
+                #else:
+                #     s2 = s2 + vect[count]*vect[count]*2.0
                 count = count+1
-        return np.einsum("i,i->", vect, s2_vect)
+        return s2
     else:
         #print("S**2 value for %iSF with electron count change of %i not yet supported." %(n_SF, delta_ec) )
         return 0
@@ -331,6 +344,7 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     #    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
     #    return(e + np.sort(LIN.eigvalsh(H))[0])
     print("Performing %iSF with electron count change of %i..." %(n_SF, delta_ec) )
+    print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(wfn.doccpi()[0], socc, na_virt) )
     if(sf_diag_method == "LinOp"):
         #A = SPLIN.LinearOperator(H.shape, matvec=mv)
         a_occ = wfn.doccpi()[0] + wfn.soccpi()[0]
