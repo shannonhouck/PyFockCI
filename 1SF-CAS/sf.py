@@ -186,12 +186,12 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, socc):
                 if(i==a): # to same orbital, no mult lost
                     s = (socc)/2.0
                 else: # to different orbital, S-1
-                    s = (socc - 1.0)/2.0
+                    s = (socc - 2.0)/2.0
                 s2_vect[count] = vect[count]*(s*(s+1.0))
                 count = count+1
         return np.einsum("i,i->", vect, s2_vect)
     else:
-        print("S**2 value for %iSF with electron count change of %i not yet supported." %(n_SF, delta_ec) )
+        #print("S**2 value for %iSF with electron count change of %i not yet supported." %(n_SF, delta_ec) )
         return 0
 
 # Performs the 1SF-CAS calculation.
