@@ -177,35 +177,101 @@ def get_F(wfn):
     return (Fa, Fb)
 
 # calculates S**2
-def calc_s_squared(n_SF, delta_ec, conf_space, vect, socc):
+def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, na_virt):
+    s2 = 0.0
+    # obtain Sz and Sz (same general formula regardless of method)
+    na = socc - n_SF
+    nb = n_SF
+    if(delta_ec==1): # IP
+        nb = nb + 1
+    if(delta_ec==-1): # EA
+        na = na - 1
+    for v in vect:
+        # do Sz
+        s2 = s2 + v*v*(0.5*(na) - 0.5*(nb))
+        # do Sz^2
+        s2 = s2 + v*v*(0.25*(na*na) + 0.25*(nb*nb) - 0.5*(na*nb))
+
+    # CAS-1SF
     if(n_SF==1 and delta_ec==0 and conf_space==""):
-        na = socc - 1
-        nb = 1
         count = 0
-        s2 = 0.0
         for i in range(socc):
             for a in range(socc):
-                # from Sz
-                s2 = s2 + vect[count]*vect[count]*(0.5*(na) - 0.5*(nb))
-                # from Sz^2
-                s2 = s2 + vect[count]*vect[count]*(0.25*(na*na) + 0.25*(nb*nb) - 0.5*(na*nb))
+                count2 = 0
+                for j in range(socc):
+                    for b in range(socc):
+                        if(i==a and j==b):
+                            s2 = s2 + vect[count]*vect[count2]*1.0
+                        count2 = count2+1
+                count = count+1
+
+    # CAS-2SF
+    if(n_SF==2 and delta_ec==0 and conf_space==""):
+        count = 0 
+        for i in range(socc):
+            for j in range(i):
+                for a in range(socc):
+                    for b in range(a):
+                        count2 = 0 
+                        for k in range(socc):
+                            for l in range(k):
+                                for c in range(socc):
+                                    for d in range(c):
+                                        if(i==a):
+                                            if(d==l and j==k and b==c):
+                                                s2 = s2 + vect[count]*vect[count2]*1.0
+                                        #    if(c==k and j==l and b==d):
+                                        #        s2 = s2 + vect[count]*vect[count2]*1.0
+                                        #if(j==b):
+                                        #    if(d==l and i==k and a==c):
+                                        #        s2 = s2 + vect[count]*vect[count2]*1.0
+                                        #    if(c==k and i==l and a==d):
+                                        #        s2 = s2 + vect[count]*vect[count2]*1.0
+                                        count2 = count2+1
+                        count = count+1
+
+    # RAS(h)-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space=="h"):
+        # block 1
+        count = 0 
+        for i in range(socc):
+            for a in range(socc):
                 # from S-S+
                 if(i==a):
                     s2 = s2 + vect[count]*vect[count]*1.0
                     # from S-S+
-                    count2 = 0
+                    count2 = 0 
                     for j in range(socc):
                         for b in range(socc):
                             if(j==b and not(i==j)):
                                 s2 = s2 + vect[count]*vect[count2]*1.0
                             count2 = count2+1
-                #else:
-                #     s2 = s2 + vect[count]*vect[count]*2.0
                 count = count+1
-        return s2
-    else:
-        #print("S**2 value for %iSF with electron count change of %i not yet supported." %(n_SF, delta_ec) )
-        return 0
+        # block 2
+        for I in range(docc):
+            for a in range(socc):
+                # from S-S+
+                s2 = s2 + vect[count]*vect[count]*2.0
+                # from S-S+
+                count2 = (socc*socc)+(docc*socc)
+                for J in range(docc):
+                    for i in range(socc):
+                        for b in range(socc):
+                            for c in range(b):
+                                if((I==J) and (a==b or a==c)):
+                                    s2 = s2 + vect[count]*vect[count2]*1.0
+                                count2 = count2+1
+                count = count+1
+        # block 3
+        for I in range(docc):
+            for i in range(socc):
+                for a in range(socc):
+                    for b in range(a):
+                        # from S-S+
+                        s2 = s2 + vect[count]*vect[count]*2.0
+                        count = count + 1
+
+    return s2
 
 # Performs the 1SF-CAS calculation.
 # Parameters:
@@ -372,7 +438,7 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
         print("\nROOT No.\tEnergy\t\tS**2")
         print("------------------------------------------------")
         for i, corr in enumerate(vals):
-            print("   %i\t\t%6.6f\t%8.6f" % (i, e + corr, calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], socc)))
+            print("   %i\t\t%6.6f\t%8.6f" % (i, e + corr, calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], wfn.doccpi()[0], socc, na_virt)))
         print("------------------------------------------------\n")
         return(e + vals[0])
 

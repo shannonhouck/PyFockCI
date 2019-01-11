@@ -101,7 +101,6 @@ class LinOpH (LinearOperator):
                             v_ref1[j, i, a, b] = -1.0*v[index]
                             v_ref1[j, i, b, a] = v[index]
                             index = index + 1
-            print(index)
 
             ################################################ 
             # Do the following term:
