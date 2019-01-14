@@ -198,16 +198,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, na_virt):
         for p in range(socc):
             for q in range(socc):
                 s2 = s2 + vect[p,p]*vect[q,q]*1.0
-    '''
-        vect = np.reshape(vect, (socc,socc))
-        for i in range(socc):
-            for a in range(socc):
-                for j in range(socc):
-                    for b in range(socc):
-                        if(i==a and j==b):
-                            s2 = s2 + vect[i,a]*vect[j,b]*1.0
-    '''
-
+        return s2
 
     # CAS-2SF
     if(n_SF==2 and delta_ec==0 and conf_space==""):
@@ -228,6 +219,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, na_virt):
                     for q in range(socc):
                         s2 = s2 + v_ref1[q,j,q,b]*v_ref1[p,j,p,b]*1.0
                         #s2 = s2 - v_ref1[q,j,q,b]*v_ref1[p,j,p,b]*1.0
+        return s2
 
     # RAS(h)-1SF
     if(n_SF==1 and delta_ec==0 and conf_space=="h"):
@@ -269,8 +261,50 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, na_virt):
                         # from S-S+
                         s2 = s2 + vect[count]*vect[count]*2.0
                         count = count + 1
+        return s2
 
-    return s2
+    # 1IP and 1EA
+    if(n_SF==0 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
+        # no contributions from S-S+
+        return s2
+
+    # CAS-1SF-EA
+    if(n_SF==1 and delta_ec==1 and conf_space==""):
+        # v(1) unpack to indexing: (iab:abb)
+        v_ref1 = np.zeros((socc,socc,socc))
+        index = 0
+        for i in range(socc):
+            for a in range(socc):
+                for b in range(a):
+                    v_ref1[i, a, b] = vect[index]
+                    v_ref1[i, b, a] = -1.0*vect[index]
+                    index = index + 1
+        for p in range(socc):
+            for q in range(socc):
+                for a in range(socc):
+                        s2 = s2 + v_ref1[q,q,a]*v_ref1[p,p,a]
+        return s2
+
+    # CAS-1SF-IP
+    if(n_SF==1 and delta_ec==-1 and conf_space==""):
+        # v(1) unpack to indexing: (iab:abb)
+        v_ref1 = np.zeros((socc,socc,socc))
+        index = 0 
+        for i in range(socc):
+            for j in range(i):
+                for a in range(socc):
+                    v_ref1[i, j, a] = vect[index]
+                    v_ref1[j, i, a] = -1.0*vect[index]
+                    index = index + 1 
+        for p in range(socc):
+            for q in range(socc):
+                for i in range(socc):
+                        s2 = s2 + v_ref1[q,i,q]*v_ref1[p,i,p]
+        return s2
+
+    else:
+        return s2
+
 
 # Performs the 1SF-CAS calculation.
 # Parameters:
