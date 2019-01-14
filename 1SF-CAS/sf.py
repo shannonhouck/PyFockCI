@@ -194,41 +194,40 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, na_virt):
 
     # CAS-1SF
     if(n_SF==1 and delta_ec==0 and conf_space==""):
-        count = 0
+        vect = np.reshape(vect, (socc,socc))
+        for p in range(socc):
+            for q in range(socc):
+                s2 = s2 + vect[p,p]*vect[q,q]*1.0
+    '''
+        vect = np.reshape(vect, (socc,socc))
         for i in range(socc):
             for a in range(socc):
-                count2 = 0
                 for j in range(socc):
                     for b in range(socc):
                         if(i==a and j==b):
-                            s2 = s2 + vect[count]*vect[count2]*1.0
-                        count2 = count2+1
-                count = count+1
+                            s2 = s2 + vect[i,a]*vect[j,b]*1.0
+    '''
+
 
     # CAS-2SF
     if(n_SF==2 and delta_ec==0 and conf_space==""):
-        count = 0 
+        v_ref1 = np.zeros((socc, socc, socc, socc))
+        index = 0
         for i in range(socc):
             for j in range(i):
                 for a in range(socc):
                     for b in range(a):
-                        count2 = 0 
-                        for k in range(socc):
-                            for l in range(k):
-                                for c in range(socc):
-                                    for d in range(c):
-                                        if(i==a):
-                                            if(d==l and j==k and b==c):
-                                                s2 = s2 + vect[count]*vect[count2]*1.0
-                                        #    if(c==k and j==l and b==d):
-                                        #        s2 = s2 + vect[count]*vect[count2]*1.0
-                                        #if(j==b):
-                                        #    if(d==l and i==k and a==c):
-                                        #        s2 = s2 + vect[count]*vect[count2]*1.0
-                                        #    if(c==k and i==l and a==d):
-                                        #        s2 = s2 + vect[count]*vect[count2]*1.0
-                                        count2 = count2+1
-                        count = count+1
+                        v_ref1[i, j, a, b] = vect[index]
+                        v_ref1[i, j, b, a] = -1.0*vect[index]
+                        v_ref1[j, i, a, b] = -1.0*vect[index]
+                        v_ref1[j, i, b, a] = vect[index]
+                        index = index + 1
+        for b in range(socc):
+            for j in range(socc):
+                for p in range(socc):
+                    for q in range(socc):
+                        s2 = s2 + v_ref1[q,j,q,b]*v_ref1[p,j,p,b]*1.0
+                        #s2 = s2 - v_ref1[q,j,q,b]*v_ref1[p,j,p,b]*1.0
 
     # RAS(h)-1SF
     if(n_SF==1 and delta_ec==0 and conf_space=="h"):

@@ -51212,3 +51212,68 @@ CIWave: opdm                :      0.017u      0.000s      0.001w      2 calls
 | CIWave: CIvect read       :      0.000u      0.000s      0.000w     26 calls
 
 ***********************************************************
+
+Host: shannon-book.local
+
+Timers On : Mon Jan 14 11:30:40 2019
+Timers Off: Mon Jan 14 11:30:42 2019
+
+Wall Time:        1.77 seconds
+
+Total PK formation time     :      0.117u      0.017s      0.076w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.006w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.001w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.011w     22 calls
+JK: D                       :      0.000u      0.000s      0.000w     22 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w     22 calls
+JK: JK                      :      0.017u      0.000s      0.010w     22 calls
+PK computes JK              :      0.017u      0.000s      0.010w     22 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w     22 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     22 calls
+HF: DIIS                    :      0.000u      0.000s      0.001w     22 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.000w      3 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.000w      2 calls
+bMatrix setup               :      0.000u      0.000s      0.000w      2 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w      2 calls
+New vector                  :      0.000u      0.000s      0.000w      2 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     22 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     22 calls
+CIWave: CIvect write        :      0.000u      0.000s      0.001w    181 calls
+CIWave: CIvect read         :      0.017u      0.017s      0.003w   1230 calls
+CIWave: s2                  :      0.000u      0.000s      0.000w     14 calls
+CIWave: s1                  :      0.000u      0.000s      0.000w     14 calls
+CIWave: s3                  :      0.000u      0.000s      0.001w     14 calls
+CIWave: s3_mt               :      0.000u      0.000s      0.001w    294 calls
+CIWave: opdm                :      0.000u      0.000s      0.000w      2 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.117u      0.017s      0.076w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.006w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.001w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      1 calls
+HF: Form G                  :      0.017u      0.000s      0.011w     22 calls
+| JK: D                     :      0.000u      0.000s      0.000w     22 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w     22 calls
+| JK: JK                    :      0.017u      0.000s      0.010w     22 calls
+| | PK computes JK          :      0.017u      0.000s      0.010w     22 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w     22 calls
+HF: Form F                  :      0.000u      0.000s      0.001w     22 calls
+HF: DIIS                    :      0.000u      0.000s      0.001w     22 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.000w      3 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.000w      2 calls
+| | bMatrix setup           :      0.000u      0.000s      0.000w      2 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w      2 calls
+| | New vector              :      0.000u      0.000s      0.000w      2 calls
+HF: Form C                  :      0.000u      0.000s      0.003w     22 calls
+HF: Form D                  :      0.000u      0.000s      0.000w     22 calls
+CIWave: CIvect write        :      0.000u      0.000s      0.001w    181 calls
+CIWave: CIvect read         :      0.017u      0.017s      0.003w   1204 calls
+CIWave: s2                  :      0.000u      0.000s      0.000w     14 calls
+CIWave: s1                  :      0.000u      0.000s      0.000w     14 calls
+CIWave: s3                  :      0.000u      0.000s      0.001w     14 calls
+| CIWave: s3_mt             :      0.000u      0.000s      0.001w    294 calls
+CIWave: opdm                :      0.000u      0.000s      0.000w      2 calls
+| CIWave: CIvect read       :      0.000u      0.000s      0.000w     26 calls
+
+***********************************************************
