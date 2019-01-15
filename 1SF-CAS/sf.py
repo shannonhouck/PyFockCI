@@ -218,49 +218,43 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, na_virt):
                 for p in range(socc):
                     for q in range(socc):
                         s2 = s2 + v_ref1[q,j,q,b]*v_ref1[p,j,p,b]*1.0
-                        #s2 = s2 - v_ref1[q,j,q,b]*v_ref1[p,j,p,b]*1.0
         return s2
 
     # RAS(h)-1SF
     if(n_SF==1 and delta_ec==0 and conf_space=="h"):
-        # block 1
-        count = 0 
-        for i in range(socc):
-            for a in range(socc):
-                # from S-S+
-                if(i==a):
-                    s2 = s2 + vect[count]*vect[count]*1.0
-                    # from S-S+
-                    count2 = 0 
-                    for j in range(socc):
-                        for b in range(socc):
-                            if(j==b and not(i==j)):
-                                s2 = s2 + vect[count]*vect[count2]*1.0
-                            count2 = count2+1
-                count = count+1
-        # block 2
-        for I in range(docc):
-            for a in range(socc):
-                # from S-S+
-                s2 = s2 + vect[count]*vect[count]*2.0
-                # from S-S+
-                count2 = (socc*socc)+(docc*socc)
-                for J in range(docc):
-                    for i in range(socc):
-                        for b in range(socc):
-                            for c in range(b):
-                                if((I==J) and (a==b or a==c)):
-                                    s2 = s2 + vect[count]*vect[count2]*1.0
-                                count2 = count2+1
-                count = count+1
-        # block 3
+        v_b1 = vect[:(socc*socc)] # v for block 1
+        v_b2 = vect[(socc*socc):((socc*socc)+(socc*docc))] # v for block 2
+        v_b3 = vect[((socc*socc)+(socc*docc)):] # v for block 3
+        # v(1) indexing: (ia:ab)
+        v_ref1 = np.reshape(v_b1, (socc, socc))
+        # v(2) indexing: (Ia:ab)
+        v_ref2 = np.reshape(v_b2, (docc, socc))
+        # v(3) unpack to indexing: (Iiab:babb)
+        v_ref3 = np.zeros((docc, socc, socc, socc))
+        index = 0
         for I in range(docc):
             for i in range(socc):
                 for a in range(socc):
                     for b in range(a):
-                        # from S-S+
-                        s2 = s2 + vect[count]*vect[count]*2.0
-                        count = count + 1
+                        v_ref3[I, i, a, b] = v_b3[index]
+                        v_ref3[I, i, b, a] = -1.0*v_b3[index]
+                        index = index + 1
+        # block 1
+        for p in range(socc):
+            for q in range(socc):
+                s2 = s2 + v_ref1[p,p]*v_ref1[q,q]*1.0
+        # block 2
+        for I in range(docc):
+            for a in range(socc):
+                s2 = s2 + v_ref2[I,a]*v_ref2[I,a]*1.0
+                for p in range(socc):
+                    s2 = s2 + v_ref2[I,a]*v_ref3[I,p,a,p]*1.0
+        for I in range(docc):
+            for a in range(socc):
+                for p in range(socc):
+                    s2 = s2 + v_ref3[I,p,a,p]*v_ref2[I,a]*1.0
+                    for q in range(socc):
+                        s2 = s2 + v_ref3[I,p,a,p]*v_ref3[I,q,a,q]*1.0
         return s2
 
     # 1IP and 1EA
@@ -325,7 +319,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, na_virt):
 #
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
-def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", e_convergence=1e-10 ):
+def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="" ):
     # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
@@ -455,7 +449,7 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
             num_roots = n_dets - 1
         if(conf_space==""):
             A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
-            vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots, tol=e_convergence)
+            vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         else:
             if("guess_type"=="CAS"):
                 cas_A = LinOpH((socc*socc,socc*socc), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in="")
@@ -464,10 +458,10 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
                 v3_guess = np.zeros((n_dets-(socc*socc), 1))
                 guess_vect = np.vstack((cas_vects, v3_guess)).T
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
-                vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect, tol=e_convergence)
+                vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
             else:
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in=conf_space)
-                vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots, tol=e_convergence)
+                vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         print("\nROOT No.\tEnergy\t\tS**2")
         print("------------------------------------------------")
         for i, corr in enumerate(vals):
