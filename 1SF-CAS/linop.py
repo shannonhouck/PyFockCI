@@ -537,11 +537,11 @@ class LinOpH (LinearOperator):
             ################################################ 
             # Separate guess vector into blocks 1, 2, and 3
             ################################################ 
-            n_b1_dets = socc*socc
-            n_b2_dets = nb_occ*socc
-            n_b3_dets = socc*na_virt
-            n_b4_dets = nb_occ*socc*(socc*(socc-1)/2)
-            n_b5_dets = na_virt*socc*(socc*(socc-1)/2)
+            n_b1_dets = int(socc*socc)
+            n_b2_dets = int(nb_occ*socc)
+            n_b3_dets = int(socc*na_virt)
+            n_b4_dets = int(nb_occ*socc*(socc*(socc-1)/2))
+            n_b5_dets = int(na_virt*socc*(socc*(socc-1)/2))
             v_b1 = v[0:n_b1_dets] # v for block 1
             v_b2 = v[n_b1_dets:n_b1_dets+n_b2_dets] # v for block 2
             v_b3 = v[n_b1_dets+n_b2_dets:n_b1_dets+n_b2_dets+n_b3_dets] # v for block 3
@@ -1501,8 +1501,8 @@ class LinOpH (LinearOperator):
            
             """
 
-            n_b1_dets = socc * ((socc-1)*(socc)/2)
-            n_b2_dets = socc * nb_occ * socc
+            n_b1_dets = int(socc * ((socc-1)*(socc)/2))
+            n_b2_dets = int(socc * nb_occ * socc)
             v_b1 = v[0:n_b1_dets]
             v_b2 = v[n_b1_dets:n_b1_dets+n_b2_dets]
             v_b3 = v[n_b1_dets+n_b2_dets:]
@@ -1732,8 +1732,8 @@ class LinOpH (LinearOperator):
                 | H(1,1) | * v(1) = sig(1)
            
             """
-            n_b1_dets = (socc * ((socc-1)*(socc)/2)) 
-            n_b2_dets = (nb_occ * ((socc-1)*(socc)/2))
+            n_b1_dets = int(socc * ((socc-1)*(socc)/2)) 
+            n_b2_dets = int(nb_occ * ((socc-1)*(socc)/2))
             v_b1 = v[0:n_b1_dets]
             v_b2 = v[n_b1_dets:n_b1_dets+n_b2_dets]
             v_b3 = v[n_b1_dets+n_b2_dets:]
@@ -2050,8 +2050,8 @@ class LinOpH (LinearOperator):
            
             """
 
-            n_b1_dets = socc * ((socc-1)*(socc)/2)
-            n_b2_dets = socc * na_virt * socc
+            n_b1_dets = int(socc * ((socc-1)*(socc)/2))
+            n_b2_dets = int(socc * na_virt * socc)
             v_b1 = v[0:n_b1_dets]
             v_b2 = v[n_b1_dets:n_b1_dets+n_b2_dets]
             v_b3 = v[n_b1_dets+n_b2_dets:]

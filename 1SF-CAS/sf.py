@@ -432,6 +432,8 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
     else:
         print("Sorry, %iSF with electron count change of %i not yet supported. Exiting..." %(n_SF, delta_ec) )
         exit()
+    # make sure n_dets is an int (for newer Python versions)
+    n_dets = int(n_dets)
     #if(sf_diag_method == "RSP"):
     #    print("FROM DIAG: ", e + np.sort(LIN.eigvalsh(H))[0:8])
     #    print("FROM DIAG: ", np.sort(LIN.eigvalsh(H))[0:6])
@@ -453,7 +455,7 @@ def do_sf_cas( delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method
         else:
             if("guess_type"=="CAS"):
                 cas_A = LinOpH((socc*socc,socc*socc), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei, n_SF, delta_ec, conf_space_in="")
-                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1, tol=e_convergence)
+                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1)
                 socc = wfn.soccpi()[0]
                 v3_guess = np.zeros((n_dets-(socc*socc), 1))
                 guess_vect = np.vstack((cas_vects, v3_guess)).T
