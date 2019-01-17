@@ -11,6 +11,8 @@
   "test_2sf/test_2sf.py": true, 
   "test_df/test_df.py": true, 
   "test_df/test_df_2.py": true, 
+  "test_df/test_df_3.py": true, 
+  "test_df/test_df_4.py": true, 
   "test_ea/test_ea.py": true, 
   "test_ea/test_h_ea.py": true, 
   "test_ea/test_p_ea.py": true, 
