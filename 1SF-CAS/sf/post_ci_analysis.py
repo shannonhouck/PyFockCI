@@ -94,6 +94,28 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         # no contributions from S-S+
         return s2
 
+    # RAS(h)-1IP
+    if(n_SF==0 and delta_ec==-1 and conf_space=="h"):
+        v_b1 = vect[0:socc] # v for block 1
+        v_b2 = vect[socc:docc+socc] # v for block 2
+        v_b3 = vect[docc+socc:] # v for block 3
+        # v(1) indexing: (i:a)
+        v_ref1 = np.reshape(v_b1, (socc))
+        # v(2) indexing: (I:a)
+        v_ref2 = np.reshape(v_b2, (docc))
+        # v(3) indexing: (Iia:bba)
+        v_ref3 = np.reshape(v_b3, (docc, socc, socc))
+        # block 2
+        s2 = s2 + np.einsum("I,I->", v_ref2, v_ref2)
+        for p in range(docc):
+            for q in range(socc):
+                s2 = s2 + 2.0*v_ref2[p]*v_ref3[p,q,q]
+        for p in range(socc):
+            for q in range(socc):
+                for I in range(docc):
+                    s2 = s2 + v_ref3[I,p,p]*v_ref3[I,q,q]
+        return s2
+
     # CAS-1SF-EA
     if(n_SF==1 and delta_ec==1 and conf_space==""):
         # v(1) unpack to indexing: (iab:abb)
@@ -129,6 +151,6 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         return s2
 
     else:
-        return s2
+        return 0.0
 
 
