@@ -184,6 +184,75 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
                         s2 = s2 + v_ref3[I,p,a,p]*v_ref3[I,q,a,q]
         return s2
 
+
+    # RAS(h,p)-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space=="h,p"):
+        n_b1_dets = int(socc*socc)
+        n_b2_dets = int(docc*socc)
+        n_b3_dets = int(socc*virt)
+        n_b4_dets = int(docc*socc*(socc*(socc-1)/2))
+        n_b5_dets = int(virt*socc*(socc*(socc-1)/2))
+        v_b1 = vect[0:n_b1_dets] # v for block 1
+        v_b2 = vect[n_b1_dets:n_b1_dets+n_b2_dets] # v for block 2
+        v_b3 = vect[n_b1_dets+n_b2_dets:n_b1_dets+n_b2_dets+n_b3_dets] # v for block 3
+        v_b4 = vect[n_b1_dets+n_b2_dets+n_b3_dets:n_b1_dets+n_b2_dets+n_b3_dets+n_b4_dets] # v for block 4
+        v_b5 = vect[n_b1_dets+n_b2_dets+n_b3_dets+n_b4_dets:n_b1_dets+n_b2_dets+n_b3_dets+n_b4_dets+n_b5_dets] # v for block 5
+        # v(1) indexing: (ia:ab)
+        v_ref1 = np.reshape(v_b1, (socc, socc))
+        # v(2) indexing: (Ia:ab)
+        v_ref2 = np.reshape(v_b2, (docc, socc))
+        # v(3) indexing: (Ai:ab)
+        v_ref3 = np.reshape(v_b3, (virt, socc))
+        # v(3) unpack to indexing: (Iiab:babb)
+        v_ref4 = np.zeros((docc, socc, socc, socc))
+        index = 0
+        for I in range(docc):
+            for i in range(socc):
+                for a in range(socc):
+                    for b in range(a):
+                        v_ref4[I, i, a, b] = v_b4[index]
+                        v_ref4[I, i, b, a] = -1.0*v_b4[index]
+                        index = index + 1
+        # v(5) unpack to indexing: (Aijb:aaab)
+        v_ref5 = np.zeros((virt, socc, socc, socc))
+        index = 0
+        for i in range(socc):
+            for j in range(i):
+                for A in range(virt):
+                    for b in range(socc):
+                        v_ref5[A, i, j, b] = v_b5[index]
+                        v_ref5[A, j, i, b] = -1.0*v_b5[index]
+                        index = index + 1
+        # block 1
+        for p in range(socc):
+            for q in range(socc):
+                s2 = s2 + v_ref1[p,p]*v_ref1[q,q]
+        # block 2
+        s2 = s2 + np.einsum("Ia,Ia->", v_ref2, v_ref2)
+        for I in range(docc):
+            for a in range(socc):
+                for p in range(socc):
+                    s2 = s2 - 2.0*v_ref2[I,a]*v_ref4[I,p,a,p]
+        # block 3
+        s2 = s2 + np.einsum("Ai,Ai->", v_ref3, v_ref3)
+        for A in range(virt):
+            for i in range(socc):
+                for p in range(socc):
+                    s2 = s2 + 2.0*v_ref3[A,i]*v_ref5[A,i,p,p]
+        # block 4
+        for I in range(docc):
+            for a in range(socc):
+                for p in range(socc):
+                    for q in range(socc):
+                        s2 = s2 + v_ref4[I,p,a,p]*v_ref4[I,q,a,q]
+        # block 5
+        for A in range(virt):
+            for i in range(socc):
+                for q in range(socc):
+                    for p in range(socc):
+                        s2 = s2 + v_ref5[A,i,q,q]*v_ref5[A,i,p,p]
+        return s2
+
     # RAS(p)-1SF
     if(n_SF==1 and delta_ec==0 and conf_space=="p"):
         v_b1 = vect[:(socc*socc)] # v for block 1
