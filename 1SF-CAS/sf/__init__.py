@@ -211,12 +211,17 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
             else:
                 A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
-        print("\nROOT No.\tEnergy\t\tS**2")
-        print("------------------------------------------------")
-        for i, corr in enumerate(vals):
-            s2 = post_ci_analysis.calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], ras1, ras2, ras3)
-            print("   %i\t\t%6.6f\t%8.6f" % (i, e + corr, s2))
-        print("------------------------------------------------\n")
+    print("\nROOT No.\tEnergy\t\tS**2")
+    print("------------------------------------------------")
+    for i, corr in enumerate(vals):
+        s2 = post_ci_analysis.calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], ras1, ras2, ras3)
+        print("   %i\t\t%6.6f\t%8.6f" % (i, e + corr, s2))
+    print("------------------------------------------------\n")
+    print("Most Important Determinants Data:")
+    for i, corr in enumerate(vals):
+        print("\nROOT %i: %12.12f" %(i, e + corr))
+        s2 = post_ci_analysis.print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
+    print(u"\n\n\t\u2605  Fock Space CI Complete! \n")
     # Return appropriate things
     if(return_vects):
         return (e + vals, vects)

@@ -147,6 +147,112 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
                         s2 = s2 + v_ref1[q,i,q]*v_ref1[p,i,p]
         return s2
 
+    # RAS(h)-1SF-IP
+    if(n_SF==1 and delta_ec==-1 and conf_space=="h"):
+        n_b1_dets = int(socc * ((socc-1)*(socc)/2))
+        n_b2_dets = int(socc * docc * socc)
+        v_b1 = vect[0:n_b1_dets]
+        v_b2 = vect[n_b1_dets:n_b1_dets+n_b2_dets]
+        v_b3 = vect[n_b1_dets+n_b2_dets:]
+        # v(1) unpack to indexing: (ija:aab)
+        v_ref1 = np.zeros((socc,socc,socc))
+        index = 0
+        for i in range(socc):
+            for j in range(i):
+                for a in range(socc):
+                    v_ref1[i, j, a] = v_b1[index]
+                    v_ref1[j, i, a] = -1.0*v_b1[index]
+                    index = index + 1
+        # v(2) unpack to indexing: (Iia:aab)
+        v_ref2 = np.reshape(v_b2, (docc, socc, socc))
+        # v(3) unpack to indexing: (Iijab:aaabb)
+        v_ref3 = np.zeros((docc, socc, socc, socc, socc))
+        index = 0
+        for I in range(docc):
+            for i in range(socc):
+                for j in range(i):
+                    for a in range(socc):
+                        for b in range(a):
+                            v_ref3[I, i, j, a, b] = v_b3[index]
+                            v_ref3[I, j, i, a, b] = -1.0*v_b3[index]
+                            v_ref3[I, i, j, b, a] = -1.0*v_b3[index]
+                            v_ref3[I, j, i, b, a] = v_b3[index]
+                            index = index + 1
+        # block 1
+        for p in range(socc):
+            for q in range(socc):
+                for i in range(socc):
+                    s2 = s2 + v_ref1[q,i,q]*v_ref1[p,i,p]
+        # block 2
+        for I in range(docc):
+            for p in range(socc):
+                for q in range(socc):
+                    s2 = s2 + v_ref2[I,p,p]*v_ref2[I,q,q]
+                    for a in range(socc):
+                        for i in range(socc):
+                            s2 = s2 - 2.0*v_ref2[I,i,a]*v_ref3[I,p,i,a,p]
+        # block 2
+        for I in range(docc):
+            for p in range(socc):
+                for q in range(socc):
+                    for a in range(socc):
+                        for i in range(socc):
+                            s2 = s2 + v_ref3[I,q,i,a,q]*v_ref3[I,p,i,a,p]
+        return s2
+
+    # RAS(p)-1SF-EA
+    if(n_SF==1 and delta_ec==1 and conf_space=="p"):
+        n_b1_dets = int(socc * ((socc-1)*(socc)/2))
+        n_b2_dets = int(socc * virt * socc)
+        v_b1 = vect[0:n_b1_dets]
+        v_b2 = vect[n_b1_dets:n_b1_dets+n_b2_dets]
+        v_b3 = vect[n_b1_dets+n_b2_dets:]
+        # v(1) unpack to indexing: (iab:abb)
+        v_ref1 = np.zeros((socc,socc,socc))
+        index = 0
+        for i in range(socc):
+            for a in range(socc):
+                for b in range(a):
+                    v_ref1[i, a, b] = v_b1[index]
+                    v_ref1[i, b, a] = -1.0*v_b1[index]
+                    index = index + 1
+        # v(2) unpack to indexing: (Aia:abb)
+        v_ref2 = np.reshape(v_b2, (virt, socc, socc))
+        # v(3) unpack to indexing: (Aijab:aaabb)
+        v_ref3 = np.zeros((virt, socc, socc, socc, socc))
+        index = 0
+        for i in range(socc):
+            for j in range(i):
+                for A in range(virt):
+                    for a in range(socc):
+                        for b in range(a):
+                            v_ref3[A, i, j, a, b] = v_b3[index]
+                            v_ref3[A, j, i, a, b] = -1.0*v_b3[index]
+                            v_ref3[A, i, j, b, a] = -1.0*v_b3[index]
+                            v_ref3[A, j, i, b, a] = v_b3[index]
+                            index = index + 1
+        # block 1
+        for p in range(socc):
+            for q in range(socc):
+                for a in range(socc):
+                    s2 = s2 + v_ref1[q,q,a]*v_ref1[p,p,a]
+        # block 2
+        for A in range(virt):
+            for p in range(socc):
+                for q in range(socc):
+                    s2 = s2 + v_ref2[A,p,p]*v_ref2[A,q,q]
+                    for a in range(p):
+                        for i in range(socc):
+                            s2 = s2 + 2.0*v_ref2[A,i,a]*v_ref3[A,i,p,p,a]
+        # block 2
+        for A in range(virt):
+            for p in range(socc):
+                for q in range(socc):
+                    for a in range(min(p,q)):
+                        for i in range(socc):
+                            s2 = s2 + v_ref3[A,i,q,q,a]*v_ref3[A,i,p,p,a]
+        return s2
+
     # RAS(h)-1SF
     if(n_SF==1 and delta_ec==0 and conf_space=="h"):
         v_b1 = vect[:(socc*socc)] # v for block 1
@@ -294,5 +400,178 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
 
     else:
         return 0.0
+
+# inefficiently coded, fix later
+def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_to_print=10):
+
+    # fix dets_to_print if larger than number of dets
+    if(dets_to_print > n_dets):
+        dets_to_print = n_dets
+
+    # find largest-magnitude contributions
+    sort = abs(vect).argsort()[::-1]
+
+    # CAS-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space==""):
+        print("Coeff.\t\tImportant MO Occupations")
+        # make array with determinant data (i->a)
+        dets = np.zeros((n_dets, 2))
+        count = 0
+        for i in range(ras2):
+            for a in range(ras2):
+                dets[count][0] = i
+                dets[count][1] = a
+                count = count + 1
+        # generate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            # do excitation
+            i = dets[s][0]
+            a = dets[s][1]
+            out = list(mo_str) # make string editable
+            out[int(9*i+7)] = u" " # remove alpha
+            out[int(9*a+8)] = u"\u2193" # create beta
+            out = ''.join(out) # reformat string for printing
+            print("%10.6f  %s" %(vect[s], out))
+
+    # CAS-2SF
+    if(n_SF==2 and delta_ec==0 and conf_space==""):
+        print("Coeff.\t\tImportant MO Occupations")
+        # make array with determinant data (i->a)
+        dets = np.zeros((n_dets, 4)) 
+        count = 0 
+        for i in range(ras2):
+            for j in range(i):
+                for a in range(ras2):
+                    for b in range(a):
+                        dets[count][0] = i 
+                        dets[count][1] = j 
+                        dets[count][2] = a 
+                        dets[count][3] = b 
+                        count = count + 1 
+        # generate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            # do excitations
+            i = dets[s][0]
+            j = dets[s][1]
+            a = dets[s][2]
+            b = dets[s][3]
+            out = list(mo_str)
+            # eliminate alpha electrons
+            out[int(9*i+7)] = u" "
+            out[int(9*j+7)] = u" "
+            # create beta electrons
+            out[int(9*a+8)] = u"\u2193"
+            out[int(9*b+8)] = u"\u2193"
+            out = ''.join(out)
+            print("%10.6f  %s" %(vect[s], out))
+
+    # CAS-IP
+    if(n_SF==0 and delta_ec==-1 and conf_space==""):
+        print("Coeff.\t\tImportant MO Occupations")
+        # generate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            # do excitation
+            i = s
+            out = list(mo_str) # make string editable
+            out[int(9*i+7)] = u" " # remove alpha
+            out = ''.join(out) # reformat string for printing
+            print("%10.6f  %s" %(vect[s], out))
+
+    # CAS-EA
+    if(n_SF==0 and delta_ec==1 and conf_space==""):
+        print("Coeff.\t\tImportant MO Occupations")
+        # generate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            # do excitation
+            a = s
+            out = list(mo_str) # make string editable
+            out[int(9*a+8)] = u"\u2193" # create beta
+            out = ''.join(out) # reformat string for printing
+            print("%10.6f  %s" %(vect[s], out))
+
+    # CAS-1SF-IP
+    if(n_SF==1 and delta_ec==-1 and conf_space==""):
+        print("Coeff.\t\tImportant MO Occupations")
+        # make array with determinant data (i->a)
+        dets = np.zeros((n_dets, 3)) 
+        count = 0 
+        for i in range(ras2):
+            for j in range(i):
+                for a in range(ras2):
+                    dets[count][0] = i 
+                    dets[count][1] = j 
+                    dets[count][2] = a 
+                    count = count + 1 
+        # generate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            # do excitations
+            i = dets[s][0]
+            j = dets[s][1]
+            a = dets[s][2]
+            out = list(mo_str)
+            # eliminate alpha electrons
+            out[int(9*i+7)] = u" "
+            out[int(9*j+7)] = u" "
+            # create beta electrons
+            out[int(9*a+8)] = u"\u2193"
+            out = ''.join(out)
+            print("%10.6f  %s" %(vect[s], out))
+                
+    # CAS-1SF-EA
+    if(n_SF==1 and delta_ec==1 and conf_space==""):
+        print("Coeff.\t\tImportant MO Occupations")
+        # make array with determinant data (i->a)
+        dets = np.zeros((n_dets, 3)) 
+        count = 0 
+        for i in range(ras2):
+            for a in range(ras2):
+                for b in range(a):
+                    dets[count][0] = i 
+                    dets[count][1] = a 
+                    dets[count][2] = b 
+                    count = count + 1 
+        # generate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            # do excitations
+            i = dets[s][0]
+            a = dets[s][1]
+            b = dets[s][2]
+            out = list(mo_str)
+            # eliminate alpha electrons
+            out[int(9*i+7)] = u" "
+            # create beta electrons
+            out[int(9*a+8)] = u"\u2193"
+            out[int(9*b+8)] = u"\u2193"
+            out = ''.join(out)
+            print("%10.6f  %s" %(vect[s], out))
+
+
+
+
+
 
 
