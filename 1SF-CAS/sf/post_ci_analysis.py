@@ -425,7 +425,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitation
@@ -433,7 +433,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             a = dets[s][1]
             out = list(mo_str) # make string editable
             out[int(9*i+7)] = u" " # remove alpha
-            out[int(9*a+8)] = u"\u2193" # create beta
+            out[int(9*a+8)] = u"B" # create beta
             out = ''.join(out) # reformat string for printing
             print("%10.6f  %s" %(vect[s], out))
 
@@ -455,7 +455,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitations
@@ -468,8 +468,8 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             out[int(9*i+7)] = u" "
             out[int(9*j+7)] = u" "
             # create beta electrons
-            out[int(9*a+8)] = u"\u2193"
-            out[int(9*b+8)] = u"\u2193"
+            out[int(9*a+8)] = u"B"
+            out[int(9*b+8)] = u"B"
             out = ''.join(out)
             print("%10.6f  %s" %(vect[s], out))
 
@@ -479,7 +479,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitation
@@ -495,13 +495,13 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitation
             a = s
             out = list(mo_str) # make string editable
-            out[int(9*a+8)] = u"\u2193" # create beta
+            out[int(9*a+8)] = u"B" # create beta
             out = ''.join(out) # reformat string for printing
             print("%10.6f  %s" %(vect[s], out))
 
@@ -521,7 +521,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitations
@@ -533,7 +533,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             out[int(9*i+7)] = u" "
             out[int(9*j+7)] = u" "
             # create beta electrons
-            out[int(9*a+8)] = u"\u2193"
+            out[int(9*a+8)] = u"B"
             out = ''.join(out)
             print("%10.6f  %s" %(vect[s], out))
                 
@@ -564,8 +564,8 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             # eliminate alpha electrons
             out[int(9*i+7)] = u" "
             # create beta electrons
-            out[int(9*a+8)] = u"\u2193"
-            out[int(9*b+8)] = u"\u2193"
+            out[int(9*a+8)] = u"B"
+            out[int(9*b+8)] = u"B"
             out = ''.join(out)
             print("%10.6f  %s" %(vect[s], out))
 
