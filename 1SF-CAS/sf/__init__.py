@@ -6,15 +6,15 @@ import math
 import numpy as np
 from numpy import linalg as LIN
 from scipy.sparse import linalg as SPLIN
-from linop import LinOpH
 
 # importing Psi4
 import psi4
 
 # importing our packages
-import f
-import tei
-import post_ci_analysis
+from .linop import LinOpH
+from .f import *
+from .tei import *
+from .post_ci_analysis import *
 
 """
 RAS-SF-IP/EA PROGRAM
@@ -109,6 +109,9 @@ def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="L
 #    energy          Lowest root found by eigensolver (energy of system)
 def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space="",
               sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False ):
+    # make TEI object if we've passed in a numpy array
+    if(type(tei_int)==np.ndarray):
+        tei_int = tei.TEIFull(0, 0, ras1, ras2, ras3, np_tei=tei_int)
     # determine number of spin-flips and total change in electron count
     delta_ec = delta_b - delta_a
     n_SF = min(delta_a, delta_b)
@@ -211,19 +214,19 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
         if( num_roots >= n_dets ):
             num_roots = n_dets - 1
         if(conf_space==""):
-            A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
+            A = linop.LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
             vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         else:
             if("guess_type"=="CAS"):
-                cas_A = LinOpH((ras2*ras2,ras2*ras2), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
+                cas_A = linop.LinOpH((ras2*ras2,ras2*ras2), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
                 cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1)
                 socc = wfn.soccpi()[0]
                 v3_guess = np.zeros((n_dets-(ras2*ras2), 1))
                 guess_vect = np.vstack((cas_vects, v3_guess)).T
-                A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
+                A = linop.LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
             else:
-                A = LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
+                A = linop.LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
                 vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
     print("\nROOT No.\tEnergy\t\tS**2")
     print("------------------------------------------------")
@@ -235,7 +238,7 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
     for i, corr in enumerate(vals):
         print("\nROOT %i: %12.12f" %(i, e + corr))
         s2 = post_ci_analysis.print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
-    print(u"\n\n\t\u2605  Fock Space CI Complete! \n")
+    print("\n\n\t  Fock Space CI Complete! \n")
     # Return appropriate things
     if(return_vects):
         return (e + vals, vects)

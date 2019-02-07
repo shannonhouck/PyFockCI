@@ -735,7 +735,10 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
 
     # do excitation scheme: 1SF-CAS-EA
     if(n_SF==1 and delta_ec==1 and conf_space==""):
-        return 0
+        return 0.0
+
+    else:
+        return 0.0
 
 
 # Give a CI vector, prints information about the most important determinants.
@@ -773,7 +776,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitation
@@ -781,7 +784,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             a = dets[s][1]
             out = list(mo_str) # make string editable
             out[int(9*i+7)] = u" " # remove alpha
-            out[int(9*a+8)] = u"\u2193" # create beta
+            out[int(9*a+8)] = u"B" # create beta
             out = ''.join(out) # reformat string for printing
             print("%10.6f  %s" %(vect[s], out))
 
@@ -803,7 +806,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitations
@@ -816,8 +819,8 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             out[int(9*i+7)] = u" "
             out[int(9*j+7)] = u" "
             # create beta electrons
-            out[int(9*a+8)] = u"\u2193"
-            out[int(9*b+8)] = u"\u2193"
+            out[int(9*a+8)] = u"B"
+            out[int(9*b+8)] = u"B"
             out = ''.join(out)
             print("%10.6f  %s" %(vect[s], out))
 
@@ -827,7 +830,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitation
@@ -843,15 +846,47 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitation
             a = s
             out = list(mo_str) # make string editable
-            out[int(9*a+8)] = u"\u2193" # create beta
+            out[int(9*a+8)] = u"B" # create beta
             out = ''.join(out) # reformat string for printing
             print("%10.6f  %s" %(vect[s], out))
+
+    '''
+    # RAS(p)-EA
+    if(n_SF==0 and delta_ec==1 and conf_space=="p"):
+        print("Coeff.\t\tImportant MO Occupations")
+        # make array with determinant data (i->a)
+        dets = np.zeros((n_dets, 2))
+        count = 0
+        for a in range(ras2):
+            dets[count][0] = a
+            count = count + 1
+        # v(1) indexing: (a:b)
+        v_ref1 = np.reshape(v_b1, (socc))
+        # v(2) indexing: (A:b)
+        v_ref2 = np.reshape(v_b2, (na_virt))
+        # v(3) indexing: (iAa:aab)
+        v_ref3 = np.reshape(v_b3, (na_virt, socc, socc))
+        # generate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            # do excitation
+            i = dets[s][0]
+            a = dets[s][1]
+            out = list(mo_str) # make string editable
+            out[int(9*i+7)] = u" " # remove alpha
+            out[int(9*a+8)] = u"B" # create beta
+            out = ''.join(out) # reformat string for printing
+            print("%10.6f  %s" %(vect[s], out))
+    '''
 
     # CAS-1SF-IP
     if(n_SF==1 and delta_ec==-1 and conf_space==""):
@@ -869,7 +904,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitations
@@ -881,7 +916,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             out[int(9*i+7)] = u" "
             out[int(9*j+7)] = u" "
             # create beta electrons
-            out[int(9*a+8)] = u"\u2193"
+            out[int(9*a+8)] = u"B"
             out = ''.join(out)
             print("%10.6f  %s" %(vect[s], out))
 
@@ -1070,7 +1105,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
         # generate MO printing string
         mo_str = ""
         for mo in range(ras2):
-            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"\u2191 "))
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
         # print MO occupations
         for s in sort[:dets_to_print]:
             # do excitations
@@ -1081,14 +1116,180 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             # eliminate alpha electrons
             out[int(9*i+7)] = u" "
             # create beta electrons
-            out[int(9*a+8)] = u"\u2193"
-            out[int(9*b+8)] = u"\u2193"
+            out[int(9*a+8)] = u"B"
+            out[int(9*b+8)] = u"B"
             out = ''.join(out)
             print("%10.6f  %s" %(vect[s], out))
 
+    # RAS(h)-1SF-EA
+    if(n_SF==1 and delta_ec==1 and conf_space=="h"):
+        print("Coeff.\t\tImportant MO Occupations")
+        # make array with determinant data (i->a)
+        dets = np.zeros((n_dets, 5))
+        n_b1_dets = int(socc * ((socc-1)*(socc)/2))
+        n_b2_dets = int(nb_occ * ((socc-1)*(socc)/2))
+        count = 0
+        for i in range(socc):
+            for a in range(socc):
+                for b in range(a):
+                    dets[count][0] = i
+                    dets[count][1] = a
+                    dets[count][2] = b
+                    count = count + 1
+        for I in range(nb_occ):
+            for a in range(socc):
+                for b in range(a):
+                    dets[count][0] = I
+                    dets[count][1] = a
+                    dets[count][2] = b
+                    count = count + 1
+        for I in range(nb_occ):
+            for i in range(socc):
+                for a in range(socc):
+                    for b in range(a):
+                        for c in range(b):
+                            dets[count][0] = I
+                            dets[count][1] = i
+                            dets[count][2] = a
+                            dets[count][3] = b
+                            dets[count][4] = c
+                            count = count + 1
+        # g nerate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            if(s < n_b1_dets):
+                # do excitations
+                i = dets[s][0]
+                a = dets[s][1]
+                b = dets[s][2]
+                out = list(mo_str)
+                # eliminate alpha electrons
+                out[int(9*i+7)] = u" "
+                # create beta electrons
+                out[int(9*a+8)] = u"B"
+                out[int(9*b+8)] = u"B"
+                out = ''.join(out)
+            elif(s < n_b2_dets):
+                # do excitations
+                I = dets[s][0]
+                a = dets[s][1]
+                b = dets[s][2]
+                out = list(mo_str)
+                # create beta electrons
+                out[int(9*a+8)] = u"B"
+                out[int(9*b+8)] = u"B"
+                # elimination of alpha in RAS1
+                out = ("%6i %s" %(I+1, u" B")) + out
+                out = ''.join(out)
+            else:
+                # do excitations
+                I = dets[s][0]
+                i = dets[s][1]
+                a = dets[s][2]
+                b = dets[s][3]
+                c = dets[s][4]
+                out = list(mo_str)
+                # eliminate alpha in RAS2
+                out[int(9*i+7)] = u" "
+                # create beta electrons
+                out[int(9*a+8)] = u"B"
+                out[int(9*b+8)] = u"B"
+                out[int(9*c+8)] = u"B"
+                # elimination of alpha in RAS1
+                out = ("%6i %s" %(I+1, u" B")) + out
+                out = ''.join(out)
+            print("%10.6f  %s" %(vect[s], out))
 
-
-
-
-
+    # RAS(p)-1SF-EA
+    if(n_SF==1 and delta_ec==1 and conf_space=="p"):
+        print("Coeff.\t\tImportant MO Occupations")
+        # make array with determinant data (i->a)
+        dets = np.zeros((n_dets, 5))
+        n_b1_dets = int(ras2 * ((ras2-1)*(ras2)/2))
+        n_b2_dets = int(ras2 * ras3 * ras2)
+        # v(1) unpack to indexing: (iab:abb)
+        v_ref1 = np.zeros((ras2,ras2,ras2))
+        count = 0
+        for i in range(ras2):
+            for a in range(ras2):
+                for b in range(a):
+                    dets[count][0] = i
+                    dets[count][1] = a
+                    dets[count][2] = b
+                    count = count + 1
+        # v(2) unpack to indexing: (Aia:abb)
+        v_ref2 = np.zeros((ras3,ras2,ras2))
+        for A in range(ras3):
+            for i in range(ras2):
+                for a in range(ras2):
+                    dets[count][0] = A
+                    dets[count][1] = i
+                    dets[count][2] = a
+                    count = count + 1
+        # v(3) unpack to indexing: (Aijab:aaabb)
+        v_ref3 = np.zeros((ras3, ras2, ras2, ras2, ras2))
+        count = 0
+        for i in range(ras2):
+            for j in range(i):
+                for A in range(ras3):
+                    for a in range(ras2):
+                        for b in range(a):
+                            dets[count][0] = A
+                            dets[count][1] = i
+                            dets[count][2] = j
+                            dets[count][3] = a
+                            dets[count][4] = b
+                            count = count + 1
+        # generate MO printing string
+        mo_str = ""
+        for mo in range(ras2):
+            mo_str = mo_str + ("%6i %s" %(mo+ras1+1, u"A "))
+        # print MO occupations
+        for s in sort[:dets_to_print]:
+            if(s < n_b1_dets):
+                # do excitations
+                i = dets[s][0]
+                a = dets[s][1]
+                b = dets[s][2]
+                out = list(mo_str)
+                # eliminate alpha electrons
+                out[int(9*i+7)] = u" "
+                # create beta electrons
+                out[int(9*a+8)] = u"B"
+                out[int(9*b+8)] = u"B"
+                out = ''.join(out)
+            elif(s < n_b1_dets):
+                # do excitations
+                A = dets[s][0]
+                i = dets[s][1]
+                a = dets[s][2]
+                out = list(mo_str)
+                # eliminate alpha electrons
+                out[int(9*i+7)] = u" "
+                # create beta electrons
+                out[int(9*a+8)] = u"B"
+                # Addition of alpha in RAS3
+                out = ''.join(out)
+                out = out + ("%6i %s" %(A+ras1+ras2+1, u"A "))
+            else:
+                # do excitations
+                A = dets[s][0]
+                i = dets[s][1]
+                j = dets[s][2]
+                a = dets[s][3]
+                b = dets[s][4]
+                out = list(mo_str)
+                # eliminate alpha electrons
+                out[int(9*i+7)] = u" "
+                out[int(9*j+7)] = u" "
+                # create beta electrons
+                out[int(9*a+8)] = u"B"
+                out[int(9*b+8)] = u"B"
+                # Addition of alpha in RAS3
+                out = ''.join(out)
+                out = out + ("%6i %s" %(A+ras1+ras2+1, u"A "))
+            print("%10.6f  %s" %(vect[s], out))
 
