@@ -95,6 +95,9 @@ def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="L
 #    energy          Lowest root found by eigensolver (energy of system)
 def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space="",
               sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False ):
+    # make TEI object if we've passed in a numpy array
+    if(type(tei_int)==np.ndarray):
+        tei_int = tei.TEIFull(0, 0, ras1, ras2, ras3, np_tei=tei_int)
     # determine number of spin-flips and total change in electron count
     delta_ec = delta_b - delta_a
     n_SF = min(delta_a, delta_b)

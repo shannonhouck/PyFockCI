@@ -21,18 +21,22 @@ class TEI:
         pass
 
 # Class for full TEI integrals.
+#   np_tei         Allows for importing a previously-computed TEI integral (in NumPy martrix form)
 class TEIFull(TEI):
-    def __init__(self, C, basis, ras1, ras2, ras3):
-        # get necessary integrals/matrices from Psi4 (AO basis)
-        mints = psi4.core.MintsHelper(basis)
-        self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
-        # put in physicists' notation
-        self.eri = self.eri.transpose(0, 2, 1, 3)
-        # move to MO basis
-        self.eri = np.einsum('pqrs,pa',self.eri,C)
-        self.eri = np.einsum('aqrs,qb',self.eri,C)
-        self.eri = np.einsum('abrs,rc',self.eri,C)
-        self.eri = np.einsum('abcs,sd',self.eri,C)
+    def __init__(self, C, basis, ras1, ras2, ras3, np_tei=None):
+        if(not type(np_tei)==type(None)):
+            self.eri = np_tei
+        else:
+            # get necessary integrals/matrices from Psi4 (AO basis)
+            mints = psi4.core.MintsHelper(basis)
+            self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
+            # put in physicists' notation
+            self.eri = self.eri.transpose(0, 2, 1, 3)
+            # move to MO basis
+            self.eri = np.einsum('pqrs,pa',self.eri,C)
+            self.eri = np.einsum('aqrs,qb',self.eri,C)
+            self.eri = np.einsum('abrs,rc',self.eri,C)
+            self.eri = np.einsum('abcs,sd',self.eri,C)
         # ind stores the indexing of ras1/ras2/ras3 for get_subblock method
         self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[ras1+ras2,ras1+ras2+ras3]]
 
