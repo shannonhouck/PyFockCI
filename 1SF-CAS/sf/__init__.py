@@ -33,6 +33,20 @@ Psi4NumPy Tutorials
 ###############################################################################################
 
 # Runs SF-CAS using Psi4's integral packages
+# Parameters:
+#    delta_a         Number of alpha electrons to eliminate
+#    delta_b         Number of beta electrons to create
+#    conf_space      Excitation scheme (Options: "", "h", "p", "h,p")
+#    add_opts        Additional options for Psi4
+#    sf_diag_method  Diagonalization method to use for SF (LinOp is the only one working now)
+#    num_roots       The number of roots to find (defaults to 6)
+#    guess_type      Initial guess to use (Options: "RANDOM", "CAS")
+#    integral_type   Form of TEIs to use (Options: "FULL", "DF")
+#    aux_basis_type  Auxiliary basis to use for DF TEIs (Defaults to JKFIT version of Psi4 basis)
+#    return_vects    Return CI vectors? (Defaults to False)
+#    return_wfn      Return Psi4 reference ROHF wavefunction object? (Defaults to False)
+# Returns:
+#    s2              The S**2 expectation value for the state
 def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp",
             num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
     # cleanup in case of multiple calculations
