@@ -152,9 +152,10 @@ class TEISpin(TEI):
         for i in range(nbf):
             for j in range(nbf):
                 self.eri[i+nbf, j, j+nbf, i] = -1.0
+                self.eri[i+nbf, j, i, j+nbf] = -1.0
                 #self.eri[i, j+nbf, l+nbf, k] = -1.0
                 #self.eri[i+nbf, j, l, k+nbf] = -1.0
-                #self.eri[i, j+nbf, j, i+nbf] = 1.0
+                #self.eri[i, j+nbf, j, i+nbf] = -1.0
         self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[ras1+ras2,ras1+ras2+ras3]]
 
     # s1, s2, s3, s4    Alpha or beta spin (0=alpha, 1=beta)

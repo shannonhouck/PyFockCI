@@ -574,16 +574,16 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
         sig_1 = sig_1 - np.einsum("jb,ajbi->ia", v_ref1, tei_tmp)
         #       H(1,2) v(2) = sig(1)
         #   sig(ia:ab) += -1.0*sig(jB:ab)*I(ajBi:baba)
-        #tei_tmp = s2_tei.get_subblock(2, 2, 3, 2, 1, 0, 1, 0)
-        #sig_1 = sig_1 - np.einsum("Bj,ajBi->ia", v_ref2, tei_tmp)
+        tei_tmp = s2_tei.get_subblock(2, 2, 3, 2, 1, 0, 1, 0)
+        sig_1 = sig_1 - np.einsum("Bj,ajBi->ia", v_ref2, tei_tmp)
         #       H(1,3) v(3) = sig(1)
         #   sig(iA:ab) += - v(ijAb:aaab)*I(ajbA:baba)
-        #tei_tmp = s2_tei.get_subblock(2, 2, 2, 3, 1, 0, 1, 0)
-        #sig_1 = sig_1 - np.einsum("Aijb,ajbA->ia", v_ref3, tei_tmp)
+        tei_tmp = s2_tei.get_subblock(2, 2, 2, 3, 1, 0, 1, 0)
+        sig_1 = sig_1 - np.einsum("Aijb,ajbA->ia", v_ref3, tei_tmp)
         #       H(2,1) v(1) = sig(2)
         #   sig(iA:ab) += v(jb:ab)*t(jb:ab)*I(Ajbi:baba)
-        #tei_tmp = s2_tei.get_subblock(3, 2, 2, 2, 1, 0, 1, 0)
-        #sig_2 = -1.0*np.einsum("jb,Ajbi->Ai", v_ref1, tei_tmp)
+        tei_tmp = s2_tei.get_subblock(3, 2, 2, 2, 1, 0, 1, 0)
+        sig_2 = -1.0*np.einsum("jb,Ajbi->Ai", v_ref1, tei_tmp)
         #       H(2,2) v(2) = sig(2)
         #   sig(iA:ab) += sig(iB:ab)*F(BA:bb) - sig(jA:ab)*F(ji:aa)
         Fa_tmp = F[0:socc, 0:socc]
@@ -598,8 +598,8 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
         sig_2 = sig_2 - np.einsum("Bijc,AjcB->Ai", v_ref3, tei_tmp)
         #       H(3,1) v(1) = sig(3)
         #   sig(ijAb:aaab) += - v(ic:ab)*I(Abjc:abab) + v(jc:ab)*I(Abic:abab)
-        #tei_tmp = s2_tei.get_subblock(3, 2, 2, 2, 0, 1, 0, 1)
-        #sig_3 = -1.0*np.einsum("ic,Abjc->Aijb", v_ref1, tei_tmp) + np.einsum("jc,Abic->Aijb", v_ref1, tei_tmp)
+        tei_tmp = s2_tei.get_subblock(3, 2, 2, 2, 0, 1, 0, 1)
+        sig_3 = -1.0*np.einsum("ic,Abjc->Aijb", v_ref1, tei_tmp) + np.einsum("jc,Abic->Aijb", v_ref1, tei_tmp)
         #       H(3,2) v(2) = sig(3)
         #   sig(ijAb:aaab) += - v(jA:ab)*I(AbjC:abab) + v(jc:ab)*I(AbiC:abab)
         tei_tmp = s2_tei.get_subblock(3, 2, 2, 3, 0, 1, 0, 1)
@@ -664,14 +664,14 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
         # Do the following term:
         #       H(2,2) v(2) = sig(2)
         ################################################ 
-        F_tmp = F[0:virt, 0:virt]
-        sig_2 = np.einsum("B,AB->A", v_ref2, F_tmp)
+        #F_tmp = F[0:virt, 0:virt]
+        #sig_2 = np.einsum("B,AB->A", v_ref2, F_tmp)
         ################################################ 
         # Do the following term:
         #       H(2,3) v(3) = sig(2)
         ################################################ 
         tei_tmp = s2_tei.get_subblock(2, 3, 3, 2, 0, 1, 0, 1)
-        sig_2 = sig_2 + np.einsum("Bia,iABa->A", v_ref3, tei_tmp)
+        sig_2 = np.einsum("Bia,iABa->A", v_ref3, tei_tmp)
         ################################################ 
         # Do the following term:
         #       H(3,2) v(2) = sig(3)
@@ -682,16 +682,16 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
         # Do the following term:
         #       H(3,3) v(3) = sig(3)
         ################################################ 
-        F_tmp = F[0:socc, 0:socc]
-        sig_3 = sig_3 - np.einsum("Aja,ji->Aia", v_ref3, F_tmp)
-        F_tmp = F[0:virt, 0:virt]
-        sig_3 = sig_3 + np.einsum("Bia,AB->Aia", v_ref3, F_tmp)
-        F_tmp = F[0:socc, 0:socc]
-        sig_3 = sig_3 + np.einsum("Aib,ab->Aia", v_ref3, F_tmp)
+        #F_tmp = F[0:socc, 0:socc]
+        #sig_3 = sig_3 - np.einsum("Aja,ji->Aia", v_ref3, F_tmp)
+        #F_tmp = F[0:virt, 0:virt]
+        #sig_3 = sig_3 + np.einsum("Bia,AB->Aia", v_ref3, F_tmp)
+        #F_tmp = F[0:socc, 0:socc]
+        #sig_3 = sig_3 + np.einsum("Aib,ab->Aia", v_ref3, F_tmp)
         tei_tmp = s2_tei.get_subblock(2, 2, 2, 2, 0, 1, 0, 1)
         sig_3 = sig_3 - np.einsum("Ajb,jaib->Aia", v_ref3, tei_tmp)
-        #tei_tmp = s2_tei.get_subblock(3, 2, 3, 2, 0, 1, 0, 1)
-        #sig_3 = sig_3 + np.einsum("Bib,AaBb->Aia", v_ref3, tei_tmp)
+        tei_tmp = s2_tei.get_subblock(3, 2, 3, 2, 0, 1, 0, 1)
+        sig_3 = sig_3 + np.einsum("Bib,AaBb->Aia", v_ref3, tei_tmp)
         # reshape and return
         sig_2 = np.reshape(sig_2, (v_b2.shape[0], ))
         sig_3 = np.reshape(sig_3, (v_b3.shape[0], ))
@@ -718,12 +718,12 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
         tei_tmp = s2_tei.get_subblock(2, 1, 1, 2, 1, 0, 1, 0)
         sig_3 = -1.0*np.einsum("J,aJIi->Iia", v_ref2, tei_tmp)
         #       H(3,3) v(3) = sig(3)
-        F_tmp = F[0:socc, 0:socc]
-        sig_3 = sig_3 - np.einsum("Ija,ji->Iia", v_ref3, F_tmp)
-        F_tmp = F[0:socc, 0:socc]
-        sig_3 = sig_3 + np.einsum("Iib,ab->Iia", v_ref3, F_tmp)
-        F_tmp = F[0:docc, 0:docc]
-        sig_3 = sig_3 - np.einsum("Jia,JI->Iia", v_ref3, F_tmp)
+        #F_tmp = F[0:socc, 0:socc]
+        #sig_3 = sig_3 - np.einsum("Ija,ji->Iia", v_ref3, F_tmp)
+        #F_tmp = F[0:socc, 0:socc]
+        #sig_3 = sig_3 + np.einsum("Iib,ab->Iia", v_ref3, F_tmp)
+        #F_tmp = F[0:docc, 0:docc]
+        #sig_3 = sig_3 - np.einsum("Jia,JI->Iia", v_ref3, F_tmp)
         tei_tmp = s2_tei.get_subblock(2, 2, 2, 2, 1, 0, 1, 0)
         sig_3 = sig_3 - np.einsum("Ijb,ajbi->Iia", v_ref3, tei_tmp)
         tei_tmp = s2_tei.get_subblock(1, 2, 1, 2, 1, 0, 1, 0)
@@ -734,8 +734,8 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
         return np.einsum("i,i->", v_b2, sig_2) + np.einsum("i,i->", v_b3, sig_3)
 
     # do excitation scheme: 1SF-CAS-EA
-    if(n_SF==1 and delta_ec==1 and conf_space==""):
-        return 0.0
+    #if(n_SF==1 and delta_ec==1 and conf_space==""):
+    #    return 0.0
 
     else:
         return 0.0
