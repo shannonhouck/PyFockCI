@@ -1,7 +1,9 @@
 import psi4
 import numpy as np
 
-# Gets Fa and Fb for spactial orbitals
+# Gets Fa and Fb for spactial orbitals using Psi4.
+# Parameters:
+#    wfn             Psi4 wavefunction object
 def get_F(wfn):
     # get necessary integrals/matrices from Psi4 (AO basis)
     C = psi4.core.Matrix.to_array(wfn.Ca())

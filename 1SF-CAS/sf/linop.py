@@ -983,7 +983,7 @@ class LinOpH (LinearOperator):
 
             ################################################ 
             # Do the following term:
-            #       H(1,1) v(1) = sig(1)
+            #       H(1,2) v(2) = sig(1)
             ################################################ 
             #   sig(a:b) += v(a:b)*F(ab:bb)
             F_tmp = Fb[0:nb_occ, nb_occ:na_occ]

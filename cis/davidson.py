@@ -2,20 +2,17 @@ from __future__ import print_function
 import numpy as np
 from numpy import linalg as LIN
 
-def davidson( A, vInit, cutoff, maxIter ):
-    # generate vSpace (search subspace)
-    # based on vInit (input vectors)
-    vSpace = vInit;
-    # size at which to collapse search subspace
-    collapseSize = 300;
+
+def davidson( A, vInit, cutoff, maxIter, collapseSize=50 ):
+    # initialize vSpace (search subspace)
+    vSpace = vInit
     # cutoff for adding vector to Krylov search subspace
-    delta = 0.000001;
+    delta = 0.000001
     # number of eigenvalues to solve for
-    k = vInit.shape[1];
-
+    k = vInit.shape[1]
     # iterations completed
-    j = 0;
-
+    j = 0
+    # storing sigmas...
     sig = None;
 
     # index of last sigma added
@@ -55,7 +52,7 @@ def davidson( A, vInit, cutoff, maxIter ):
             print("%16.8f" % LIN.norm(r[:,i]), end='')
         print("\n")
 
-        # check residuals for convergence (break)
+        # check residuals for convergence
         converged = True;
         for i in range(k):
             if( LIN.norm(r[:,i])>cutoff ):
@@ -70,13 +67,17 @@ def davidson( A, vInit, cutoff, maxIter ):
             lastSig = 0
             vSpaceNew = None
             for l in range(k):
-                newVect = np.zeros((rows(A),1))
+                newVect = np.zeros((A.shape[0],1))
                 for i in range(vSpace.shape[1]):
-                    newVect = newVect + np.dot(eVects[i,eIndex(l)], vSpace[:,i])
-            # orthonormalize
-            newVect = newVect/norm(newVect);
-            vSpaceNew = [vSpaceNew, newVect];
+                    newVect = newVect + np.dot(eVects[i,eIndex[l]], vSpace[:,i]).reshape((A.shape[0],1))
+                # orthonormalize
+                newVect = newVect/LIN.norm(newVect)
+                if(vSpaceNew is None):
+                    vSpaceNew = newVect
+                else:
+                    vSpaceNew = np.column_stack((vSpaceNew, newVect))
             vSpace = vSpaceNew
+            #print(vSpace.shape)
             sig = None
 
         # else, apply preconditioner to residuals (elif)
@@ -85,7 +86,7 @@ def davidson( A, vInit, cutoff, maxIter ):
             D = np.diag(np.diag(A));
             for i in range(k) :
                 sNew = LIN.solve(LIN.inv(D-eVals[i]*np.eye(D.shape[0])), r[:,i])
-                print(sNew)
+                #print(sNew)
                 if ( LIN.norm(sNew) > delta ):
                     # orthogonalize
                     h = np.dot(vSpace.T, sNew);
@@ -97,19 +98,18 @@ def davidson( A, vInit, cutoff, maxIter ):
                 else:
                     print("AAAAAAAAA WHY")
         if ( vSpace.shape[1] > A.shape[1] ):
-            printf("...\nError: Make sure your inputs are reasonable!\n\n");
+            print("...\nError: Make sure your inputs are reasonable!\n\n");
             return;
         # increase j and loop again
         j = j+1;
 
+# generate testing matrix
 dim = 2000
 ATest = np.random.rand(dim, dim)
 ATest = ATest.T + ATest
 ATest = ATest + np.diag(np.eye(dim,1)) - 5000*np.eye(dim)
-guessindexes = np.diag(ATest).argsort()
+#guessindexes = np.diag(ATest).argsort()
 vTest = np.zeros((dim,2))
-#vTest[guessindexes[0], 0] = 1.0
-#vTest[guessindexes[1], 1] = 1.0
 vTest[0, 0] = 1.0
 vTest[1, 1] = 1.0
 print(vTest.shape)
