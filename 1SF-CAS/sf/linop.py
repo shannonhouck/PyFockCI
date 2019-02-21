@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
+from .post_ci_analysis import generate_dets
 
 class LinOpH (LinearOperator):
     
@@ -14,10 +15,52 @@ class LinOpH (LinearOperator):
         self.n_SF = n_SF_in # number of spin-flips
         self.delta_ec = delta_ec_in # change in electron count
         self.conf_space = conf_space_in # excitation rank
+        self.num_dets = shape_in[0]
         # getting integrals
         self.Fa = Fa_in
         self.Fb = Fb_in
         self.tei = tei_in
+
+    # obtain diagonal elements of Hamiltonian
+    def diag(self):
+        # grabbing necessary info from self
+        n_dets = self.num_dets
+        Fa = self.Fa
+        Fb = self.Fb
+        tei = self.tei
+        conf_space = self.conf_space
+        na_occ = self.na_occ
+        nb_occ = self.nb_occ
+        na_virt = self.na_virt
+        nb_virt = self.nb_virt
+        n_SF = self.n_SF
+        delta_ec = self.delta_ec
+        nbf = na_occ + na_virt
+        socc = na_occ - nb_occ
+        # get list of determinants
+        det_list = generate_dets(n_SF, delta_ec, conf_space, nb_occ, na_occ-nb_occ, na_virt) 
+        # building "base" value
+        Fa_tmp = Fa[0:na_occ, 0:na_occ]
+        Fb_tmp = Fb[0:nb_occ, 0:nb_occ]
+        base = np.einsum("ii->", Fa_tmp) + np.einsum("ii->", Fb_tmp)
+        # set up diagonal
+        diag_out = np.zeros((n_dets,1))
+        # replace necessary values
+        count = 0
+        for det in det_list:
+            diag_out[count] = base
+            # eliminate electrons
+            for i in det[0][0]:
+                diag_out[count] = diag_out[count] - Fa[i,i]
+            for i in det[0][1]:
+                diag_out[count] = diag_out[count] - Fb[i,i]
+            # add electrons
+            for a in det[1][0]:
+                diag_out[count] = diag_out[count] + Fa[a,a]
+            for a in det[1][1]:
+                diag_out[count] = diag_out[count] + Fb[a,a]
+            count = count + 1
+        return diag_out
 
     def _matvec(self, v):
         # grabbing necessary info from self
@@ -552,7 +595,7 @@ class LinOpH (LinearOperator):
             v_ref2 = np.reshape(v_b2, (nb_occ, socc))
             # v(3) indexing: (Ai:ab)
             v_ref3 = np.reshape(v_b3, (na_virt, socc))
-            # v(3) unpack to indexing: (Iiab:babb)
+            # v(4) unpack to indexing: (Iiab:babb)
             v_ref4 = np.zeros((nb_occ, socc, socc, socc))
             index = 0
             for I in range(nb_occ):
@@ -1195,7 +1238,7 @@ class LinOpH (LinearOperator):
             v_ref1 = np.reshape(v_b1, (socc))
             # v(2) indexing: (I:a)
             v_ref2 = np.reshape(v_b2, (nb_occ))
-            # v(3) indexing: (Iia:bba)
+            # v(3) indexing: (Iia:bab)
             v_ref3 = np.reshape(v_b3, (nb_occ, socc, socc))
 
             ################################################ 
@@ -2064,9 +2107,9 @@ class LinOpH (LinearOperator):
                         v_ref1[i, a, b] = v_b1[index]
                         v_ref1[i, b, a] = -1.0*v_b1[index]
                         index = index + 1
-            # v(2) unpack to indexing: (Aia:abb)
+            # v(2) unpack to indexing: (Aia:bab)
             v_ref2 = np.reshape(v_b2, (na_virt, socc, socc))
-            # v(3) unpack to indexing: (Aijab:aaabb)
+            # v(3) unpack to indexing: (Aijab:baabb)
             v_ref3 = np.zeros((na_virt, socc, socc, socc, socc))
             index = 0
             for i in range(socc):

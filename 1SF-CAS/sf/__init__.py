@@ -49,7 +49,7 @@ Psi4NumPy Tutorials
 # Returns:
 #    s2              The S**2 expectation value for the state
 def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp",
-            num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
+            num_roots=6, guess_type="RANDOM", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
     # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
@@ -73,7 +73,7 @@ def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="L
     Cb = psi4.core.Matrix.to_array(wfn.Cb())
     Fa, Fb = f.get_F(wfn)
     if(integral_type=="FULL"):
-        tei_int = tei.TEIFull(wfn.Ca(), wfn.basisset(), wfn.doccpi()[0], ras2, ras3)
+        tei_int = tei.TEIFull(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3)
     if(integral_type=="DF"):
         # if user hasn't defined which aux basis to use, default behavior is to use the one from opts
         if(aux_basis_name == ""):
@@ -115,7 +115,7 @@ def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="L
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
 def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space="",
-              sf_diag_method="DAVIDSON", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False ):
+              sf_diag_method="DAVIDSON", num_roots=6, guess_type="RANDOM", integral_type="FULL", aux_basis_name="", return_vects=False ):
     # make TEI object if we've passed in a numpy array
     if(type(tei_int)==np.ndarray):
         tei_int = tei.TEIFull(0, 0, ras1, ras2, ras3, np_tei=tei_int)
@@ -211,47 +211,54 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
     #    return(e + np.sort(LIN.eigvalsh(H))[0])
     print("Performing %iSF with electron count change of %i..." %(n_SF, delta_ec) )
     print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(ras1, ras2, ras3) )
-    # Generate appropriate guesses
-    guess_vect = None
-    if(guess_type == "CAS"):
-        cas_A = linop.LinOpH((ras2*ras2,ras2*ras2), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
-        cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1)
-        socc = wfn.soccpi()[0]
-        v3_guess = np.zeros((n_dets-(ras2*ras2), 1)) 
-        guess_vect = np.vstack((cas_vects, v3_guess)).T
-    elif(guess_type == "RANDOM"):
-        guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
-    else:
-        guess_vect = np.zeros((n_dets, num_roots))
-        for i in range(num_roots):
-            guess_vect[i,i] = 1.0
     # setup for the method
     a_occ = ras1 + ras2
     b_occ = ras1
     a_virt = ras3
     b_virt = ras2 + ras3
+    # Generate appropriate guesses
+    guess_vect = None
     print("Number of determinants:", n_dets)
     if( num_roots >= n_dets ):
         num_roots = n_dets - 1 
+    #if(guess_type == "CAS"):
+    #    if(conf_space==""):
+    #        guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
+    #    else:
+    #        cas_A = linop.LinOpH((ras2*ras2,ras2*ras2), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
+    #        cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1)
+    #        v3_guess = np.zeros((n_dets-(ras2*ras2), 1)) 
+    #        guess_vect = np.vstack((cas_vects, v3_guess)).T
+    if(guess_type == "RANDOM"):
+        guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
+    else:
+        guess_vect = np.zeros((n_dets, num_roots))
+        for i in range(num_roots):
+            guess_vect[i,i] = 1.0
+    print(guess_vect)
     A = linop.LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
     # run method
+    if(n_dets < 100):
+        sf_diag_method = "LANCZOS"
     if(sf_diag_method == "LANCZOS"):
         if(conf_space==""):
             vals, vects = SPLIN.eigsh(A, which='SA', k=num_roots)
         else:
             vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
+            #vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
     else: #if(sf_diag_method == "DAVIDSON"):
         vals, vects = davidson(A, guess_vect)
     print("\nROOT No.\tEnergy\t\tS**2")
     print("------------------------------------------------")
     for i, corr in enumerate(vals):
-        s2 = post_ci_analysis.calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], ras1, ras2, ras3)
+        #s2 = post_ci_analysis.calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], ras1, ras2, ras3)
+        s2 = 0
         print("   %i\t\t%6.6f\t%8.6f" % (i, e + corr, s2))
     print("------------------------------------------------\n")
-    print("Most Important Determinants Data:")
-    for i, corr in enumerate(vals):
-        print("\nROOT %i: %12.12f" %(i, e + corr))
-        s2 = post_ci_analysis.print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
+    #print("Most Important Determinants Data:")
+    #for i, corr in enumerate(vals):
+    #    print("\nROOT %i: %12.12f" %(i, e + corr))
+    #    s2 = post_ci_analysis.print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
     print("\n\n\t  Fock Space CI Complete! \n")
     # Return appropriate things
     if(return_vects):
