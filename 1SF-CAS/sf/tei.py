@@ -65,11 +65,8 @@ class TEIDF(TEI):
             J = np.squeeze(J)
         # Contract and obtain final form
         eri = np.einsum("PQ,Qpq->Ppq", J, eri)
-<<<<<<< HEAD
         # set up C
-=======
         C = psi4.core.Matrix.to_array(C)
->>>>>>> b0f4d4f91fdcdf12b6d2cbb216027d70c5ef4985
         C_ras1 = C[:, 0:ras1]
         C_ras2 = C[:, ras1:ras1+ras2]
         C_ras3 = C[:, ras1+ras2:]
