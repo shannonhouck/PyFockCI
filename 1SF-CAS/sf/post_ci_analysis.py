@@ -1,5 +1,5 @@
 import numpy as np
-import tei
+#import tei
 
 # Calculates S**2 for a given CI state.
 # Parameters:

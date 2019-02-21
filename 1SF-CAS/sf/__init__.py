@@ -49,7 +49,7 @@ Psi4NumPy Tutorials
 # Returns:
 #    s2              The S**2 expectation value for the state
 def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LinOp",
-            num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
+            num_roots=6, guess_type="LANCZOS", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
     # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
@@ -114,7 +114,7 @@ def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="L
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
 def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space="", J_in=None, C_in=None,
-              sf_diag_method="LinOp", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False ):
+              sf_diag_method="LANCZOS", num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False ):
     # make TEI object if we've passed in a numpy array
     if(type(tei_int)==np.ndarray):
         if(integral_type=="FULL"):
@@ -251,9 +251,9 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
         print("   %i\t\t%6.6f\t%8.6f" % (i, e + corr, s2))
     print("------------------------------------------------\n")
     print("Most Important Determinants Data:")
-    for i, corr in enumerate(vals):
-        print("\nROOT %i: %12.12f" %(i, e + corr))
-        s2 = post_ci_analysis.print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
+    #for i, corr in enumerate(vals):
+    #    print("\nROOT %i: %12.12f" %(i, e + corr))
+    #    s2 = post_ci_analysis.print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
     print("\n\n\t  Fock Space CI Complete! \n")
     # Return appropriate things
     if(return_vects):
