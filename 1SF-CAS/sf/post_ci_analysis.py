@@ -415,6 +415,211 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         return 0.0
     '''
 
+# Returns a list of determinants in the following form:
+# det = [...] (det[0] is 0th determinant, det[1] is 1st, etc.)
+# det[count] = [[[elim (alpha)], [elim (beta)]], [[add (a)], [add (b)]]]
+# indexing starts at zero
+# complicated? yeah, for sure, but it works
+def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
+    # storing list of determinants
+    dets_list = []
+
+    # CAS-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space==""):
+        # make array with determinant data (i->a)
+        for i in range(ras1,ras1+ras2):
+            for a in range(ras1,ras1+ras2):
+                dets_list.append([[[i],[]], [[],[a]]])
+        return dets_list
+
+    # RAS(h)-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space=="h"):
+        # v(1) indexing: (ia:ab)
+        for i in range(ras1,ras1+ras2):
+            for a in range(ras1,ras1+ras2):
+                dets_list.append([[[i],[]], [[],[a]]])
+        # v(2) indexing: (Ia:ab)
+        for I in range(ras1):
+            for a in range(ras1,ras1+ras2):
+                dets_list.append([[[I],[]], [[],[a]]])
+        # v(3) unpack to indexing: (Iiab:babb)
+        for I in range(ras1):
+            for i in range(ras1,ras1+ras2):
+                for a in range(ras1,ras1+ras2):
+                    for b in range(ras1,a):
+                        dets_list.append([[[i],[I]], [[],[a,b]]])
+        return dets_list
+
+    # RAS(p)-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space=="p"):
+        # v(1) indexing: (ia:ab)
+        for i in range(ras1,ras1+ras2):
+            for a in range(ras1,ras1+ras2):
+                dets_list.append([[[i],[]], [[],[a]]])
+        # v(2) indexing: (Ai:ab)
+        for A in range(ras1+ras2,ras1+ras2+ras3):
+            for i in range(ras1,ras1+ras2):
+                dets_list.append([[[i],[]], [[],[A]]])
+        # v(3) unpack to indexing: (Aijb:aaab)
+        for i in range(ras1,ras1+ras2):
+            for j in range(ras1,i):
+                for A in range(ras1+ras2,ras1+ras2+ras3):
+                    for b in range(ras1,ras1+ras2):
+                        dets_list.append([[[i,j],[]], [[A],[b]]])
+        print(len(dets_list))
+        return dets_list
+
+    # RAS(h,p)-1SF
+        # v(1) indexing: (ia:ab)
+        for i in range(ras1,ras1+ras2):
+            for a in range(ras1,ras1+ras2):
+                dets_list.append([[[i],[]], [[],[a]]])
+        # v(2) indexing: (Ia:ab)
+        for I in range(ras1):
+            for a in range(ras1,ras1+ras2):
+                dets_list.append([[[I],[]], [[],[a]]])
+        # v(3) indexing: (Ai:ab)
+        for A in range(ras1+ras2,ras1+ras2+ras3):
+            for i in range(ras1,ras1+ras2):
+                dets_list.append([[[i],[]], [[],[A]]])
+        # v(4) unpack to indexing: (Iiab:babb)
+        for I in range(ras1):
+            for i in range(ras1,ras1+ras2):
+                for a in range(ras1,ras1+ras2):
+                    for b in range(ras1,a):
+                        dets_list.append([[[i],[I]], [[],[a,b]]])
+        # v(5) unpack to indexing: (Aijb:aaab)
+        for i in range(ras1,ras1+ras2):
+            for j in range(ras1,i):
+                for A in range(ras1+ras2,ras1+ras2+ras3):
+                    for b in range(ras1,ras1+ras2):
+                        dets_list.append([[[i,j],[]], [[A],[b]]])
+
+    # CAS-2SF
+    if(n_SF==2 and delta_ec==0 and conf_space==""):
+        for i in range(ras1,ras1+ras2):
+            for j in range(ras1,i):
+                for a in range(ras1,ras1+ras2):
+                    for b in range(ras1,a):
+                        dets_list.append([[[i,j],[]], [[],[a,b]]])
+
+    # CAS-IP
+    if(n_SF==0 and delta_ec==-1 and conf_space==""):
+        # v(1) indexing: (i:a)
+        for i in range(ras1,ras1+ras2):
+            dets_list.append([[[i],[]], [[],[]]])
+
+    # RAS(h)-IP
+    if(n_SF==0 and delta_ec==-1 and conf_space=="h"):
+        # v(1) indexing: (i:a)
+        for i in range(ras1,ras1+ras2):
+            dets_list.append([[[i],[]], [[],[]]])
+        # v(2) indexing: (I:a)
+        for I in range(ras1):
+            dets_list.append([[[I],[]], [[],[]]])
+        # v(3) indexing: (Iia:bab)
+        for I in range(ras1):
+            for i in range(ras1,ras1+ras2):
+                for a in range(ras1,ras1+ras2):
+                    dets_list.append([[[i],[I]], [[],[a]]])
+
+    # RAS(p)-IP
+    if(n_SF==0 and delta_ec==-1 and conf_space=="p"):
+        # v(1) indexing: (i:a)
+        for i in range(ras1,ras1+ras2):
+            dets_list.append([[[i],[]], [[],[]]])
+        # v(2) indexing: (Aij:aaa)
+        for i in range(ras1,ras1+ras2):
+            for j in range(ras1,i):
+                for A in range(ras1+ras2,ras1+ras2+ras3):
+                    dets_list.append([[[i,j],[]], [[A],[]]])
+
+    # CAS-1SF-IP
+    if(n_SF==1 and delta_ec==-1 and conf_space==""):
+        for i in range(ras1,ras1+ras2):
+            for j in range(ras1,i):
+                for a in range(ras1,ras1+ras2):
+                    dets_list.append([[[i,j],[]], [[],[a]]])
+
+    # RAS(h)-1SF-IP
+    if(n_SF==1 and delta_ec==-1 and conf_space=="h"):
+        # v(1) unpack to indexing: (ija:aab)
+        for i in range(ras1,ras1+ras2):
+            for j in range(ras1,i):
+                for a in range(ras1,ras1+ras2):
+                    dets_list.append([[[i,j],[]], [[],[a]]])
+        # v(2) unpack to indexing: (Iia:aab)
+        for I in range(ras1):
+            for i in range(ras1,ras1+ras2):
+                for a in range(ras1,ras1+ras2):
+                    dets_list.append([[[I,i],[]], [[],[a]]])
+        # v(3) unpack to indexing: (Iijab:aaabb)
+        for I in range(ras1):
+            for i in range(ras1,ras1+ras2):
+                for j in range(ras1,i):
+                    for a in range(ras1,ras1+ras2):
+                        for b in range(ras1,a):
+                            dets_list.append([[[I,i,j],[]], [[],[a,b]]])
+
+    # CAS-EA
+    if(n_SF==0 and delta_ec==1 and conf_space==""):
+        for a in range(ras1,ras1+ras2):
+            dets_list.append([[[],[]], [[],[a]]])
+
+    # RAS(h)-EA
+    if(n_SF==0 and delta_ec==1 and conf_space=="h"):
+        # v(1) indexing: (a:b)
+        for a in range(ras1,ras1+ras2):
+            dets_list.append([[[],[]], [[],[a]]])
+        # v(2) indexing: (Iab:bbb)
+        for I in range(ras1):
+            for a in range(ras1,ras1+ras2):
+                for b in range(ras1,a):
+                    dets_list.append([[[],[I]], [[],[a,b]]])
+
+    # doing RAS(p)-EA calculation
+    if(n_SF==0 and delta_ec==1 and conf_space=="p"):
+        # v(1) indexing: (a:b)
+        for a in range(ras1,ras1+ras2):
+            dets_list.append([[[],[]], [[],[a]]])
+        # v(2) indexing: (A:b)
+        for A in range(ras1+ras2,ras1+ras2+ras3):
+            dets_list.append([[[],[]], [[],[A]]])
+        # v(3) indexing: (Aia:aab)
+        for A in range(ras1+ras2,ras1+ras2+ras3):
+            for i in range(ras1,ras1+ras2):
+                for a in range(ras1,ras1+ras2):
+                    dets_list.append([[[i],[]], [[A],[a]]])
+
+    # CAS-1SF-EA
+    if(n_SF==1 and delta_ec==1 and conf_space==""):
+        # v(1) unpack to indexing: (iab:abb)
+        for i in range(ras1,ras1+ras2):
+            for a in range(ras1,ras1+ras2):
+                for b in range(ras1,a):
+                    dets_list.append([[[i],[]], [[],[a,b]]])
+
+    # RAS(p)-1SF-EA
+    if(n_SF==1 and delta_ec==1 and conf_space=="p"):
+        # v(1) unpack to indexing: (iab:abb)
+        for i in range(ras1,ras1+ras2):
+            for a in range(ras1,ras1+ras2):
+                for b in range(ras1,a):
+                    dets_list.append([[[i],[]], [[],[a,b]]])
+        # v(2) unpack to indexing: (Aia:bab)
+        for A in range(ras1+ras2,ras1+ras2+ras3):
+            for i in range(ras1,ras1+ras2):
+                for a in range(ras1,ras1+ras2):
+                    dets_list.append([[[i],[]], [[],[A,a]]])
+        # v(3) unpack to indexing: (Aijab:baabb)
+        for i in range(ras1,ras1+ras2):
+            for j in range(ras1,i):
+                for A in range(ras1+ras2,ras1+ras2+ras3):
+                    for a in range(ras1,ras1+ras2):
+                        for b in range(ras1,a):
+                            dets_list.append([[[i,j],[]], [[],[A,a,b]]])
+
+    return dets_list
 
 def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
     # get S**2 ERIs
