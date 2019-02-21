@@ -47,23 +47,25 @@ class TEIFull(TEI):
 class TEIDF(TEI):
     # Used Psi4NumPy for reference for this section
     # ras1, ras2, ras3 indicate the number of orbitals in each section
-    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space):
-        # get info from Psi4
-        zero = psi4.core.BasisSet.zero_ao_basis_set()
-        mints = psi4.core.MintsHelper(basis)
-        # (Q|pq)
-        eri = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, basis, basis))
-        eri = np.squeeze(eri)
-        # J^-1/2 (don't need to keep)
-        #J = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, zero, aux))
-        J = mints.ao_eri(zero, aux, zero, aux)
-        J.power(-0.5, 1e-14)
-        J = np.squeeze(J)
+    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space, np_tei=None, np_J=None):
+        if(not type(np_tei)==type(None)):
+            eri = np_tei
+            J = np_J
+        else:
+            # get info from Psi4
+            zero = psi4.core.BasisSet.zero_ao_basis_set()
+            mints = psi4.core.MintsHelper(basis)
+            # (Q|pq)
+            eri = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, basis, basis))
+            eri = np.squeeze(eri)
+            C = psi4.core.Matrix.to_array(C)
+            # set up J^-1/2 (don't need to keep)
+            J = mints.ao_eri(zero, aux, zero, aux)
+            J.power(-0.5, 1e-14)
+            J = np.squeeze(J)
         # Contract and obtain final form
         eri = np.einsum("PQ,Qpq->Ppq", J, eri)
-        # put in physicists' notation
-        #self.eri = self.eri.transpose(0, 2, 1, 3)
-        C = psi4.core.Matrix.to_array(C)
+        # set up C
         C_ras1 = C[:, 0:ras1]
         C_ras2 = C[:, ras1:ras1+ras2]
         C_ras3 = C[:, ras1+ras2:]
