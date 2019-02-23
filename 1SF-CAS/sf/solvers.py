@@ -2,19 +2,19 @@ from __future__ import print_function
 import numpy as np
 from scipy import linalg as LIN
 
-# Runs SF-CAS using Psi4's integral packages
+# Solves for the eigenvalues and eigenvectors of a Hamiltonian.
 # Parameters:
 #    A               Hamiltonian (LinOp object)
 #    vInit           Initial guess vector (numpy)
-#    cutoff          Cutoff for energy convergence (default: 1e-8)
+#    e_conv          Cutoff for energy convergence (default: 1e-6)
+#    r_conv          Cutoff for residual squared convergence (default: 1e-4)
+#    vect_cutoff     Cutoff for adding vectors to Krylov space (default: 1e-8)
 #    maxIter         Maximum number of iterations
 # Returns:
 #    s2              The S**2 expectation value for the state
-def davidson( A, vInit, cutoff=1e-6, maxIter=100, collapseSize=50 ):
+def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapseSize=50 ):
     # initialize vSpace (search subspace)
     vSpace = vInit
-    # cutoff for adding vector to Krylov search subspace
-    delta = 1e-4
     # number of eigenvalues to solve for
     k = vInit.shape[1]
     # iterations completed
@@ -23,6 +23,8 @@ def davidson( A, vInit, cutoff=1e-6, maxIter=100, collapseSize=50 ):
     sig = None;
     # diagonal of Hamiltonian
     D = A.diag()
+    # storing last eigenvalues
+    lastVals = np.zeros((k))
 
     # index of last sigma added
     lastSig = 0;
@@ -63,7 +65,11 @@ def davidson( A, vInit, cutoff=1e-6, maxIter=100, collapseSize=50 ):
         # check residuals for convergence
         converged = True;
         for i in range(k):
-            if( LIN.norm(r[:,i])>cutoff ):
+            # check residual
+            if( LIN.norm(r[:,i])>r_conv ):
+                converged = False
+            # check energy
+            if( (eVals[i]-lastVals[i] ) > e_conv):
                 converged = False
 
         # if converged, return appropriate values
@@ -93,7 +99,7 @@ def davidson( A, vInit, cutoff=1e-6, maxIter=100, collapseSize=50 ):
         else:
             for i in range(k) :
                 sNew = LIN.solve(LIN.inv(D-eVals[i]*np.eye(D.shape[0])), r[:,i])
-                if ( LIN.norm(sNew) > delta ):
+                if ( LIN.norm(sNew) > vect_cutoff ):
                     # orthogonalize
                     h = np.dot(vSpace.T, sNew);
                     sNew = sNew - np.dot(vSpace,h);
@@ -108,6 +114,8 @@ def davidson( A, vInit, cutoff=1e-6, maxIter=100, collapseSize=50 ):
         if ( vSpace.shape[1] > A.shape[1] ):
             print("...\nError: Make sure your inputs for Davidson are reasonable!\n\n");
             exit()
+        # save the eigenvalues
+        lastVals = eVals
         # increase j and loop again
         j = j+1;
 

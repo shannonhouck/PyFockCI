@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 #import tei
 
@@ -967,6 +968,19 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
     # find largest-magnitude contributions
     sort = abs(vect).argsort()[::-1]
 
+    print("Coeff.\t\tImportant MO Occupations")
+    # obtain ordered determinant lists
+    dets = generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3)
+
+    for s in sort[:dets_to_print]:
+        print("%10.6f " %(vect[s]), end='')
+        # annihilated
+        print("\tREMOVE:\tA: %9s" %(dets[s][0][0]), end='')
+        print("\tB: %9s" %(dets[s][0][1]), end='')
+        print("\tADD:\tB: %9s" %(dets[s][1][0]), end='')
+        print("\tB: %9s" %(dets[s][1][1]))
+
+    '''
     # CAS-1SF
     if(n_SF==1 and delta_ec==0 and conf_space==""):
         print("Coeff.\t\tImportant MO Occupations")
@@ -1061,7 +1075,6 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             out = ''.join(out) # reformat string for printing
             print("%10.6f  %s" %(vect[s], out))
 
-    '''
     # RAS(p)-EA
     if(n_SF==0 and delta_ec==1 and conf_space=="p"):
         print("Coeff.\t\tImportant MO Occupations")
@@ -1091,7 +1104,6 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
             out[int(9*a+8)] = u"B" # create beta
             out = ''.join(out) # reformat string for printing
             print("%10.6f  %s" %(vect[s], out))
-    '''
 
     # CAS-1SF-IP
     if(n_SF==1 and delta_ec==-1 and conf_space==""):
@@ -1497,4 +1509,5 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
                 out = ''.join(out)
                 out = out + ("%6i %s" %(A+ras1+ras2+1, u"A "))
             print("%10.6f  %s" %(vect[s], out))
+    '''
 
