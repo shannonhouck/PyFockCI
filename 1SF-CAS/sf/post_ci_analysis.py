@@ -946,6 +946,21 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
     else:
         return 0.0
 
+def print_det_list(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
+    print("ROHF Config:")
+    print("\tDOCC: %i" %ras1)
+    print("\tSOCC: %i" %ras2)
+    print("\tVIRT: %i" %ras3)
+    det_list = generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3)
+    count = 0
+    for i in range(len(det_list)):
+        print("DET %i" %i, end='')
+        # annihilated
+        print("\tREMOVE:\tA: %9s" %(det_list[i][0][0]), end='')
+        print("\tB: %9s" %(det_list[i][0][1]), end='')
+        print("\tADD:\tB: %9s" %(det_list[i][1][0]), end='')
+        print("\tB: %9s" %(det_list[i][1][1]))
+
 
 # Give a CI vector, prints information about the most important determinants.
 # Parameters:
