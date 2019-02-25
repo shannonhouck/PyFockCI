@@ -467,10 +467,10 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                 for A in range(ras1+ras2,ras1+ras2+ras3):
                     for b in range(ras1,ras1+ras2):
                         dets_list.append([[[i,j],[]], [[A],[b]]])
-        print(len(dets_list))
         return dets_list
 
     # RAS(h,p)-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space=="h,p"):
         # v(1) indexing: (ia:ab)
         for i in range(ras1,ras1+ras2):
             for a in range(ras1,ras1+ras2):
@@ -495,6 +495,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                 for A in range(ras1+ras2,ras1+ras2+ras3):
                     for b in range(ras1,ras1+ras2):
                         dets_list.append([[[i,j],[]], [[A],[b]]])
+        return dets_list
 
     # CAS-2SF
     if(n_SF==2 and delta_ec==0 and conf_space==""):

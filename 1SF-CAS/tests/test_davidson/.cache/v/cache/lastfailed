@@ -1,7 +1,4 @@
 {
-  "test_general.py::test_1": true,
-  "test_general.py::test_2": true,
-  "test_general.py::test_3": true,
   "test_guesses.py::test_1": true,
   "test_guesses.py::test_2": true,
   "test_guesses.py::test_3": true
