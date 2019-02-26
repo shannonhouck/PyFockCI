@@ -44,7 +44,7 @@ class LinOpH (LinearOperator):
         Fb_tmp = Fb[0:nb_occ, 0:nb_occ]
         base = np.einsum("ii->", Fa_tmp) + np.einsum("ii->", Fb_tmp)
         # set up diagonal
-        diag_out = np.zeros((n_dets,1))
+        diag_out = np.zeros((n_dets))
         # replace necessary values
         count = 0
         for det in det_list:

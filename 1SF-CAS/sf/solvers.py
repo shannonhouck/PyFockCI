@@ -23,7 +23,8 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
     # storing sigmas...
     sig = None;
     # diagonal of Hamiltonian
-    D = A.diag()
+    D = np.diag(A.diag())
+    print(D.shape)
     # storing last eigenvalues
     lastVals = np.zeros((k))
 
@@ -34,8 +35,6 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
 
     print("Starting Davidson...")
     while ( j<maxIter ):
-        print(lastSig)
-        print(vSpace.shape[1])
         # form k sigma vectors
         for i in range(lastSig, vSpace.shape[1]):
             if(type(sig)==type(None)):
@@ -44,11 +43,8 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
             else:
                 sig = np.column_stack((sig, A.matvec(vSpace[:,i])))
   
-        print(vSpace.shape)
-        print(sig.shape)
         # form subspace matrix
         Av = np.dot(vSpace.T, sig)
-        print(Av.shape)
         # solve for k lowest eigenvalues/vectors
         eVals, eVects = LIN.eigh(Av)
         eVals = eVals[:k]
@@ -62,7 +58,6 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
                 r = rNew
             else:
                 r = np.column_stack((r, rNew));
-        print(r.shape)
 
         # print info about this iteration
         print("\nIteration: %4i" % j)
@@ -82,8 +77,7 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
         # if converged, return appropriate values
         if ( converged ):
             print("\nDavidson Converged! \n")
-            print("NOTE: still working on eigenvectors.")
-            return (eVals, vSpace[:,k:])
+            return (eVals, vSpace[:,-k:])
         # collapse subspace if necessary (if)
         elif( vSpace.shape[1] > collapseSize ):
             print("\tCollapsing Krylov subspace...")
@@ -113,10 +107,8 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
                     # normalize
                     sNew = (1.0/LIN.norm(sNew))*sNew
                     vSpace = np.column_stack((vSpace, sNew))
-                    #lastSig = lastSig + 1
-                else:
-                    pass
-                lastSig = lastSig + 1
+                    lastSig = lastSig + 1
+                #lastSig = lastSig + 1
         # error check for user adding too many guess vects
         if ( vSpace.shape[1] > A.shape[1] ):
             print("...\nError: Make sure your inputs for Davidson are reasonable!\n\n");
