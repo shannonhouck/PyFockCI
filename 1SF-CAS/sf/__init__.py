@@ -48,8 +48,8 @@ Psi4NumPy Tutorials
 #    return_wfn      Return Psi4 reference ROHF wavefunction object? (Defaults to False)
 # Returns:
 #    s2              The S**2 expectation value for the state
-def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="LANCZOS",
-            num_roots=6, guess_type="CAS", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
+def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="DAVIDSON",
+            num_roots=6, guess_type="RANDOM", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
     # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
@@ -116,7 +116,7 @@ def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="L
 # Returns:
 #    energy          Lowest root found by eigensolver (energy of system)
 def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space="", J_in=None, C_in=None,
-              sf_diag_method="LANCZOS", num_roots=6, guess_type="RANDOM", integral_type="FULL", aux_basis_name="", return_vects=False ):
+              sf_diag_method="DAVIDSON", num_roots=6, guess_type="RANDOM", integral_type="FULL", aux_basis_name="", return_vects=False ):
     # make TEI object if we've passed in a numpy array
     if(type(tei_int)==np.ndarray):
         if(integral_type=="FULL"):
@@ -131,7 +131,6 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
     if(n_SF==1 and delta_ec==0 and conf_space==""):
         n_dets = ras2 * ras2
     elif(n_SF==2 and delta_ec==0 and conf_space==""):
-        guess_type = ""
         n_dets = 0
         for i in range(ras2):
             for j in range(i):
@@ -147,11 +146,9 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
         n_dets = n_dets + (ras2 * ras3) + (((ras2-1)*(ras2)/2) * ras2 * ras3)
     # CAS-IP/EA
     elif(n_SF==0 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
-        guess_type = ""
         n_dets = ras2
     # RAS(h)-EA
     elif(n_SF==0 and delta_ec==1 and conf_space=="h"):
-        guess_type = ""
         n_dets = ras2
         for I in range(ras1):
             for a in range(ras2):
@@ -159,15 +156,12 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
                     n_dets = n_dets + 1
     # RAS(p)-EA
     elif(n_SF==0 and delta_ec==1 and conf_space=="p"):
-        guess_type = ""
         n_dets = ras2 + ras3 + (ras3*ras2*ras2)
     # RAS(h)-IP
     elif(n_SF==0 and delta_ec==-1 and conf_space=="h"):
-        guess_type = ""
         n_dets = ras2 + ras1 + (ras1*ras2*ras2)
     # RAS(p)-IP
     elif(n_SF==0 and delta_ec==-1 and conf_space=="p"):
-        guess_type = ""
         n_dets = ras2
         for i in range(ras2):
             for j in range(i):
@@ -175,7 +169,6 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
                     n_dets = n_dets + 1
     # CAS-1SF-IP/EA
     elif(n_SF==1 and (delta_ec==-1 or delta_ec==1) and conf_space==""):
-        guess_type = ""
         n_dets = ras2 * ((ras2-1)*(ras2)/2)
     # RAS(p)-1SF-EA
     elif(n_SF==1 and delta_ec==1 and conf_space=="p"):
@@ -192,7 +185,6 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
                                 n_dets = n_dets + 1
     # RAS(h)-1SF-IP
     elif(n_SF==1 and delta_ec==-1 and conf_space=="h"):
-        guess_type = ""
         n_dets = ras2 * ((ras2-1)*(ras2)/2)
         n_dets = n_dets + (ras2 * ras1 * ras2)
         # this is the MOST hack-ish way to get the triangle number of a traingle number. Fix later
@@ -205,7 +197,7 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
                             count = count + 1
         n_dets = n_dets + count
     else:
-        print("Sorry, %iSF with electron count change of %i not yet supported. Exiting..." %(n_SF, delta_ec) )
+        print("Sorry, %iSF with electron count change of %i and conf space %s not yet supported. Exiting..." %(n_SF, delta_ec, conf_space) )
         exit()
     # make sure n_dets is an int (for newer Python versions)
     n_dets = int(n_dets)
@@ -255,20 +247,28 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
             if(conf_space==""):
                 guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
             else:
-                cas_A = linop.LinOpH((ras2*ras2,ras2*ras2), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
+                # CAS-1SF
+                if(n_SF==1 and delta_ec==0):
+                    n_cas_dets = ras2 * ras2
+                # CAS-1SF-IP/EA
+                elif(n_SF==1 and (delta_ec==-1 or delta_ec==1)):
+                    n_cas_dets = ras2 * ((ras2-1)*(ras2)/2)
+                # CAS-IP/EA
+                elif(n_SF==0 and (delta_ec==-1 or delta_ec==1)):
+                    n_cas_dets = ras2
+                cas_A = linop.LinOpH((n_cas_dets,n_cas_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
                 cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=num_roots)
-                v3_guess = np.zeros((n_dets-(ras2*ras2), num_roots)) 
+                v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
                 guess_vect = np.vstack((cas_vects, v3_guess))
-        elif(guess_type == "RANDOM"):
-            guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
-            print(guess_vect.shape)
+        #elif(guess_type == "RANDOM"):
+        #    guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
+        #    print(guess_vect.shape)
         else:
             guess_vect = np.zeros((n_dets, num_roots))
             for i in range(num_roots):
                 guess_vect[i,i] = 1.0 
-            print(guess_vect.shape)
-        print(guess_vect.shape)
-        vals, vects = davidson(A, guess_vect)
+        collapse = int(n_dets/num_roots) - 1
+        vals, vects = davidson(A, guess_vect, collapse_per_root=collapse)
     print("\nROOT No.\tEnergy\t\tS**2")
     print("------------------------------------------------")
     for i, corr in enumerate(vals):

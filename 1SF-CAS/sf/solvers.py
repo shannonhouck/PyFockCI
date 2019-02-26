@@ -12,7 +12,7 @@ from scipy import linalg as LIN
 #    maxIter         Maximum number of iterations
 # Returns:
 #    s2              The S**2 expectation value for the state
-def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapseSize=50 ):
+def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapse_per_root=25 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -26,6 +26,8 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
     D = A.diag()
     # storing last eigenvalues
     lastVals = np.zeros((k))
+
+    collapseSize = k*collapse_per_root
 
     # index of last sigma added
     lastSig = 0;

@@ -2,19 +2,32 @@ import psi4
 import numpy as np
 
 # Writes Psi4 Wavefunction object to NumPy array
-def wfn_to_npy(wfn, df, file='ref_wfn_mat.npz', separate=False):
-    # Get MO coeffs.
-    Ca = psi4.core.Matrix.to_array(wfn.Ca())
-    Cb = psi4.core.Matrix.to_array(wfn.Cb())
-    # Get Fock matrices
-    Fa = np.dot(Ca.T, np.dot(wfn.Fa(), Ca))
-    Fb = np.dot(Ca.T, np.dot(wfn.Fb(), Ca))
+def wfn_to_npy(wfn, df, file='ref_wfn_mat.npz', separate=False, localize=False):
     # get additional data
     e = wfn.energy()
     ras1 = wfn.doccpi()[0]
     ras2 = wfn.soccpi()[0]
     ras3 = wfn.basisset().nbf() - (wfn.doccpi()[0] + wfn.soccpi()[0])
     extras = np.array([e, ras1, ras2, ras3])
+    # Get MO coeffs.
+    Ca = psi4.core.Matrix.to_array(wfn.Ca())
+    Cb = psi4.core.Matrix.to_array(wfn.Cb())
+    # localize RAS2 if needed
+    if(localize):
+        C = psi4.core.Matrix.to_array(wfn.Ca())
+        ras1_C = C[:, :ras1]
+        ras2_C = C[:, ras1:ras1+ras2]
+        ras3_C = C[:, ras1+ras2:]
+        loc2 = psi4.core.Localizer.build('BOYS', wfn.basisset(), psi4.core.Matrix.from_array(ras2_C))
+        loc2.localize()
+        ras2_localized = psi4.core.Matrix.to_array(loc2.L, copy=True)
+        Ca = np.column_stack((ras1_C, ras2_localized, ras3_C))
+        Cb = np.column_stack((ras1_C, ras2_localized, ras3_C))
+        wfn.Ca().copy(psi4.core.Matrix.from_array(Ca, name="Ca"))
+        wfn.Cb().copy(psi4.core.Matrix.from_array(Cb, name="Cb"))
+    # Get Fock matrices
+    Fa = np.dot(Ca.T, np.dot(wfn.Fa(), Ca))
+    Fb = np.dot(Ca.T, np.dot(wfn.Fb(), Ca))
     # Get two-electron integrals
     # for DF case
     if(df):

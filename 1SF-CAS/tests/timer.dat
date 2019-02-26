@@ -51858,3 +51858,69 @@ CIWave: opdm                :      0.000u      0.000s      0.000w      2 calls
 CIWave: CIvect read         :      0.000u      0.000s      0.000w      7 calls
 
 ***********************************************************
+
+Host: nr103
+
+Timers On : Mon Feb 25 11:14:48 2019
+Timers Off: Mon Feb 25 11:14:55 2019
+
+Wall Time:        6.42 seconds
+
+Total PK formation time     :      0.033u      0.000s      0.014w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.012w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.000w      2 calls
+JK: D                       :      0.000u      0.000s      0.000w      2 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w      2 calls
+JK: JK                      :      0.000u      0.000s      0.000w      2 calls
+PK computes JK              :      0.000u      0.000s      0.000w      2 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w      2 calls
+HF: Form F                  :      0.000u      0.000s      0.000w      2 calls
+HF: DIIS                    :      0.000u      0.000s      0.002w      2 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.002w      2 calls
+DIISManager::extrapolate    :      0.000u      0.000s      0.000w      1 calls
+bMatrix setup               :      0.000u      0.000s      0.000w      1 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.000w      1 calls
+New vector                  :      0.000u      0.000s      0.000w      1 calls
+HF: Form C                  :      0.000u      0.000s      0.000w      2 calls
+HF: Form D                  :      0.000u      0.000s      0.000w      2 calls
+CIWave: CIvect write        :      0.000u      0.000s      0.000w      7 calls
+CIWave: CIvect read         :      0.000u      0.000s      0.000w      2 calls
+
+-----------------------------------------------------------
+Total PK formation time     :      0.033u      0.000s      0.014w      1 calls
+HF: Form H                  :      0.000u      0.000s      0.012w      1 calls
+HF: Form S/X                :      0.000u      0.000s      0.000w      1 calls
+HF: Guess                   :      0.000u      0.000s      0.000w      1 calls
+HF: Form G                  :      0.000u      0.000s      0.000w      2 calls
+| JK: D                     :      0.000u      0.000s      0.000w      2 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w      2 calls
+| JK: JK                    :      0.000u      0.000s      0.000w      2 calls
+| | PK computes JK          :      0.000u      0.000s      0.000w      2 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w      2 calls
+HF: Form F                  :      0.000u      0.000s      0.000w      2 calls
+HF: DIIS                    :      0.000u      0.000s      0.002w      2 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.002w      2 calls
+| DIISManager::extrapolate  :      0.000u      0.000s      0.000w      1 calls
+| | bMatrix setup           :      0.000u      0.000s      0.000w      1 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.000w      1 calls
+| | New vector              :      0.000u      0.000s      0.000w      1 calls
+HF: Form C                  :      0.000u      0.000s      0.000w      2 calls
+HF: Form D                  :      0.000u      0.000s      0.000w      2 calls
+CIWave: CIvect write        :      0.000u      0.000s      0.000w      7 calls
+CIWave: CIvect read         :      0.000u      0.000s      0.000w      2 calls
+
+***********************************************************
+
+Host: nr103
+
+Timers On : Mon Feb 25 11:15:17 2019
+Timers Off: Mon Feb 25 11:15:17 2019
+
+Wall Time:        0.26 seconds
+
+
+-----------------------------------------------------------
+
+***********************************************************
