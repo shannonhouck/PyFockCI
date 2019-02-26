@@ -49,7 +49,7 @@ Psi4NumPy Tutorials
 # Returns:
 #    s2              The S**2 expectation value for the state
 def sf_psi4(delta_a, delta_b, mol, conf_space="", add_opts={}, sf_diag_method="DAVIDSON",
-            num_roots=6, guess_type="RANDOM", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
+            num_roots=6, guess_type="I", integral_type="FULL", aux_basis_name="", return_vects=False, return_wfn=False):
     # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
@@ -267,7 +267,7 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
             guess_vect = np.zeros((n_dets, num_roots))
             for i in range(num_roots):
                 guess_vect[i,i] = 1.0 
-        collapse = int(n_dets/num_roots) - 1
+        collapse = 10
         vals, vects = davidson(A, guess_vect, collapse_per_root=collapse)
     print("\nROOT No.\tEnergy\t\tS**2")
     print("------------------------------------------------")
