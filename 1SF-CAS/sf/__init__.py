@@ -217,7 +217,7 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
     print("Number of determinants:", n_dets)
     if( num_roots >= n_dets ):
         num_roots = n_dets - 1
-    A = linop.LinOpH((n_dets,n_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
+    A = linop.LinOpH((n_dets,n_dets), e, a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
     # run method
     print("Running Fock-space CI...")
     print("\tSpin-Flips: %3i\n\tElectron Count Change: %3i\n" %(n_SF, delta_ec))
@@ -256,7 +256,7 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
                 # CAS-IP/EA
                 elif(n_SF==0 and (delta_ec==-1 or delta_ec==1)):
                     n_cas_dets = ras2
-                cas_A = linop.LinOpH((n_cas_dets,n_cas_dets), a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
+                cas_A = linop.LinOpH((n_cas_dets,n_cas_dets), e, a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
                 cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=num_roots)
                 v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
                 guess_vect = np.vstack((cas_vects, v3_guess))
@@ -267,24 +267,23 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
             guess_vect = np.zeros((n_dets, num_roots))
             for i in range(num_roots):
                 guess_vect[i,i] = 1.0 
-        collapse = 10
-        vals, vects = davidson(A, guess_vect, collapse_per_root=collapse)
+        vals, vects = davidson(A, guess_vect)
     print("\nROOT No.\tEnergy\t\tS**2")
     print("------------------------------------------------")
     for i, corr in enumerate(vals):
         #s2 = post_ci_analysis.calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], ras1, ras2, ras3)
         s2 = 0
-        print("   %i\t\t%6.6f\t%8.6f" % (i, e + corr, s2))
+        print("   %i\t\t%6.6f\t%8.6f" % (i, corr, s2))
     print("------------------------------------------------\n")
     print("Most Important Determinants Data:")
     for i, corr in enumerate(vals):
-        print("\nROOT %i: %12.12f" %(i, e + corr))
+        print("\nROOT %i: %12.12f" %(i, corr))
         s2 = post_ci_analysis.print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
     print("\n\n\t  Fock Space CI Complete! \n")
     # Return appropriate things
     if(return_vects):
-        return (e + vals, vects)
+        return (vals, vects)
     else:
-        return e + vals
+        return vals
 
 

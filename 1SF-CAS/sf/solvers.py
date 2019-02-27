@@ -12,7 +12,7 @@ from scipy import linalg as LIN
 #    maxIter         Maximum number of iterations
 # Returns:
 #    s2              The S**2 expectation value for the state
-def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapse_per_root=25 ):
+def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapse_per_root=12 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -35,15 +35,28 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
 
     print("Starting Davidson...")
     while ( j<maxIter ):
+        # first iteration
+        if(type(sig)==type(None)):
+            # form k sigma vectors
+            for i in range(0, vSpace.shape[1]):
+                if(type(sig)==type(None)):
+                    sig = A.matvec(vSpace[:,i])
+                    sig = sig.reshape((vSpace.shape[0],1))
+                else:
+                    sig = np.column_stack((sig, A.matvec(vSpace[:,i])))
+
         # form k sigma vectors
-        for i in range(lastSig, vSpace.shape[1]):
-            if(type(sig)==type(None)):
-                sig = A.matvec(vSpace[:,i])
-                sig = sig.reshape((vSpace.shape[0],1))
-            else:
+        else:
+            for i in range(sig.shape[1], vSpace.shape[1]):
+            #if(type(sig)==type(None)):
+            #    sig = A.matvec(vSpace[:,i])
+            #    sig = sig.reshape((vSpace.shape[0],1))
+            #else:
                 sig = np.column_stack((sig, A.matvec(vSpace[:,i])))
   
         # form subspace matrix
+        print("vSpace", vSpace.shape)
+        print("SIG", sig.shape)
         Av = np.dot(vSpace.T, sig)
         # solve for k lowest eigenvalues/vectors
         eVals, eVects = LIN.eigh(Av)
@@ -65,13 +78,13 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
             print("\tROOT %2i: %16.8f\t%E" % (i, val, LIN.norm(r[:,i])))
 
         # check residuals for convergence
-        converged = True;
+        converged = True
         for i in range(k):
             # check residual
-            if( LIN.norm(r[:,i])>r_conv ):
+            if( abs(LIN.norm(r[:,i]))>r_conv ):
                 converged = False
             # check energy
-            if( (eVals[i]-lastVals[i] ) > e_conv):
+            if( abs(eVals[i]-lastVals[i]) > e_conv):
                 converged = False
 
         # if converged, return appropriate values
