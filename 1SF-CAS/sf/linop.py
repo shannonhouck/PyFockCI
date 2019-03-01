@@ -4,9 +4,10 @@ from .post_ci_analysis import generate_dets
 
 class LinOpH (LinearOperator):
     
-    def __init__(self, shape_in, na_occ_in, nb_occ_in, na_virt_in, nb_virt_in, Fa_in, Fb_in, tei_in, n_SF_in, delta_ec_in, conf_space_in=""):
+    def __init__(self, shape_in, offset_in, na_occ_in, nb_occ_in, na_virt_in, nb_virt_in, Fa_in, Fb_in, tei_in, n_SF_in, delta_ec_in, conf_space_in=""):
         super(LinOpH, self).__init__(dtype=np.dtype('float64'), shape=shape_in)
         # getting the numbers of orbitals
+        self.offset = offset_in # diagonal offset (usually energy)
         self.na_occ = na_occ_in # number of alpha occupied
         self.nb_occ = nb_occ_in # number of beta occupied
         self.na_virt = na_virt_in # number of alpha virtual
@@ -29,6 +30,7 @@ class LinOpH (LinearOperator):
         Fb = self.Fb
         tei = self.tei
         conf_space = self.conf_space
+        offset = self.offset
         na_occ = self.na_occ
         nb_occ = self.nb_occ
         na_virt = self.na_virt
@@ -42,9 +44,9 @@ class LinOpH (LinearOperator):
         # building "base" value
         Fa_tmp = Fa[0:na_occ, 0:na_occ]
         Fb_tmp = Fb[0:nb_occ, 0:nb_occ]
-        base = np.einsum("ii->", Fa_tmp) + np.einsum("ii->", Fb_tmp)
+        base = np.einsum("ii->", Fa_tmp) + np.einsum("ii->", Fb_tmp) + offset
         # set up diagonal
-        diag_out = np.zeros((n_dets,1))
+        diag_out = np.zeros((n_dets))
         # replace necessary values
         count = 0
         for det in det_list:
@@ -68,6 +70,7 @@ class LinOpH (LinearOperator):
         Fb = self.Fb
         tei = self.tei
         conf_space = self.conf_space
+        offset = self.offset
         na_occ = self.na_occ
         nb_occ = self.nb_occ
         na_virt = self.na_virt
@@ -76,6 +79,10 @@ class LinOpH (LinearOperator):
         delta_ec = self.delta_ec
         nbf = na_occ + na_virt
         socc = na_occ - nb_occ
+
+        # offset
+        offset_v = (offset * v).reshape(v.shape[0], 1)
+
         # do excitation scheme: 1SF-CAS
         if(n_SF==1 and delta_ec==0 and conf_space==""):
             """ 
@@ -114,7 +121,9 @@ class LinOpH (LinearOperator):
             # using reshape because tei is non-contiguous in memory (look into this while doing speedup)
             tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
             tei_tmp = np.reshape(-1.0*np.einsum("jb,ajbi->ia", v_b1, tei_tmp), (v.shape[0], 1))
-            return F_tmp + tei_tmp
+            print((F_tmp + tei_tmp).shape)
+            print((F_tmp + tei_tmp + offset_v).shape)
+            return F_tmp + tei_tmp + offset_v
 
         # do excitation scheme: 2SF-CAS
         if(n_SF==2 and delta_ec==0 and conf_space==""):
@@ -176,7 +185,7 @@ class LinOpH (LinearOperator):
                             sig_1_out[index] = sig_1[i, j, a, b]
                             index = index + 1
 
-            return sig_1_out
+            return sig_1_out + offset_v
 
         # do excitation scheme: 1SF-CAS + h
         if(n_SF==1 and delta_ec==0 and conf_space=="h"):
@@ -365,7 +374,7 @@ class LinOpH (LinearOperator):
                             index = index + 1
 
             # combine and return
-            return np.vstack((sig_1, sig_2, sig_3_out))
+            return np.vstack((sig_1, sig_2, sig_3_out)) + offset_v
 
         # do excitation scheme: 1SF-CAS + p
         if(n_SF==1 and delta_ec==0 and conf_space=="p"):
@@ -552,7 +561,7 @@ class LinOpH (LinearOperator):
                             index = index + 1 
 
             # combine and return
-            return np.vstack((sig_1, sig_2, sig_3_out))
+            return np.vstack((sig_1, sig_2, sig_3_out)) + offset_v
 
         # do excitation scheme: RAS(h,p)-1SF
         if(n_SF==1 and delta_ec==0 and conf_space=="h,p"):
@@ -964,7 +973,7 @@ class LinOpH (LinearOperator):
                             index = index + 1
 
             # combine and return
-            return np.vstack((sig_1, sig_2, sig_3, sig_4_out, sig_5_out))
+            return np.vstack((sig_1, sig_2, sig_3, sig_4_out, sig_5_out)) + offset_v
 
         # doing EA calculation
         if(n_SF==0 and delta_ec==1 and conf_space==""):
@@ -983,7 +992,7 @@ class LinOpH (LinearOperator):
             """
             F_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
             sig_1 = np.einsum("b,ab->a", v, F_tmp)
-            return sig_1
+            return sig_1 + offset_v
 
         # doing RAS(h)-EA calculation
         if(n_SF==0 and delta_ec==1 and conf_space=="h"):
@@ -1078,7 +1087,7 @@ class LinOpH (LinearOperator):
                         sig_2_out[index] = sig_2[I, a, b]
                         index = index + 1
 
-            return np.vstack((sig_1, sig_2_out))
+            return np.vstack((sig_1, sig_2_out)) + offset_v
 
         # doing RAS(p)-EA calculation
         if(n_SF==0 and delta_ec==1 and conf_space=="p"):
@@ -1191,7 +1200,7 @@ class LinOpH (LinearOperator):
             sig_2 = np.reshape(sig_2, (v_b2.shape[0], 1))
             sig_3 = np.reshape(sig_3, (v_b3.shape[0], 1))
 
-            return np.vstack((sig_1, sig_2, sig_3))
+            return np.vstack((sig_1, sig_2, sig_3)) + offset_v
 
         # doing IP calculation
         if(n_SF==0 and delta_ec==-1 and conf_space==""):
@@ -1210,7 +1219,7 @@ class LinOpH (LinearOperator):
             """
             F_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
             sig_1 = -1.0*np.einsum("j,ji->i", v, F_tmp)
-            return sig_1
+            return sig_1 + offset_v
 
         # doing RAS(h)-IP calculation
         if(n_SF==0 and delta_ec==-1 and conf_space=="h"):
@@ -1324,7 +1333,7 @@ class LinOpH (LinearOperator):
             sig_2 = np.reshape(sig_2, (v_b2.shape[0], 1))
             sig_3 = np.reshape(sig_3, (v_b3.shape[0], 1))
 
-            return np.vstack((sig_1, sig_2, sig_3))
+            return np.vstack((sig_1, sig_2, sig_3)) + offset_v
 
         # doing RAS(p)-IP calculation
         if(n_SF==0 and delta_ec==-1 and conf_space=="p"):
@@ -1419,7 +1428,7 @@ class LinOpH (LinearOperator):
                         sig_2_out[index] = sig_2[A, i, j]
                         index = index + 1
 
-            return np.vstack((sig_1, sig_2_out))
+            return np.vstack((sig_1, sig_2_out)) + offset_v
 
 
         # do excitation scheme: 1SF-CAS-EA
@@ -1470,7 +1479,7 @@ class LinOpH (LinearOperator):
                         sig_1_out[index] = sig_1[i, a, b]
                         index = index + 1
 
-            return sig_1_out
+            return sig_1_out + offset_v
 
         # do excitation scheme: CAS-1SF-IP
         if(n_SF==1 and delta_ec==-1 and conf_space==""):
@@ -1521,7 +1530,7 @@ class LinOpH (LinearOperator):
                         sig_1_out[index] = sig_1[i, j, a]
                         index = index + 1 
 
-            return sig_1_out
+            return sig_1_out + offset_v
 
         # do excitation scheme: RAS(h)-1SF-IP
         if(n_SF==1 and delta_ec==-1 and conf_space=="h"):
@@ -1755,7 +1764,7 @@ class LinOpH (LinearOperator):
                                 sig_3_out[index] = sig_3[I, i, j, a, b]
                                 index = index + 1
 
-            return np.vstack((sig_1_out, sig_2_out, sig_3_out))
+            return np.vstack((sig_1_out, sig_2_out, sig_3_out)) + offset_v
 
         # do excitation scheme: RAS(h)-1SF-EA
         if(n_SF==1 and delta_ec==1 and conf_space=="h"):
@@ -2072,7 +2081,7 @@ class LinOpH (LinearOperator):
                                 sig_3_out[index] = v_ref3[I, i, a, b, c]
                                 index = index + 1
 
-            return np.vstack((sig_1_out, sig_2_out, sig_3_out))
+            return np.vstack((sig_1_out, sig_2_out, sig_3_out)) + offset_v
 
         # do excitation scheme: RAS(p)-1SF-EA
         if(n_SF==1 and delta_ec==1 and conf_space=="p"):
@@ -2303,7 +2312,7 @@ class LinOpH (LinearOperator):
                                 sig_3_out[index] = sig_3[A, i, j, a, b]
                                 index = index + 1
 
-            return np.vstack((sig_1_out, sig_2_out, sig_3_out))
+            return np.vstack((sig_1_out, sig_2_out, sig_3_out)) + offset_v
 
     # These two are vestigial-- I'm sure they served some purpose in the parent class,
     # but we only really need matvec for our purposes!

@@ -1,4 +1,5 @@
 {
-  "test_general.py::test_1": true,
+  "test_general.py": true, 
+  "test_general.py::test_1": true, 
   "test_general.py::test_2": true
 }
