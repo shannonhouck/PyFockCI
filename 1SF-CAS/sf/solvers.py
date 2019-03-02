@@ -1,6 +1,9 @@
 from __future__ import print_function
 import numpy as np
 from scipy import linalg as LIN
+from scipy.sparse import diags
+from scipy.sparse.linalg import inv as sparse_inv
+from scipy.sparse.linalg import spsolve
 
 # Solves for the eigenvalues and eigenvectors of a Hamiltonian.
 # Parameters:
@@ -12,7 +15,7 @@ from scipy import linalg as LIN
 #    maxIter         Maximum number of iterations
 # Returns:
 #    s2              The S**2 expectation value for the state
-def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapse_per_root=12 ):
+def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=200, collapse_per_root=12 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -23,8 +26,7 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
     # storing sigmas...
     sig = None;
     # diagonal of Hamiltonian
-    D = np.diag(A.diag())
-    print(D.shape)
+    D = A.diag()
     # storing last eigenvalues
     lastVals = np.zeros((k))
 
@@ -112,7 +114,8 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
         # else, apply preconditioner to residuals (elif)
         else:
             for i in range(k) :
-                sNew = LIN.solve(LIN.inv(D-eVals[i]*np.eye(D.shape[0])), r[:,i])
+                sNew = LIN.solve_banded((0,0), 1.0/(D-eVals[i]*np.ones(D.shape[0])).reshape(1,D.shape[0]), r[:,i])
+                #sNew = spsolve(sparse_inv(D-diags(eVals[i]*np.ones(D.shape[0]))), r[:,i])
                 if ( LIN.norm(sNew) > vect_cutoff ):
                     # orthogonalize
                     h = np.dot(vSpace.T, sNew);
