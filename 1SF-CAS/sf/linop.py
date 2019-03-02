@@ -46,9 +46,7 @@ class LinOpH (LinearOperator):
         Fb_tmp = Fb[0:nb_occ, 0:nb_occ]
         base = np.einsum("ii->", Fa_tmp) + np.einsum("ii->", Fb_tmp) + offset
         # set up diagonal
-        print("set up diag out")
         diag_out = np.zeros((n_dets))
-        print("finish diag out")
         # replace necessary values
         count = 0
         for det in det_list:
@@ -64,7 +62,6 @@ class LinOpH (LinearOperator):
             for a in det[1][1]:
                 diag_out[count] = diag_out[count] + Fb[a,a]
             count = count + 1
-        print("finish diag out FINAL")
         return diag_out
 
     def _matvec(self, v):
