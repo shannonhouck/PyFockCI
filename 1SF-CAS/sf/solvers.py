@@ -15,7 +15,7 @@ from scipy.sparse.linalg import spsolve
 #    maxIter         Maximum number of iterations
 # Returns:
 #    s2              The S**2 expectation value for the state
-def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=250, collapse_per_root=15 ):
+def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapse_per_root=15 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -75,7 +75,7 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=250,
         # print info about this iteration
         print("\nIteration: %4i" % j)
         for i, val in enumerate(eVals):
-            print("\tROOT %2i: %16.8f\t%E" % (i, val, LIN.norm(r[:,i])))
+            print("\tROOT %2i: %16.8f\t%E\t%E" % (i, val, eVals[i]-lastVals[i], LIN.norm(r[:,i])))
 
         # check residuals for convergence
         converged = True
@@ -112,10 +112,17 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=250,
         # else, apply preconditioner to residuals (elif)
         else:
             for i in range(k) :
-                sNew = r[:,i]/(D-eVals[i]*np.ones(D.shape[0]))
+                #print(r[:,i].shape)
+                #print(D.shape)
+                sNew = r[:,i]
+                #sNew = (1.0/(D-eVals[i]))*r[:,i]
+                #print(sNew.shape)
+                #sNew = r[:,i]/(D-eVals[i]*np.ones(D.shape[0]))
                 #sNew = LIN.solve_banded((0,0), 1.0/(D-eVals[i]*np.ones(D.shape[0])).reshape(1,D.shape[0]), r[:,i])
                 # tried sparse solver but it's less efficient than banded
                 #sNew = spsolve(sparse_inv(D-diags(eVals[i]*np.ones(D.shape[0]))), r[:,i])
+                #sNew = LIN.solve(LIN.inv(D-np.diag(eVals[i]*np.ones(D.shape[0]))), r[:,i])
+                #print(sNew.shape)
                 if ( LIN.norm(sNew) > vect_cutoff ):
                     # orthogonalize
                     h = np.dot(vSpace.T, sNew);
