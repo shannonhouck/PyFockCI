@@ -114,8 +114,8 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
             for i in range(k) :
                 #print(r[:,i].shape)
                 #print(D.shape)
-                sNew = r[:,i]
-                #sNew = (1.0/(D-eVals[i]))*r[:,i]
+                #sNew = r[:,i]
+                sNew = (1.0/(D-eVals[i]))*r[:,i]
                 #print(sNew.shape)
                 #sNew = r[:,i]/(D-eVals[i]*np.ones(D.shape[0]))
                 #sNew = LIN.solve_banded((0,0), 1.0/(D-eVals[i]*np.ones(D.shape[0])).reshape(1,D.shape[0]), r[:,i])
