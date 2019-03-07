@@ -15,7 +15,7 @@ from scipy.sparse.linalg import spsolve
 #    maxIter         Maximum number of iterations
 # Returns:
 #    s2              The S**2 expectation value for the state
-def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapse_per_root=15 ):
+def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=50, collapse_per_root=15 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -50,10 +50,6 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
         # form k sigma vectors
         else:
             for i in range(sig.shape[1], vSpace.shape[1]):
-            #if(type(sig)==type(None)):
-            #    sig = A.matvec(vSpace[:,i])
-            #    sig = sig.reshape((vSpace.shape[0],1))
-            #else:
                 sig = np.column_stack((sig, A.matvec(vSpace[:,i])))
   
         # form subspace matrix
@@ -112,15 +108,9 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
         # else, apply preconditioner to residuals (elif)
         else:
             for i in range(k) :
-                #print(r[:,i].shape)
-                #print(D.shape)
                 #sNew = r[:,i]
                 sNew = (1.0/(D-eVals[i]))*r[:,i]
-                #print(sNew.shape)
-                #sNew = r[:,i]/(D-eVals[i]*np.ones(D.shape[0]))
                 #sNew = LIN.solve_banded((0,0), 1.0/(D-eVals[i]*np.ones(D.shape[0])).reshape(1,D.shape[0]), r[:,i])
-                # tried sparse solver but it's less efficient than banded
-                #sNew = spsolve(sparse_inv(D-diags(eVals[i]*np.ones(D.shape[0]))), r[:,i])
                 #sNew = LIN.solve(LIN.inv(D-np.diag(eVals[i]*np.ones(D.shape[0]))), r[:,i])
                 #print(sNew.shape)
                 if ( LIN.norm(sNew) > vect_cutoff ):
@@ -131,7 +121,6 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
                     sNew = (1.0/LIN.norm(sNew))*sNew
                     vSpace = np.column_stack((vSpace, sNew))
                     lastSig = lastSig + 1
-                #lastSig = lastSig + 1
         # error check for user adding too many guess vects
         if ( vSpace.shape[1] > A.shape[1] ):
             print("...\nError: Make sure your inputs for Davidson are reasonable!\n\n");
