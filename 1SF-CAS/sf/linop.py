@@ -44,7 +44,10 @@ class LinOpH (LinearOperator):
         # building "base" value
         Fa_tmp = Fa[0:na_occ, 0:na_occ]
         Fb_tmp = Fb[0:nb_occ, 0:nb_occ]
-        base = np.einsum("ii->", Fa_tmp) + np.einsum("ii->", Fb_tmp) + offset
+        print(Fa)
+        #base = np.einsum("ii", Fa_tmp) + np.einsum("ii", Fb_tmp)
+        #base = np.einsum("ii", Fa_tmp) + np.einsum("ii", Fb_tmp) + offset
+        base = offset
         # set up diagonal
         diag_out = np.zeros((n_dets))
         # replace necessary values

@@ -15,7 +15,7 @@ from scipy.sparse.linalg import spsolve
 #    maxIter         Maximum number of iterations
 # Returns:
 #    s2              The S**2 expectation value for the state
-def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100, collapse_per_root=15 ):
+def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=50, collapse_per_root=15 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -50,10 +50,6 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
         # form k sigma vectors
         else:
             for i in range(sig.shape[1], vSpace.shape[1]):
-            #if(type(sig)==type(None)):
-            #    sig = A.matvec(vSpace[:,i])
-            #    sig = sig.reshape((vSpace.shape[0],1))
-            #else:
                 sig = np.column_stack((sig, A.matvec(vSpace[:,i])))
   
         # form subspace matrix
@@ -122,7 +118,6 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-8, maxIter=100,
                     sNew = (1.0/LIN.norm(sNew))*sNew
                     vSpace = np.column_stack((vSpace, sNew))
                     lastSig = lastSig + 1
-                #lastSig = lastSig + 1
         # error check for user adding too many guess vects
         if ( vSpace.shape[1] > A.shape[1] ):
             print("...\nError: Make sure your inputs for Davidson are reasonable!\n\n");
