@@ -156,10 +156,9 @@ class TEISpin(TEI):
         for i in range(nbf):
             for j in range(nbf):
                 self.eri[i+nbf, j, j+nbf, i] = -1.0
-                self.eri[i+nbf, j, i, j+nbf] = -1.0
-                #self.eri[i, j+nbf, l+nbf, k] = -1.0
-                #self.eri[i+nbf, j, l, k+nbf] = -1.0
-                #self.eri[i, j+nbf, j, i+nbf] = -1.0
+                #self.eri[i+nbf, j, i, j+nbf] = 1.0
+                #self.eri[i, j+nbf, j+nbf, i] = 1.0
+                self.eri[i, j+nbf, j, i+nbf] = -1.0
         self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[ras1+ras2,ras1+ras2+ras3]]
 
     # s1, s2, s3, s4    Alpha or beta spin (0=alpha, 1=beta)
@@ -167,4 +166,15 @@ class TEISpin(TEI):
         nbf = self.nbf
         return self.eri[(s1*nbf)+self.ind[a][0]:(s1*nbf)+self.ind[a][1], (s2*nbf)+self.ind[b][0]:(s2*nbf)+self.ind[b][1],
                         (s3*nbf)+self.ind[c][0]:(s3*nbf)+self.ind[c][1], (s4*nbf)+self.ind[d][0]:(s4*nbf)+self.ind[d][1]]
+
+    def full(self):
+        return self.eri
+
+    def get_alpha(self):
+        nbf = self.nbf
+        return self.eri[:nbf, :nbf, :nbf, :nbf]
+
+    def get_beta(self):
+        nbf = self.nbf
+        return self.eri[nbf:, nbf:, nbf:, nbf:]
 

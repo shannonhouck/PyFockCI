@@ -121,7 +121,6 @@ class LinOpH (LinearOperator):
             # using reshape because tei is non-contiguous in memory (look into this while doing speedup)
             tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
             tei_tmp = np.reshape(-1.0*np.einsum("jb,ajbi->ia", v_b1, tei_tmp), (v.shape[0], 1))
-            print((F_tmp + tei_tmp).shape)
             print((F_tmp + tei_tmp + offset_v).shape)
             return F_tmp + tei_tmp + offset_v
 
@@ -991,7 +990,7 @@ class LinOpH (LinearOperator):
            
             """
             F_tmp = Fb[nb_occ:na_occ, nb_occ:na_occ]
-            sig_1 = np.einsum("b,ab->a", v, F_tmp)
+            sig_1 = np.einsum("b,ab->a", v, F_tmp).reshape((v.shape[0], 1))
             return sig_1 + offset_v
 
         # doing RAS(h)-EA calculation
@@ -1218,7 +1217,7 @@ class LinOpH (LinearOperator):
            
             """
             F_tmp = Fa[nb_occ:na_occ, nb_occ:na_occ]
-            sig_1 = -1.0*np.einsum("j,ji->i", v, F_tmp)
+            sig_1 = -1.0*np.einsum("j,ji->i", v, F_tmp).reshape((v.shape[0], 1))
             return sig_1 + offset_v
 
         # doing RAS(h)-IP calculation
@@ -2038,16 +2037,6 @@ class LinOpH (LinearOperator):
 
             e3_1 = 0.25*np.einsum("Iiabc,Iiabc->", sig_3_1, v_ref3)
             e3_2 = 0.25*np.einsum("Iiabc,Iiabc->", sig_3_2, v_ref3)
-
-            '''
-            print("Are E1 and E2 close?")
-            print(np.isclose(e1_2, e2_1))
-            print("Are E1 and E3 close?")
-            print(np.isclose(e1_3, e3_1))
-            print(e1_3, e3_1)
-            print("Are E2 and E3 close?")
-            print(np.isclose(e2_3, e3_2))
-            '''
 
             sig_1_out = np.zeros((v_b1.shape[0], 1))
             index = 0

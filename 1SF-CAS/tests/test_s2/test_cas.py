@@ -43,7 +43,6 @@ def test_h_1sf():
         s2 = post_ci_analysis.calc_s_squared(1, 0, "h", vects[:, i], 4, 6, 18)
         assert abs(s2 - s_expected[i]) < threshold
 
-'''
 # Test: RAS(p)-1SF
 def test_p_1sf():
     psi4.core.clean()
@@ -56,6 +55,7 @@ def test_p_1sf():
         s2 = post_ci_analysis.calc_s_squared(1, 0, "p", vects[:, i], 4, 6, 18)
         assert abs(s2 - s_expected[i]) < threshold
 
+'''
 # Test: RAS(hp)-1SF
 def test_hp_1sf():
     psi4.core.clean()
@@ -67,6 +67,7 @@ def test_hp_1sf():
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(1, 0, "h,p", vects[:, i], 4, 6, 18)
         assert abs(s2 - s_expected[i]) < threshold
+'''
 
 # Test: EA
 def test_cas_ea():
@@ -92,6 +93,7 @@ def test_cas_ip():
         s2 = post_ci_analysis.calc_s_squared(0, -1, "", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
 
+'''
 # Test: 1SF-EA-CAS
 def test_cas_1sfea():
     psi4.core.clean()
@@ -188,9 +190,6 @@ def test_p_ip():
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(0, -1, "p", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
-'''
-
-'''
 
 # NOT WORKING-- likely due to us just not grabbing the right Psi4 roots
 # Test: 2SF-CAS
