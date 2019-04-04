@@ -93,7 +93,6 @@ def test_cas_ip():
         s2 = post_ci_analysis.calc_s_squared(0, -1, "", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
 
-'''
 # Test: 1SF-EA-CAS
 def test_cas_1sfea():
     psi4.core.clean()
@@ -150,7 +149,7 @@ def test_h_ea():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     s_expected = [8.75, 8.75, 8.75, 8.75, 8.75, 8.75]
-    e, vects = sf_psi4( 0, 1, n2_7, conf_space="h", add_opts=options, return_vects=True )
+    e, vects = sf_psi4( 0, 1, n2_7, conf_space="h", add_opts=options, return_vects=True, sf_diag_method="LANCZOS" )
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(0, 1, "h", vects[:, i], 4, 6, 18)
         assert abs(s2 - s_expected[i]) < threshold
@@ -161,8 +160,8 @@ def test_h_ip():
     psi4.core.clean_options()
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
-    s_expected = [8.75, 8.75, 8.75, 8.75, 8.75, 8.75]
-    e, vects = sf_psi4( 1, 0, n2_7, conf_space="h", add_opts=options, return_vects=True )
+    s_expected = [8.75, 8.75, 8.75, 8.75, 8.75]
+    e, vects = sf_psi4( 1, 0, n2_7, conf_space="h", add_opts=options, return_vects=True, sf_diag_method="LANCZOS")
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(0, -1, "h", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
@@ -173,8 +172,8 @@ def test_p_ea():
     psi4.core.clean_options()
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
-    s_expected = [8.75, 8.75, 8.75, 8.75, 8.75, 8.75]
-    e, vects = sf_psi4( 0, 1, n2_7, conf_space="p", add_opts=options, return_vects=True )
+    s_expected = [8.75, 8.75, 8.75, 8.75, 8.75]
+    e, vects = sf_psi4( 0, 1, n2_7, conf_space="p", add_opts=options, return_vects=True, sf_diag_method="LANCZOS" )
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(0, 1, "p", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
@@ -185,8 +184,8 @@ def test_p_ip():
     psi4.core.clean_options()
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
-    s_expected = [8.75, 8.75, 8.75, 8.75, 8.75, 8.75]
-    e, vects = sf_psi4( 1, 0, n2_7, conf_space="p", add_opts=options, return_vects=True )
+    s_expected = [8.75, 8.75, 8.75, 8.75, 8.75]
+    e, vects = sf_psi4( 1, 0, n2_7, conf_space="p", add_opts=options, return_vects=True, sf_diag_method="LANCZOS" )
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(0, -1, "p", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
@@ -198,10 +197,9 @@ def test_cas_2sf():
     psi4.core.clean_options()
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
-    s_expected = [2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+    s_expected = [2.0, 6.0, 12.0, 6.0, 2.0, 2.0]
     e, vects = sf_psi4( 2, 2, n2_7, conf_space="", add_opts=options, return_vects=True )
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(2, 0, "", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
-'''
 

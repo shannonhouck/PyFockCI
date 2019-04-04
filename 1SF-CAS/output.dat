@@ -1,63 +1,284 @@
 
-    -----------------------------------------------------------------------
-          Psi4: An Open-Source Ab Initio Electronic Structure Package
-                               Psi4 1.2a1.dev1092 
+*** tstart() called on Spektor
+*** at Thu Apr  4 16:12:25 2019
 
-                         Git: Rev {master} 5862cf6 dirty
+   => Loading Basis Set <=
 
-
-    R. M. Parrish, L. A. Burns, D. G. A. Smith, A. C. Simmonett,
-    A. E. DePrince III, E. G. Hohenstein, U. Bozkaya, A. Yu. Sokolov,
-    R. Di Remigio, R. M. Richard, J. F. Gonthier, A. M. James,
-    H. R. McAlexander, A. Kumar, M. Saitow, X. Wang, B. P. Pritchard,
-    P. Verma, H. F. Schaefer III, K. Patkowski, R. A. King, E. F. Valeev,
-    F. A. Evangelista, J. M. Turney, T. D. Crawford, and C. D. Sherrill,
-    J. Chem. Theory Comput. 13(7) pp 3185--3197 (2017).
-    (doi: 10.1021/acs.jctc.7b00174)
-
-    -----------------------------------------------------------------------
+    Name: CC-PVDZ
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1-2 entry N          line   168 file /home/shouck/psi4conda/share/psi4/basis/cc-pvdz.gbs 
 
 
-    Psi4 started on: Wednesday, 06 February 2019 12:08PM
+         ---------------------------------------------------------
+                                   SCF
+            by Justin Turney, Rob Parrish, Andy Simmonett
+                             and Daniel Smith
+                             ROHF Reference
+                        1 Threads,    500 MiB Core
+         ---------------------------------------------------------
 
-    Process ID: 95003
-    Host:       nr113
-    PSIDATADIR: /groups/nmayhall_lab/psi4/share/psi4
-    Memory:     500.0 MiB
-    Threads:    1
-    
-  ==> Input File <==
+  ==> Geometry <==
 
---------------------------------------------------------------------------
-import os
-import psi4
-import numpy as np
-import sf
-from sf import sf_psi4
-import numpy as np
+    Molecular point group: c1
+    Full point group: D_inf_h
 
-n2_7 = psi4.core.Molecule.create_molecule_from_string("""
-0 7
-N 0 0 0 
-N 0 0 1.5 
-symmetry c1
-""")
+    Geometry (in Angstrom), charge = 0, multiplicity = 7:
 
-options = {"basis": "cc-pvdz", 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
-e, wfn = sf_psi4( 1, 2, n2_7, conf_space="h", add_opts=options, return_wfn=True)
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+         N            0.000000000000     0.000000000000    -0.750000000000    14.003074004780
+         N            0.000000000000     0.000000000000     0.750000000000    14.003074004780
 
---------------------------------------------------------------------------
+  Running in c1 symmetry.
 
-Traceback (most recent call last):
-  File "/groups/nmayhall_lab/psi4/bin/psi4", line 262, in <module>
-    exec(content)
-  File "<string>", line 22, in <module>
-  File "/home/shouck/sf-ip-ea/1SF-CAS/sf/__init__.py", line 8, in <module>
-    from scipy.sparse import linalg as SPLIN
+  Rotational constants: A = ************  B =      1.07009  C =      1.07009 [cm^-1]
+  Rotational constants: A = ************  B =  32080.51190  C =  32080.51190 [MHz]
+  Nuclear repulsion =   17.286455480606662
 
-ModuleNotFoundError: No module named 'scipy'
+  Charge       = 0
+  Multiplicity = 7
+  Electrons    = 14
+  Nalpha       = 10
+  Nbeta        = 4
 
-    Psi4 stopped on: Wednesday, 06 February 2019 12:08PM
+  ==> Algorithm <==
 
-*** Psi4 encountered an error. Buy a developer more coffee!
-*** Resources and help at github.com/psi4/psi4.
+  SCF Algorithm Type is DIRECT.
+  DIIS enabled.
+  MOM disabled.
+  Fractional occupation disabled.
+  Guess Type is GWH.
+  Energy threshold   = 1.00e-10
+  Density threshold  = 1.00e-10
+  Integral threshold = 0.00e+00
+
+  ==> Primary Basis <==
+
+  Basis Set: CC-PVDZ
+    Blend: CC-PVDZ
+    Number of shells: 12
+    Number of basis function: 28
+    Number of Cartesian functions: 30
+    Spherical Harmonics?: true
+    Max angular momentum: 2
+
+   => Loading Basis Set <=
+
+    Name: (CC-PVDZ AUX)
+    Role: JKFIT
+    Keyword: DF_BASIS_SCF
+    atoms 1-2 entry N          line   171 file /home/shouck/psi4conda/share/psi4/basis/cc-pvdz-jkfit.gbs 
+
+  ==> Pre-Iterations <==
+
+   -------------------------------------------------------
+    Irrep   Nso     Nmo     Nalpha   Nbeta   Ndocc  Nsocc
+   -------------------------------------------------------
+     A         28      28       0       0       0       0
+   -------------------------------------------------------
+    Total      28      28      10       4       4       6
+   -------------------------------------------------------
+
+  Starting with a DF guess...
+
+  ==> Integral Setup <==
+
+  ==> MemDFJK: Density-Fitted J/K Matrices <==
+
+    J tasked:                   Yes
+    K tasked:                   Yes
+    wK tasked:                   No
+    OpenMP threads:               1
+    Memory (MB):                375
+    Algorithm:                 Core
+    Schwarz Cutoff:           1E-12
+    Mask sparsity (%):       0.0000
+    Fitting Condition:        1E-12
+
+   => Auxiliary Basis Set <=
+
+  Basis Set: (CC-PVDZ AUX)
+    Blend: CC-PVDZ-JKFIT
+    Number of shells: 48
+    Number of basis function: 140
+    Number of Cartesian functions: 162
+    Spherical Harmonics?: true
+    Max angular momentum: 3
+
+  Minimum eigenvalue in the overlap matrix is 2.3365850130E-02.
+  Using Symmetric Orthogonalization.
+
+  SCF Guess: Generalized Wolfsberg-Helmholtz.
+
+  ==> Iterations <==
+
+                           Total Energy        Delta E     RMS |[F,P]|
+
+   @DF-ROHF iter   1:  -107.96072984552157   -1.07961e+02   5.05694e-02 
+   @DF-ROHF iter   2:  -108.45261471508832   -4.91885e-01   6.46907e-03 
+   @DF-ROHF iter   3:  -108.47535816280219   -2.27434e-02   2.20835e-03 
+   @DF-ROHF iter   4:  -108.47744361608059   -2.08545e-03   9.46377e-04 
+   @DF-ROHF iter   5:  -108.47780685994215   -3.63244e-04   3.95245e-04 
+   @DF-ROHF iter   6:  -108.47787275894228   -6.58990e-05   1.82438e-04 
+   @DF-ROHF iter   7:  -108.47788541469487   -1.26558e-05   7.34993e-05 
+   @DF-ROHF iter   8:  -108.47788787167043   -2.45698e-06   3.53434e-05 
+   @DF-ROHF iter   9:  -108.47788835977744   -4.88107e-07   1.38635e-05 
+   @DF-ROHF iter  10:  -108.47788845855804   -9.87806e-08   6.96207e-06 
+   @DF-ROHF iter  11:  -108.47788847901349   -2.04554e-08   2.67736e-06 
+   @DF-ROHF iter  12:  -108.47788848335261   -4.33913e-09   1.40884e-06 
+   @DF-ROHF iter  13:  -108.47788848429707   -9.44453e-10   5.37391e-07 
+   @DF-ROHF iter  14:  -108.47788848450790   -2.10832e-10   2.95554e-07 
+   @DF-ROHF iter  15:  -108.47788848455620   -4.83027e-11   1.13928e-07 
+   @DF-ROHF iter  16:  -108.47788848456763   -1.14255e-11   6.46588e-08 
+   @DF-ROHF iter  17:  -108.47788848457002   -2.38742e-12   2.56990e-08 
+   @DF-ROHF iter  18:  -108.47788848457097   -9.52127e-13   1.47530e-08 
+   @DF-ROHF iter  19:  -108.47788848457100   -2.84217e-14   6.12255e-09 
+   @DF-ROHF iter  20:  -108.47788848457097    2.84217e-14   3.49085e-09 
+   @DF-ROHF iter  21:  -108.47788848457118   -2.13163e-13   1.51528e-09 DIIS
+   @DF-ROHF iter  22:  -108.47788848457100    1.84741e-13   8.04313e-10 DIIS
+   @DF-ROHF iter  23:  -108.47788848457118   -1.84741e-13   1.74676e-13 DIIS
+
+  DF guess converged.
+
+  ==> Integral Setup <==
+
+  ==> DirectJK: Integral-Direct J/K Matrices <==
+
+    J tasked:                  Yes
+    K tasked:                  Yes
+    wK tasked:                  No
+    Integrals threads:           1
+    Schwarz Cutoff:          1E-12
+
+   @DF-ROHF iter  24:  -108.47819317232687   -3.04688e-04   3.84301e-05 DIIS
+   @DF-ROHF iter  25:  -108.47819362836634   -4.56039e-07   7.96167e-06 DIIS
+   @DF-ROHF iter  26:  -108.47819367848646   -5.01201e-08   4.00227e-06 DIIS
+   @DF-ROHF iter  27:  -108.47819369101273   -1.25263e-08   1.33450e-06 DIIS
+   @DF-ROHF iter  28:  -108.47819369341724   -2.40451e-09   2.05676e-07 DIIS
+   @DF-ROHF iter  29:  -108.47819369345625   -3.90088e-11   2.27746e-08 DIIS
+   @DF-ROHF iter  30:  -108.47819369345675   -4.97380e-13   2.22884e-09 DIIS
+   @DF-ROHF iter  31:  -108.47819369345686   -1.13687e-13   4.07928e-10 DIIS
+   @DF-ROHF iter  32:  -108.47819369345689   -2.84217e-14   3.12671e-11 DIIS
+
+  ==> Post-Iterations <==
+
+    Orbital Energies [Eh]
+    ---------------------
+
+    Doubly Occupied:                                                      
+
+       1A    -15.582638     2A    -15.582617     3A     -1.137775  
+       4A     -0.811223  
+
+    Singly Occupied:                                                      
+
+       5A     -0.317812     6A     -0.266804     7A     -0.266804  
+       8A     -0.080722     9A     -0.080722    10A      0.177192  
+
+    Virtual:                                                              
+
+      11A      0.900296    12A      0.954048    13A      0.954048  
+      14A      0.998064    15A      1.028090    16A      1.028090  
+      17A      1.067603    18A      1.438772    19A      1.760563  
+      20A      1.760563    21A      1.951466    22A      1.951466  
+      23A      2.136121    24A      2.136121    25A      2.211483  
+      26A      2.573219    27A      2.573219    28A      3.091067  
+
+    Final Occupation by Irrep:
+              A 
+    DOCC [     4 ]
+    SOCC [     6 ]
+
+  Energy converged.
+
+  @DF-ROHF Final Energy:  -108.47819369345689
+
+   => Energetics <=
+
+    Nuclear Repulsion Energy =             17.2864554806066621
+    One-Electron Energy =                -182.0526864137150369
+    Two-Electron Energy =                  56.2880372396515014
+    Total Energy =                       -108.4781936934568733
+
+
+
+Properties will be evaluated at   0.000000,   0.000000,   0.000000 [a0]
+
+Properties computed using the SCF density matrix
+
+  Nuclear Dipole Moment: [e a0]
+     X:     0.0000      Y:     0.0000      Z:     0.0000
+
+  Electronic Dipole Moment: [e a0]
+     X:    -0.0000      Y:     0.0000      Z:     0.0000
+
+  Dipole Moment: [e a0]
+     X:    -0.0000      Y:     0.0000      Z:     0.0000     Total:     0.0000
+
+  Dipole Moment: [D]
+     X:    -0.0000      Y:     0.0000      Z:     0.0000     Total:     0.0000
+
+
+*** tstop() called on Spektor at Thu Apr  4 16:12:26 2019
+Module time:
+	user time   =       0.49 seconds =       0.01 minutes
+	system time =       0.00 seconds =       0.00 minutes
+	total time  =          1 seconds =       0.02 minutes
+Total time:
+	user time   =       0.49 seconds =       0.01 minutes
+	system time =       0.00 seconds =       0.00 minutes
+	total time  =          1 seconds =       0.02 minutes
+Performing 1SF with electron count change of -1...
+	RAS1: 4
+	RAS2: 6
+	RAS3: 18
+Number of determinants: 90
+Number of roots: 2
+Running Fock-space CI...
+	Spin-Flips:   1
+	Electron Count Change:  -1
+
+	RAS1: 4
+	RAS2: 6
+	RAS3: 18
+	Diagonalization: LANCZOS
+	Guess: CAS
+
+ROOT No.	Energy		S**2
+------------------------------------------------
+   0		-108.290983	3.750000
+   1		-108.280702	3.750000
+------------------------------------------------
+
+Most Important Determinants Data:
+
+ROOT 0: -108.290982703788
+Coeff.		Important MO Occupations
+ -0.630371 	REMOVE:	A:    [9, 8]	B:        []	ADD:	B:        []	B:       [5]
+ -0.630371 	REMOVE:	A:    [9, 7]	B:        []	ADD:	B:        []	B:       [6]
+ -0.250551 	REMOVE:	A:    [9, 5]	B:        []	ADD:	B:        []	B:       [8]
+ -0.250551 	REMOVE:	A:    [9, 6]	B:        []	ADD:	B:        []	B:       [7]
+  0.169145 	REMOVE:	A:    [9, 7]	B:        []	ADD:	B:        []	B:       [5]
+ -0.169145 	REMOVE:	A:    [9, 8]	B:        []	ADD:	B:        []	B:       [6]
+  0.067229 	REMOVE:	A:    [9, 5]	B:        []	ADD:	B:        []	B:       [7]
+ -0.067229 	REMOVE:	A:    [9, 6]	B:        []	ADD:	B:        []	B:       [8]
+  0.061950 	REMOVE:	A:    [8, 4]	B:        []	ADD:	B:        []	B:       [8]
+  0.061950 	REMOVE:	A:    [7, 4]	B:        []	ADD:	B:        []	B:       [7]
+
+ROOT 1: -108.280701796566
+Coeff.		Important MO Occupations
+ -0.761204 	REMOVE:	A:    [9, 7]	B:        []	ADD:	B:        []	B:       [4]
+ -0.602585 	REMOVE:	A:    [9, 8]	B:        []	ADD:	B:        []	B:       [4]
+ -0.133638 	REMOVE:	A:    [9, 6]	B:        []	ADD:	B:        []	B:       [9]
+ -0.121501 	REMOVE:	A:    [6, 4]	B:        []	ADD:	B:        []	B:       [4]
+  0.087292 	REMOVE:	A:    [7, 4]	B:        []	ADD:	B:        []	B:       [9]
+  0.069102 	REMOVE:	A:    [8, 4]	B:        []	ADD:	B:        []	B:       [9]
+ -0.057680 	REMOVE:	A:    [9, 5]	B:        []	ADD:	B:        []	B:       [9]
+ -0.052442 	REMOVE:	A:    [5, 4]	B:        []	ADD:	B:        []	B:       [4]
+ -0.048645 	REMOVE:	A:    [8, 7]	B:        []	ADD:	B:        []	B:       [5]
+ -0.039842 	REMOVE:	A:    [9, 4]	B:        []	ADD:	B:        []	B:       [7]
+
+
+	  Fock Space CI Complete! 
+

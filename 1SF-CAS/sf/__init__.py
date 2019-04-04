@@ -218,13 +218,14 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
     print("Number of determinants:", n_dets)
     if( num_roots >= n_dets ):
         num_roots = n_dets - 1
+    num_roots = int(num_roots)
     print("Number of roots:", num_roots)
     A = linop.LinOpH((n_dets,n_dets), e, a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
     # run method
     print("Running Fock-space CI...")
     print("\tSpin-Flips: %3i\n\tElectron Count Change: %3i\n" %(n_SF, delta_ec))
     print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(ras1, ras2, ras3) )
-    if(n_dets < 100):
+    if(n_dets < 250):
         sf_diag_method = "LANCZOS"
     print("\tDiagonalization: %s\n\tGuess: %s" %(sf_diag_method, guess_type))
     if(sf_diag_method == "LANCZOS"):
@@ -253,13 +254,14 @@ def do_sf_cas(delta_a, delta_b, mol, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_
             else:
                 # CAS-1SF
                 if(n_SF==1 and delta_ec==0):
-                    n_cas_dets = ras2 * ras2
+                    n_cas_dets = int(ras2 * ras2)
                 # CAS-1SF-IP/EA
                 elif(n_SF==1 and (delta_ec==-1 or delta_ec==1)):
-                    n_cas_dets = ras2 * ((ras2-1)*(ras2)/2)
+                    n_cas_dets = int(ras2 * ((ras2-1)*(ras2)/2))
                 # CAS-IP/EA
                 elif(n_SF==0 and (delta_ec==-1 or delta_ec==1)):
-                    n_cas_dets = ras2
+                    n_cas_dets = int(ras2)
+                # TODO: Modify CAS root number if needed
                 cas_A = linop.LinOpH((n_cas_dets,n_cas_dets), e, a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
                 cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=num_roots)
                 v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
