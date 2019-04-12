@@ -28,7 +28,6 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         # do Sz^2
         s2 = s2 + v*v*(0.25*(na*na) + 0.25*(nb*nb) - 0.5*(na*nb))
 
-    '''
     # CAS-1SF
     if(n_SF==1 and delta_ec==0 and conf_space==""):
         vect = np.reshape(vect, (socc,socc))
@@ -414,9 +413,8 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
 
     else:
         return s2 + smp_with_eri(n_SF, delta_ec, conf_space, vect, docc, socc, virt)
-    '''
 
-    return s2 + smp_with_eri(n_SF, delta_ec, conf_space, vect, docc, socc, virt)
+    #return s2 + smp_with_eri(n_SF, delta_ec, conf_space, vect, docc, socc, virt)
 
 # Returns a list of determinants in the following form:
 # det = [...] (det[0] is 0th determinant, det[1] is 1st, etc.)

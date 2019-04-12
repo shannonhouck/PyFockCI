@@ -189,7 +189,7 @@ class LinOpH (LinearOperator):
 
             return sig_1_out + offset_v
 
-        # do excitation scheme: 1SF-CAS + h
+        # do excitation scheme: RAS(h)-1SF
         if(n_SF==1 and delta_ec==0 and conf_space=="h"):
             """ 
                 definitions:
@@ -378,7 +378,7 @@ class LinOpH (LinearOperator):
             # combine and return
             return np.vstack((sig_1, sig_2, sig_3_out)) + offset_v
 
-        # do excitation scheme: 1SF-CAS + p
+        # do excitation scheme: RAS(p)-1SF
         if(n_SF==1 and delta_ec==0 and conf_space=="p"):
             """
                 definitions:

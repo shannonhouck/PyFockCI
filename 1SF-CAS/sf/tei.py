@@ -23,21 +23,25 @@ class TEI:
 # Class for full TEI integrals.
 #   np_tei         Allows for importing a previously-computed TEI integral (in NumPy martrix form)
 class TEIFull(TEI):
-    def __init__(self, C, basis, ras1, ras2, ras3, np_tei=None):
+    def __init__(self, C, basis, ras1, ras2, ras3, ref_method='PSI4', np_tei=None):
         if(not type(np_tei)==type(None)):
             print("Reading in two-electron integrals...")
             self.eri = np_tei
         else:
-            # get necessary integrals/matrices from Psi4 (AO basis)
-            mints = psi4.core.MintsHelper(basis)
-            self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
-            # put in physicists' notation
-            self.eri = self.eri.transpose(0, 2, 1, 3)
-            # move to MO basis
-            self.eri = np.einsum('pqrs,pa',self.eri,C)
-            self.eri = np.einsum('aqrs,qb',self.eri,C)
-            self.eri = np.einsum('abrs,rc',self.eri,C)
-            self.eri = np.einsum('abcs,sd',self.eri,C)
+            if(ref_method=='PSI4'):
+                # get necessary integrals/matrices from Psi4 (AO basis)
+                mints = psi4.core.MintsHelper(basis)
+                self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
+                # put in physicists' notation
+                self.eri = self.eri.transpose(0, 2, 1, 3)
+                # move to MO basis
+                self.eri = np.einsum('pqrs,pa',self.eri,C)
+                self.eri = np.einsum('aqrs,qb',self.eri,C)
+                self.eri = np.einsum('abrs,rc',self.eri,C)
+                self.eri = np.einsum('abcs,sd',self.eri,C)
+            else:
+                print("ERROR: Method not yet supported. Exiting...")
+                exit()
         # ind stores the indexing of ras1/ras2/ras3 for get_subblock method
         self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[ras1+ras2,ras1+ras2+ras3]]
 
@@ -51,22 +55,26 @@ class TEIFull(TEI):
 class TEIDF(TEI):
     # Used Psi4NumPy for reference for this section
     # ras1, ras2, ras3 indicate the number of orbitals in each section
-    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space, np_tei=None, np_J=None):
+    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space, ref_method='PSI4', np_tei=None, np_J=None):
         if(not type(np_tei)==type(None)):
             eri = np_tei
             J = np_J
         else:
             # get info from Psi4
-            zero = psi4.core.BasisSet.zero_ao_basis_set()
-            mints = psi4.core.MintsHelper(basis)
-            # (Q|pq)
-            eri = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, basis, basis))
-            eri = np.squeeze(eri)
-            C = psi4.core.Matrix.to_array(C)
-            # set up J^-1/2 (don't need to keep)
-            J = mints.ao_eri(zero, aux, zero, aux)
-            J.power(-0.5, 1e-14)
-            J = np.squeeze(J)
+            if(ref_method=='PSI4'):
+                zero = psi4.core.BasisSet.zero_ao_basis_set()
+                mints = psi4.core.MintsHelper(basis)
+                # (Q|pq)
+                eri = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, basis, basis))
+                eri = np.squeeze(eri)
+                C = psi4.core.Matrix.to_array(C)
+                # set up J^-1/2 (don't need to keep)
+                J = mints.ao_eri(zero, aux, zero, aux)
+                J.power(-0.5, 1e-14)
+                J = np.squeeze(J)
+            else:
+                print("ERROR: Method not yet supported. Exiting...")
+                exit()
         # Contract and obtain final form
         eri = np.einsum("PQ,Qpq->Ppq", J, eri)
         # set up C

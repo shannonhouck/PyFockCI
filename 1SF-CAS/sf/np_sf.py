@@ -143,7 +143,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
                 elif(n_SF==0 and (delta_ec==-1 or delta_ec==1)):
                     n_cas_dets = int(ras2)
                 # TODO: Modify CAS root number if needed
-                cas_A = linop.LinOpH((n_cas_dets,n_cas_dets), e, a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
+                cas_A = LinOpH((n_cas_dets,n_cas_dets), e, a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
                 cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=num_roots)
                 v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
                 guess_vect = np.vstack((cas_vects, v3_guess))
