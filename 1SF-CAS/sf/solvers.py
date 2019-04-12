@@ -14,8 +14,8 @@ from scipy.sparse.linalg import spsolve
 #    vect_cutoff     Cutoff for adding vectors to Krylov space (default: 1e-8)
 #    maxIter         Maximum number of iterations
 # Returns:
-#    s2              The S**2 expectation value for the state
-def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=50, collapse_per_root=15 ):
+#    Eigenvalues/eigenvectors for the Hamiltonian.
+def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200, collapse_per_root=20 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -108,11 +108,7 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=50, 
         # else, apply preconditioner to residuals (elif)
         else:
             for i in range(k) :
-                #sNew = r[:,i]
                 sNew = (1.0/(D-eVals[i]))*r[:,i]
-                #sNew = LIN.solve_banded((0,0), 1.0/(D-eVals[i]*np.ones(D.shape[0])).reshape(1,D.shape[0]), r[:,i])
-                #sNew = LIN.solve(LIN.inv(D-np.diag(eVals[i]*np.ones(D.shape[0]))), r[:,i])
-                #print(sNew.shape)
                 if ( LIN.norm(sNew) > vect_cutoff ):
                     # orthogonalize
                     h = np.dot(vSpace.T, sNew);
