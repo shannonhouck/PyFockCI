@@ -70,11 +70,11 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
         else:
             opts.update({key.upper(): sf_opts[key]})
     # make TEI object if we've passed in a numpy array
-    print(opts)
-    if(opts['INTEGRAL_TYPE']=="FULL"):
-        tei_int = TEIFull(0, 0, ras1, ras2, ras3, np_tei=tei_int)
-    elif(opts['INTEGRAL_TYPE']=="DF"):
-        tei_int = TEIDF(C_in, 0, 0, ras1, ras2, ras3, conf_space, np_tei=tei_int, np_J=J_in)
+    if(isinstance(tei_int, np.ndarray)):
+        if(opts['INTEGRAL_TYPE']=="FULL"):
+            tei_int = TEIFull(0, 0, ras1, ras2, ras3, np_tei=tei_int)
+        elif(opts['INTEGRAL_TYPE']=="DF"):
+            tei_int = TEIDF(C_in, 0, 0, ras1, ras2, ras3, conf_space, np_tei=tei_int, np_J=J_in)
     # determine number of spin-flips and total change in electron count
     n_SF = min(delta_a, delta_b)
     delta_ec = delta_b - delta_a
@@ -166,7 +166,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
         s2 = print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
     print("\n\n\t  Fock Space CI Complete! \n")
     # Return appropriate things
-    if(return_vects):
+    if(opts['RETURN_VECTS']):
         return (vals, vects)
     else:
         return vals

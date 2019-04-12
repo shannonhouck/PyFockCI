@@ -25,6 +25,7 @@ class TEI:
 class TEIFull(TEI):
     def __init__(self, C, basis, ras1, ras2, ras3, np_tei=None):
         if(not type(np_tei)==type(None)):
+            print("Reading in two-electron integrals...")
             self.eri = np_tei
         else:
             # get necessary integrals/matrices from Psi4 (AO basis)
@@ -42,6 +43,9 @@ class TEIFull(TEI):
 
     def get_subblock(self, a, b, c, d):
         return self.eri[self.ind[a][0]:self.ind[a][1], self.ind[b][0]:self.ind[b][1], self.ind[c][0]:self.ind[c][1], self.ind[d][0]:self.ind[d][1]]
+
+    def get_full(self):
+        return self.eri
 
 # Class for full TEI integrals.
 class TEIDF(TEI):

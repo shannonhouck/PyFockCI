@@ -65,9 +65,9 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     out = do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=conf_space, sf_opts=sf_opts)
     # return appropriate values
     if(isinstance(out, tuple)):
-        if(return_wfn):
+        if(sf_opts['RETURN_WFN']):
             out = out + (wfn,)
-    elif(return_wfn):
+    elif(sf_opts['RETURN_WFN']):
         out = (out,) + (wfn,)
     return out
 
