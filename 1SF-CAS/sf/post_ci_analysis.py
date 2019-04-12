@@ -28,6 +28,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         # do Sz^2
         s2 = s2 + v*v*(0.25*(na*na) + 0.25*(nb*nb) - 0.5*(na*nb))
 
+    '''
     # CAS-1SF
     if(n_SF==1 and delta_ec==0 and conf_space==""):
         vect = np.reshape(vect, (socc,socc))
@@ -290,17 +291,19 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
             for q in range(socc):
                 s2 = s2 + v_ref1[p,p]*v_ref1[q,q]
         # block 2
-        s2 = s2 + np.einsum("Ia,Ia->", v_ref2, v_ref2)
+        #s2 = s2 + np.einsum("Ia,Ia->", v_ref2, v_ref2)
         for I in range(docc):
             for a in range(socc):
+                s2 = s2 + v_ref2[I,a]*v_ref2[I,a]
                 for p in range(socc):
-                    s2 = s2 - 2.0*v_ref2[I,a]*v_ref3[I,p,a,p]
+                    s2 = s2 + 2.0*v_ref2[I,a]*v_ref3[I,p,a,p]
         # block 3
         for I in range(docc):
             for a in range(socc):
                 for p in range(socc):
                     for q in range(socc):
                         s2 = s2 + v_ref3[I,p,a,p]*v_ref3[I,q,a,q]
+                        s2 = s2 - v_ref3[I,p,a,p]*v_ref3[I,q,q,a]
         return s2
 
 
@@ -411,6 +414,9 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
 
     else:
         return s2 + smp_with_eri(n_SF, delta_ec, conf_space, vect, docc, socc, virt)
+    '''
+
+    return s2 + smp_with_eri(n_SF, delta_ec, conf_space, vect, docc, socc, virt)
 
 # Returns a list of determinants in the following form:
 # det = [...] (det[0] is 0th determinant, det[1] is 1st, etc.)
@@ -430,7 +436,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
         return dets_list
 
     # RAS(h)-1SF
-    if(n_SF==1 and delta_ec==0 and conf_space=="h"):
+    elif(n_SF==1 and delta_ec==0 and conf_space=="h"):
         # v(1) indexing: (ia:ab)
         for i in range(ras1,ras1+ras2):
             for a in range(ras1,ras1+ras2):
@@ -448,7 +454,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
         return dets_list
 
     # RAS(p)-1SF
-    if(n_SF==1 and delta_ec==0 and conf_space=="p"):
+    elif(n_SF==1 and delta_ec==0 and conf_space=="p"):
         # v(1) indexing: (ia:ab)
         for i in range(ras1,ras1+ras2):
             for a in range(ras1,ras1+ras2):
@@ -466,7 +472,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
         return dets_list
 
     # RAS(h,p)-1SF
-    if(n_SF==1 and delta_ec==0 and conf_space=="h,p"):
+    elif(n_SF==1 and delta_ec==0 and conf_space=="h,p"):
         # v(1) indexing: (ia:ab)
         for i in range(ras1,ras1+ras2):
             for a in range(ras1,ras1+ras2):
@@ -494,7 +500,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
         return dets_list
 
     # CAS-2SF
-    if(n_SF==2 and delta_ec==0 and conf_space==""):
+    elif(n_SF==2 and delta_ec==0 and conf_space==""):
         for i in range(ras1,ras1+ras2):
             for j in range(ras1,i):
                 for a in range(ras1,ras1+ras2):
@@ -502,13 +508,13 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                         dets_list.append([[[i,j],[]], [[],[a,b]]])
 
     # CAS-IP
-    if(n_SF==0 and delta_ec==-1 and conf_space==""):
+    elif(n_SF==0 and delta_ec==-1 and conf_space==""):
         # v(1) indexing: (i:a)
         for i in range(ras1,ras1+ras2):
             dets_list.append([[[i],[]], [[],[]]])
 
     # RAS(h)-IP
-    if(n_SF==0 and delta_ec==-1 and conf_space=="h"):
+    elif(n_SF==0 and delta_ec==-1 and conf_space=="h"):
         # v(1) indexing: (i:a)
         for i in range(ras1,ras1+ras2):
             dets_list.append([[[i],[]], [[],[]]])
@@ -522,7 +528,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                     dets_list.append([[[i],[I]], [[],[a]]])
 
     # RAS(p)-IP
-    if(n_SF==0 and delta_ec==-1 and conf_space=="p"):
+    elif(n_SF==0 and delta_ec==-1 and conf_space=="p"):
         # v(1) indexing: (i:a)
         for i in range(ras1,ras1+ras2):
             dets_list.append([[[i],[]], [[],[]]])
@@ -533,14 +539,14 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                     dets_list.append([[[i,j],[]], [[A],[]]])
 
     # CAS-1SF-IP
-    if(n_SF==1 and delta_ec==-1 and conf_space==""):
+    elif(n_SF==1 and delta_ec==-1 and conf_space==""):
         for i in range(ras1,ras1+ras2):
             for j in range(ras1,i):
                 for a in range(ras1,ras1+ras2):
                     dets_list.append([[[i,j],[]], [[],[a]]])
 
     # RAS(h)-1SF-IP
-    if(n_SF==1 and delta_ec==-1 and conf_space=="h"):
+    elif(n_SF==1 and delta_ec==-1 and conf_space=="h"):
         # v(1) unpack to indexing: (ija:aab)
         for i in range(ras1,ras1+ras2):
             for j in range(ras1,i):
@@ -560,12 +566,12 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                             dets_list.append([[[I,i,j],[]], [[],[a,b]]])
 
     # CAS-EA
-    if(n_SF==0 and delta_ec==1 and conf_space==""):
+    elif(n_SF==0 and delta_ec==1 and conf_space==""):
         for a in range(ras1,ras1+ras2):
             dets_list.append([[[],[]], [[],[a]]])
 
     # RAS(h)-EA
-    if(n_SF==0 and delta_ec==1 and conf_space=="h"):
+    elif(n_SF==0 and delta_ec==1 and conf_space=="h"):
         # v(1) indexing: (a:b)
         for a in range(ras1,ras1+ras2):
             dets_list.append([[[],[]], [[],[a]]])
@@ -576,7 +582,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                     dets_list.append([[[],[I]], [[],[a,b]]])
 
     # doing RAS(p)-EA calculation
-    if(n_SF==0 and delta_ec==1 and conf_space=="p"):
+    elif(n_SF==0 and delta_ec==1 and conf_space=="p"):
         # v(1) indexing: (a:b)
         for a in range(ras1,ras1+ras2):
             dets_list.append([[[],[]], [[],[a]]])
@@ -590,7 +596,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                     dets_list.append([[[i],[]], [[A],[a]]])
 
     # CAS-1SF-EA
-    if(n_SF==1 and delta_ec==1 and conf_space==""):
+    elif(n_SF==1 and delta_ec==1 and conf_space==""):
         # v(1) unpack to indexing: (iab:abb)
         for i in range(ras1,ras1+ras2):
             for a in range(ras1,ras1+ras2):
@@ -598,7 +604,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                     dets_list.append([[[i],[]], [[],[a,b]]])
 
     # RAS(p)-1SF-EA
-    if(n_SF==1 and delta_ec==1 and conf_space=="p"):
+    elif(n_SF==1 and delta_ec==1 and conf_space=="p"):
         # v(1) unpack to indexing: (iab:abb)
         for i in range(ras1,ras1+ras2):
             for a in range(ras1,ras1+ras2):
@@ -617,6 +623,11 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                         for b in range(ras1,a):
                             dets_list.append([[[i,j],[]], [[],[A,a,b]]])
 
+    else:
+        print("Sorry, %iSF with electron count change of %i and conf space %s not yet supported." %(n_SF, delta_ec, conf_space) )
+        print("Exiting...")
+        exit()
+
     return dets_list
 
 def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
@@ -626,13 +637,16 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
     na = docc + socc
     nb = docc
     nbf = docc + socc + virt
-    Fa_tmp = np.einsum('piqi->pq', s2_tei.full()[:, :na, :, :na]) - np.einsum('piiq->pq', s2_tei.full()[:, :na, :na, :])
-    Fb_tmp = np.einsum('piqi->pq', s2_tei.full()[:, nbf:nbf+nb, :, nbf:nbf+nb])
+    Fa_tmp_tmp = np.einsum('piqi->pq', s2_tei.full()[:, :na, :, :na]) - np.einsum('piiq->pq', s2_tei.full()[:, :na, :na, :])
+    Fb_tmp_tmp = np.einsum('piqi->pq', s2_tei.full()[:, nbf:nbf+nb, :, nbf:nbf+nb])
 
-    #F = 0.5*(Fa_tmp + Fb_tmp)
+    #F = (Fa_tmp + Fb_tmp)
 
-    Fa = Fa_tmp[:nbf, :nbf]
-    Fb = Fb_tmp[nbf:, nbf:]
+    Fa = Fa_tmp_tmp[:nbf, :nbf]
+    Fb = Fb_tmp_tmp[nbf:, nbf:]
+
+    #Fa = np.eye(nbf)
+    #Fb = 0*np.eye(nbf)
 
     #print(np.allclose(Fa[:nbf, nbf:], np.zeros(Fa[:nbf, nbf:].shape)))
     #print(np.allclose(Fa[nbf:, :nbf], np.zeros(Fa[nbf:, :nbf].shape)))
@@ -646,8 +660,8 @@ def smp_with_eri(n_SF, delta_ec, conf_space, v, docc, socc, virt):
     if(n_SF==1 and delta_ec==0 and conf_space==""):
         v_b1 = np.reshape(v, (socc,socc)) # v for block 1
         #   sig(ia:ba) += -v(ia:ba) (eps(a:b)-eps(i:a))
-        Fi_tmp = Fa[0:socc, 0:socc]
-        Fa_tmp = Fb[0:socc, 0:socc]
+        Fi_tmp = Fa[docc:docc+socc, docc:docc+socc]
+        Fa_tmp = Fb[docc:docc+socc, docc:docc+socc]
         F_tmp = np.einsum("ib,ba->ia", v_b1, Fa_tmp) - np.einsum("ja,ji->ia", v_b1, Fi_tmp)
         F_tmp.shape = (v.shape[0], )
         #   sig(ai:ba) += -v(bj:ba) I(ajbi:baba)
