@@ -108,6 +108,7 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200,
         # else, apply preconditioner to residuals (elif)
         else:
             for i in range(k) :
+                # apply preconditioner
                 sNew = (1.0/(D-eVals[i]))*r[:,i]
                 if ( LIN.norm(sNew) > vect_cutoff ):
                     # orthogonalize
