@@ -127,7 +127,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
         else:
             #vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
             vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
-    else: #if(sf_diag_method == "DAVIDSON"):
+    elif(sf_diag_method == "DAVIDSON"):
         # generate guess vector
         if(opts['GUESS_TYPE'] == "CAS"):
             if(conf_space==""):
@@ -154,6 +154,9 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
             for i in range(num_roots):
                 guess_vect[i,i] = 1.0 
         vals, vects = davidson(A, guess_vect)
+    else:
+        print("Diag method not yet supported. Please enter DAVIDSON or LANCZOS.")
+        exit()
     print("\nROOT No.\tEnergy\t\tS**2")
     print("------------------------------------------------")
     for i, corr in enumerate(vals):

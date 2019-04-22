@@ -26,7 +26,7 @@ def test_cas_1sf():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     s_expected = [6.0, 12.0, 6.0, 6.0, 6.0, 6.0]
-    e, vects = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts={'return_vects': True} )
+    e, vects = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts={'return_vects': True, 'sf_diag_type': 'LANCZOS'} )
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(1, 0, "", vects[:, i], 4, 6, 18)
         assert abs(s2 - s_expected[i]) < threshold
@@ -38,7 +38,7 @@ def test_h_1sf():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     s_expected = [6.0, 12.0, 6.0, 6.0, 6.0, 6.0]
-    e, vects = fock_ci( 1, 1, n2_7, conf_space="h", ref_opts=options, sf_opts={'return_vects': True} )
+    e, vects = fock_ci( 1, 1, n2_7, conf_space="h", ref_opts=options, sf_opts={'return_vects': True, 'sf_diag_type': 'LANCZOS'} )
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(1, 0, "h", vects[:, i], 4, 6, 18)
         assert abs(s2 - s_expected[i]) < threshold
@@ -50,7 +50,7 @@ def test_p_1sf():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     s_expected = [6.0, 12.0, 6.0, 6.0, 6.0, 6.0]
-    e, vects = fock_ci( 1, 1, n2_7, conf_space="p", ref_opts=options, sf_opts={'return_vects': True} )
+    e, vects = fock_ci( 1, 1, n2_7, conf_space="p", ref_opts=options, sf_opts={'return_vects': True, 'sf_diag_type': 'LANCZOS'} )
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(1, 0, "p", vects[:, i], 4, 6, 18)
         assert abs(s2 - s_expected[i]) < threshold
