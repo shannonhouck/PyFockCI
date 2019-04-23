@@ -77,71 +77,13 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         s2 = s2 + v*v*tmp
 
     '''
+    OLD CODE (maybe useful for future??)
     for i, v in enumerate(vect):
         # do Sz
         #s2 = s2 + v*v*(0.5*(na) - 0.5*(nb))
 
         # do Sz^2
         #s2 = s2 + 2.0*v*v*(0.25*(na*na) + 0.25*(nb*nb) - 0.5*(na*nb))
-
-        det = det_list[i]
-        # det[count] = [[[elim (alpha)], [elim (beta)]], [[add (a)], [add (b)]]]
-        sz2 = socc
-        # removal of alpha
-        for rem_a in det[0][0]:
-            # RAS 1
-            if(rem_a in range(docc)):
-                # if corresponding b not removed
-                if rem_a not in (det[0][1]):
-                    sz2 = sz2 + 1
-            # RAS 2
-            elif(rem_a in range(docc+socc)):
-                # if b not added to same orbital
-                if rem_a not in (det[1][1]):
-                    sz2 = sz2 - 1
-            # RAS 3 N/A because no electrons to remove
-        # removal of beta
-        for rem_b in det[0][1]:
-            # RAS 1
-            if(rem_b in range(docc)):
-                # if corresponding a not removed
-                if rem_b not in (det[0][0]):
-                    sz2 = sz2 + 1
-            # RAS 2 is N/A (no b to remove)
-            # RAS 3 is N/A
-        # addition of alpha
-        for add_a in det[1][0]:
-            # RAS 1 is N/A
-            # RAS 2 probably should not happen but we're accounting for it anyway?
-            #if(add_a in range(docc+socc)):
-            #    # if 
-            #    if add_a not in (det[0][0]):
-            #        sz2 = sz2 + 1
-            # RAS 3
-            if(add_a in range(docc+socc+virt)):
-                # if corresponding b not added
-                if add_a not in det[1][1]:
-                    sz2 = sz2 + 1
-        for add_b in det[1][1]:
-            # RAS 1 is N/A
-            # RAS 2 probably should not happen but we're accounting for it anyway?
-            if(add_b in range(docc+socc)):
-                # if adding b to a-occupied RAS2 orbital, remove 1
-                # check that alpha not eliminated from RAS2 orbital: add_b not in det[0][0]
-                if add_b not in det[0][0]:
-                    sz2 = sz2 - 1
-                # if adding b to RAS2 orbital from which a is removed
-                elif add_b in det[0][0]:
-                    sz2 = sz2 + 0
-            # RAS 3
-            elif(add_b in range(docc+socc+virt)):
-                # if corresponding a not added
-                if add_b not in det[1][0]:
-                    sz2 = sz2 + 1
-        #print((0.5*(na) - 0.5*(nb)) + 0.25*(na*na) + 0.25*(nb*nb) - 0.5*(na*nb))
-        #s2 = s2 + np.dot(v,v)*(0.5*sz2*(0.5*sz2 + 1.0))
-        sz2 = 0.75*sz2
-        s2 = s2 + 0.5*np.dot(v,v)*sz2
     '''
 
     # CAS-1SF
@@ -176,7 +118,8 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
             for j in range(socc):
                 for p in range(socc):
                     for q in range(socc):
-                        s2 = s2 + v_ref1[q,j,q,b]*v_ref1[p,j,p,b]*1.0
+                        if(p != q):
+                            s2 = s2 + v_ref1[q,j,q,b]*v_ref1[p,j,p,b]
         return s2
 
     # 1IP and 1EA
@@ -196,15 +139,16 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         # v(3) indexing: (Iia:bba)
         v_ref3 = np.reshape(v_b3, (docc, socc, socc))
         # block 2
-        s2 = s2 + np.einsum("I,I->", v_ref2, v_ref2)
-        for p in range(docc):
-            for q in range(socc):
-                s2 = s2 + 2.0*v_ref2[p]*v_ref3[p,q,q]
+        for I in range(docc):
+            for p in range(socc):
+                s2 = s2 + v_ref2[I]*v_ref3[I,p,p]
         # block 3
-        for p in range(socc):
-            for q in range(socc):
-                for I in range(docc):
-                    s2 = s2 + v_ref3[I,p,p]*v_ref3[I,q,q]
+        for I in range(docc):
+            for p in range(socc):
+                s2 = s2 + v_ref2[I]*v_ref3[I,p,p]
+                for q in range(socc):
+                    if(p != q):
+                        s2 = s2 + v_ref3[I,p,p]*v_ref3[I,q,q]
         return s2
 
     # RAS(p)-IP
@@ -229,15 +173,16 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         # v(3) indexing: (iAa:aab)
         v_ref3 = np.reshape(v_b3, (virt, socc, socc))
         # block 2
-        s2 = s2 + np.einsum("A,A->", v_ref2, v_ref2)
         for A in range(virt):
             for p in range(socc):
-                s2 = s2 - 2.0*v_ref2[A]*v_ref3[A,p,p]
+                s2 = s2 - v_ref2[A]*v_ref3[A,p,p]
         # block 3
         for A in range(virt):
             for p in range(socc):
+                s2 = s2 - v_ref2[A]*v_ref3[A,p,p]
                 for q in range(socc):
-                    s2 = s2 + v_ref3[A,p,p]*v_ref3[A,q,q]
+                    if(p != q):
+                        s2 = s2 + v_ref3[A,p,p]*v_ref3[A,q,q]
         return s2
 
     # CAS-1SF-EA
@@ -254,6 +199,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         for p in range(socc):
             for q in range(socc):
                 for a in range(socc):
+                    if(p != q):
                         s2 = s2 + v_ref1[q,q,a]*v_ref1[p,p,a]
         return s2
 
@@ -271,6 +217,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         for p in range(socc):
             for q in range(socc):
                 for i in range(socc):
+                    if(p != q):
                         s2 = s2 + v_ref1[q,i,q]*v_ref1[p,i,p]
         return s2
 
@@ -309,31 +256,29 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         for p in range(socc):
             for q in range(socc):
                 for i in range(socc):
-                    s2 = s2 + v_ref1[q,i,q]*v_ref1[p,i,p]
+                    if(p != q):
+                        s2 = s2 + v_ref1[q,i,q]*v_ref1[p,i,p]
         # block 2
         for I in range(docc):
             for p in range(socc):
                 for q in range(socc):
-                    s2 = s2 + v_ref2[I,p,p]*v_ref2[I,q,q]
-        for I in range(docc):
-            for a in range(socc):
-                for i in range(socc):
-                    s2 = s2 + v_ref2[I,i,a]*v_ref2[I,i,a]
+                    if(p != q):
+                        s2 = s2 + v_ref2[I,p,p]*v_ref2[I,q,q]
         # block 2 w/ block 3
         for I in range(docc):
             for p in range(socc):
-                for q in range(socc):
-                    for a in range(socc):
-                        for i in range(socc):
-                            s2 = s2 - 2.0*v_ref2[I,i,a]*v_ref3[I,p,i,a,p]
-        # block 2
+                for a in range(socc):
+                    for i in range(socc):
+                        s2 = s2 - v_ref2[I,i,a]*v_ref3[I,p,i,a,p]
+        # block 3
         for I in range(docc):
             for p in range(socc):
-                for q in range(socc):
-                    for a in range(socc):
-                        for i in range(socc):
-                            s2 = s2 + v_ref3[I,q,i,a,q]*v_ref3[I,p,i,a,p]
-                            #s2 = s2 - v_ref3[I,i,q,q,a]*v_ref3[I,i,p,p,a]
+                for a in range(socc):
+                    for i in range(socc):
+                        s2 = s2 - v_ref2[I,i,a]*v_ref3[I,p,i,a,p]
+                        for q in range(socc):
+                            if(p != q):
+                                s2 = s2 + v_ref3[I,q,i,a,q]*v_ref3[I,p,i,a,p]
         return s2
 
     # RAS(p)-1SF-EA
@@ -371,22 +316,29 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         for p in range(socc):
             for q in range(socc):
                 for a in range(socc):
-                    s2 = s2 + v_ref1[q,q,a]*v_ref1[p,p,a]
+                    if(p != q):
+                        s2 = s2 + v_ref1[q,q,a]*v_ref1[p,p,a]
         # block 2
         for A in range(virt):
             for p in range(socc):
                 for q in range(socc):
-                    s2 = s2 + v_ref2[A,p,p]*v_ref2[A,q,q]
-                    for a in range(p):
-                        for i in range(socc):
-                            s2 = s2 + 2.0*v_ref2[A,i,a]*v_ref3[A,i,p,p,a]
+                    if(p != q):
+                        s2 = s2 - v_ref2[A,p,p]*v_ref2[A,q,q]
         # block 2
         for A in range(virt):
             for p in range(socc):
-                for q in range(socc):
-                    for a in range(min(p,q)):
-                        for i in range(socc):
-                            s2 = s2 + v_ref3[A,i,q,q,a]*v_ref3[A,i,p,p,a]
+                for a in range(socc):
+                    for i in range(socc):
+                        s2 = s2 + v_ref2[A,i,a]*v_ref3[A,i,p,p,a]
+        # block 2
+        for A in range(virt):
+            for p in range(socc):
+                for a in range(socc):
+                    for i in range(socc):
+                        s2 = s2 + v_ref2[A,i,a]*v_ref3[A,i,p,p,a]
+                        for q in range(socc):
+                            if(p != q):
+                                s2 = s2 + 0.5*v_ref3[A,i,q,q,a]*v_ref3[A,i,p,p,a]
         return s2
 
     # RAS(h)-1SF
@@ -467,34 +419,37 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
                         v_ref5[A, i, j, b] = v_b5[index]
                         v_ref5[A, j, i, b] = -1.0*v_b5[index]
                         index = index + 1
-        # block 1
+        # block 1 (CAS-SF)
         for p in range(socc):
             for q in range(socc):
-                s2 = s2 + v_ref1[p,p]*v_ref1[q,q]
-        # block 2
-        s2 = s2 + np.einsum("Ia,Ia->", v_ref2, v_ref2)
+                if(p != q):
+                    s2 = s2 + v_ref1[p,p]*v_ref1[q,q]
+        # block 2 (h)
         for I in range(docc):
             for a in range(socc):
                 for p in range(socc):
-                    s2 = s2 - 2.0*v_ref2[I,a]*v_ref4[I,p,a,p]
-        # block 3
-        s2 = s2 + np.einsum("Ai,Ai->", v_ref3, v_ref3)
+                    s2 = s2 - v_ref2[I,a]*v_ref4[I,p,a,p]
+        # block 3 (p)
         for A in range(virt):
             for i in range(socc):
                 for p in range(socc):
-                    s2 = s2 + 2.0*v_ref3[A,i]*v_ref5[A,i,p,p]
-        # block 4
+                    s2 = s2 + v_ref3[A,i]*v_ref5[A,i,p,p]
+        # block 4 (h)
         for I in range(docc):
             for a in range(socc):
                 for p in range(socc):
+                    s2 = s2 - v_ref2[I,a]*v_ref4[I,p,a,p]
                     for q in range(socc):
-                        s2 = s2 + v_ref4[I,p,a,p]*v_ref4[I,q,a,q]
-        # block 5
+                        if(p != q):
+                            s2 = s2 + v_ref4[I,p,a,p]*v_ref4[I,q,a,q]
+        # block 5 (p)
         for A in range(virt):
             for i in range(socc):
                 for q in range(socc):
+                    s2 = s2 + v_ref3[A,i]*v_ref5[A,i,q,q]
                     for p in range(socc):
-                        s2 = s2 + v_ref5[A,i,q,q]*v_ref5[A,i,p,p]
+                        if(p != q):
+                            s2 = s2 + v_ref5[A,i,q,q]*v_ref5[A,i,p,p]
         return s2
 
     # RAS(p)-1SF
@@ -744,7 +699,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                 for A in range(ras1+ras2,ras1+ras2+ras3):
                     for a in range(ras1,ras1+ras2):
                         for b in range(ras1,a):
-                            dets_list.append([[[i,j],[]], [[],[A,a,b]]])
+                            dets_list.append([[[i,j],[]], [[A],[a,b]]])
 
     else:
         print("Sorry, %iSF with electron count change of %i and conf space %s not yet supported." %(n_SF, delta_ec, conf_space) )

@@ -57,9 +57,9 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     if(sf_opts['INTEGRAL_TYPE']=="FULL"):
         tei_int = TEIFull(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3, ref_method='PSI4')
     if(sf_opts['INTEGRAL_TYPE']=="DF"):
-        # if user hasn't defined which aux basis to use, default behavior is to use the one from opts
+        # if user hasn't defined which aux basis to use, default behavior is to use the one from Psi4 wfn
         if(sf_opts['AUX_BASIS_NAME'] == ""):
-            aux_basis_name = ref_opts['BASIS']
+            aux_basis_name = wfn.basisset().name()
         aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", "JKFIT", aux_basis_name)
         tei_int = TEIDF(wfn.Ca(), wfn.basisset(), aux_basis, ras1, ras2, ras3, conf_space, ref_method='PSI4')
     out = do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=conf_space, sf_opts=sf_opts)
