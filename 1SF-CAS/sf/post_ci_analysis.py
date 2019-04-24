@@ -323,14 +323,14 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
             for p in range(socc):
                 for q in range(socc):
                     if(p != q):
-                        s2 = s2 - v_ref2[A,p,p]*v_ref2[A,q,q]
+                        s2 = s2 + v_ref2[A,p,p]*v_ref2[A,q,q]
         # block 2
         for A in range(virt):
             for p in range(socc):
                 for a in range(socc):
                     for i in range(socc):
                         s2 = s2 + v_ref2[A,i,a]*v_ref3[A,i,p,p,a]
-        # block 2
+        # block 3
         for A in range(virt):
             for p in range(socc):
                 for a in range(socc):
@@ -338,7 +338,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
                         s2 = s2 + v_ref2[A,i,a]*v_ref3[A,i,p,p,a]
                         for q in range(socc):
                             if(p != q):
-                                s2 = s2 + 0.5*v_ref3[A,i,q,q,a]*v_ref3[A,i,p,p,a]
+                                s2 = s2 + v_ref3[A,i,q,q,a]*v_ref3[A,i,p,p,a]
         return s2
 
     # RAS(h)-1SF
@@ -641,7 +641,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
                 for j in range(ras1,i):
                     for a in range(ras1,ras1+ras2):
                         for b in range(ras1,a):
-                            dets_list.append([[[I,i,j],[]], [[],[a,b]]])
+                            dets_list.append([[[i,j],[I]], [[],[a,b]]])
 
     # CAS-EA
     elif(n_SF==0 and delta_ec==1 and conf_space==""):

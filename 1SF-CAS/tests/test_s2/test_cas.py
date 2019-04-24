@@ -19,7 +19,6 @@ N 0 0 2.5
 symmetry c1
 """)
 
-'''
 # Test: 1SF-CAS
 def test_cas_1sf():
     psi4.core.clean()
@@ -127,7 +126,6 @@ def test_h_1sfip():
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(1, -1, "h", vects[:, i], 4, 6, 18)
         assert abs(s2 - s_expected[i]) < threshold
-'''
 
 # Test: RAS(p)-1SF-EA
 def test_p_1sfea():
@@ -135,13 +133,12 @@ def test_p_1sfea():
     psi4.core.clean_options()
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
-    s_expected = [8.75, 3.75, 3.75, 3.75, 3.75, 3.75]
+    s_expected = [8.75, 3.75, 3.75, 3.75, 8.75, 8.75]
     e, vects = fock_ci( 1, 2, n2_7, conf_space="p", ref_opts=options, sf_opts={'return_vects': True, 'sf_diag_type': 'LANCZOS'} )
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(1, 1, "p", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
 
-'''
 # Test: RAS(h)-EA
 def test_h_ea():
     psi4.core.clean()
@@ -201,4 +198,4 @@ def test_cas_2sf():
     for i in range(len(s_expected)):
         s2 = post_ci_analysis.calc_s_squared(2, 0, "", vects[:, i], 4, 6, 18) 
         assert abs(s2 - s_expected[i]) < threshold
-'''
+
