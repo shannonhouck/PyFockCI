@@ -15,7 +15,7 @@ from scipy.sparse.linalg import spsolve
 #    maxIter         Maximum number of iterations
 # Returns:
 #    Eigenvalues/eigenvectors for the Hamiltonian.
-def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200, collapse_per_root=20 ):
+def davidson( A, vInit, e_conv=1e-10, r_conv=1e-6, vect_cutoff=1e-5, maxIter=200, collapse_per_root=20 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -33,7 +33,12 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200,
     collapseSize = k*collapse_per_root
 
     # index of last sigma added
-    lastSig = 0;
+    lastSig = 0
+
+    # keep track of converged roots
+    converged = k*[False]
+    final_vects = k*[None]
+    final_vals = k*[0.0]
 
     print("Starting Davidson...")
     while ( j<maxIter ):
@@ -74,19 +79,32 @@ def davidson( A, vInit, e_conv=1e-6, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200,
             print("\tROOT %2i: %16.8f\t%E\t%E" % (i, val, eVals[i]-lastVals[i], LIN.norm(r[:,i])))
 
         # check residuals for convergence
-        converged = True
+        all_converged = True
         for i in range(k):
             # check residual
             if( abs(LIN.norm(r[:,i]))>r_conv ):
-                converged = False
+                all_converged = False
             # check energy
             if( abs(eVals[i]-lastVals[i]) > e_conv):
-                converged = False
+                all_converged = False
+            '''
+            # if one of the roots has converged for the first time...
+            if( (abs(LIN.norm(r[:,i])) < r_conv) and (abs(eVals[i]-lastVals[i]) < e_conv)):
+                if(not converged[i]):
+                    converged[i] = True
+                    tmp = vSpace[:, -k:]
+                    print(tmp.shape)
+                    final_vects[i] = tmp[:, i]
+                    final_vals[i] = eVals[i]
+            '''
 
         # if converged, return appropriate values
-        if ( converged ):
+        if ( all_converged ):
             print("\nDavidson Converged! \n")
-            return (eVals, vSpace[:,-k:])
+            return (eVals, np.dot(vSpace, eVects))
+            #return (eVals, eVects)
+            #return (eVals, vSpace[-k:,:].T)
+            #return (final_vals, final_vects_out)
         # collapse subspace if necessary (if)
         elif( vSpace.shape[1] > collapseSize ):
             print("\tCollapsing Krylov subspace...")

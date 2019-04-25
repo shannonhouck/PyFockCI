@@ -52,7 +52,7 @@ Psi4NumPy Tutorials
 #    wfn             Psi4 reference wavefunction (Psi4 only, optional)
 def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}, program='PSI4'):
     # update options
-    tmp_opts = {'SF_DIAG_METHOD': 'LANCZOS',
+    tmp_opts = {'SF_DIAG_METHOD': 'DAVIDSON',
                 'NUM_ROOTS': 6,
                 'GUESS_TYPE': 'CAS',
                 'INTEGRAL_TYPE': 'FULL',

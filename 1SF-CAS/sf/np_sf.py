@@ -127,7 +127,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
         else:
             #vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
             vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
-    elif(sf_diag_method == "DAVIDSON"):
+    elif(opts['SF_DIAG_METHOD'] == "DAVIDSON"):
         # generate guess vector
         if(opts['GUESS_TYPE'] == "CAS"):
             if(conf_space==""):

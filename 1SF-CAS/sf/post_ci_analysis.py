@@ -1054,6 +1054,7 @@ def print_det_list(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
     print("\tDOCC: %i" %ras1)
     print("\tSOCC: %i" %ras2)
     print("\tVIRT: %i" %ras3)
+    # generate list of determinants (start ordering at 1)
     det_list = generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3)
     count = 0
     for i in range(len(det_list)):
@@ -1061,7 +1062,7 @@ def print_det_list(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
         # annihilated
         print("\tREMOVE:\tA: %9s" %(det_list[i][0][0]), end='')
         print("\tB: %9s" %(det_list[i][0][1]), end='')
-        print("\tADD:\tB: %9s" %(det_list[i][1][0]), end='')
+        print("\tADD:\tA: %9s" %(det_list[i][1][0]), end='')
         print("\tB: %9s" %(det_list[i][1][1]))
 
 
@@ -1087,7 +1088,7 @@ def print_dets(vect, n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3, dets_
     sort = abs(vect).argsort()[::-1]
 
     print("Coeff.\t\tImportant MO Occupations")
-    # obtain ordered determinant lists
+    # obtain ordered determinant lists, start order at 1
     dets = generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3)
 
     for s in sort[:dets_to_print]:
