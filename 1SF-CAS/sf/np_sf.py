@@ -18,44 +18,38 @@ from .post_ci_analysis import *
 from .solvers import *
 
 """
-RAS-SF-IP/EA PROGRAM
+NumPy RAS-SF-IP/EA
 
-Runs RAS-SF-IP/EA calculations. In Progress.
+Performs Fock-space CI using NumPy arrays as input for integrals.
 
-Refs:
-Crawford Tutorials (http://sirius.chem.vt.edu/wiki/doku.php?id=crawdad:programming:project12)
-DePrince Tutorials (https://www.chem.fsu.edu/~deprince/programming_projects/cis/)
-Sherrill Notes (http://vergil.chemistry.gatech.edu/notes/cis/cis.html)
-Psi4NumPy Tutorials
 """
 
-###############################################################################################
-# Functions
-###############################################################################################
-
-# Performs the 1SF-CAS calculation, given NumPy input arrays.
-# Parameters:
-#    delta_a         Desired number of alpha electrons to remove (int)
-#    delta_b         Desired number of beta electrons to add (int)
-#    ras1            RAS1 space (int)
-#    ras2            RAS2 space (int)
-#    ras3            RAS3 space (int)
-#    Fa              Alpha Fock matrix (NumPy array)
-#    Fb              Beta Fock matrix (NumPy array)
-#    tei_int         Two-electron integrals (NumPy array)
-#    e               ROHF energy (float)
-#    conf_space      Desired excitation scheme:
-#                        ""         CAS-nSF-IP/EA (default)
-#                        "h"        RAS(h)-nSF-IP/EA
-#                        "p"        RAS(p)-nSF-IP/EA
-#                        "h,p"      RAS(h,p)-nSF-IP/EA
-#    sf_opts         Additional options (dict)
-#                    See __init__ for more information.
-#
-# Returns:
-#    energy          List of requested roots for the system
-#    vects           Eigenvectors for the system (optional)
-def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space="", sf_opts={}, J_in=None, C_in=None):
+def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
+             conf_space="", sf_opts={}, J_in=None, C_in=None):
+    """Performs the 1SF-CAS calculation, given NumPy input arrays.
+       Input
+           delta_a -- Desired number of alpha electrons to remove (int)
+           delta_b -- Desired number of beta electrons to add (int)
+           ras1 -- RAS1 space (int)
+           ras2 -- RAS2 space (int)
+           ras3 -- RAS3 space (int)
+           Fa -- Alpha Fock matrix (NumPy array)
+           Fb -- Beta Fock matrix (NumPy array)
+           tei_int -- Two-electron integrals (NumPy array)
+           e -- ROHF energy (float)
+           conf_space -- Desired excitation scheme:
+                         "" CAS-nSF-IP/EA (default)
+                         "h" RAS(h)-nSF-IP/EA
+                         "p" RAS(p)-nSF-IP/EA
+                         "h,p" RAS(h,p)-nSF-IP/EA
+           sf_opts -- Additional options (dict)
+                      See __init__ for more information.
+           J_in -- J matrix (for DF calculations)
+           C_in -- MO coefficients matrix (for DF calculations)
+       Output
+           energy -- List of requested roots for the system
+           vects -- Eigenvectors for the system (optional)
+    """
     # update options
     opts =  {'SF_DIAG_METHOD': 'DAVIDSON',
              'NUM_ROOTS': 6,
@@ -64,6 +58,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
              'AUX_BASIS_TYPE': '',
              'RETURN_VECTS': False,
              'RETURN_WFN': False}
+    # capitalize as needed
     for key in sf_opts:
         if(isinstance(sf_opts[key], str)):
             opts.update({key.upper(): sf_opts[key].upper()})
@@ -74,61 +69,48 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
         if(opts['INTEGRAL_TYPE']=="FULL"):
             tei_int = TEIFull(0, 0, ras1, ras2, ras3, np_tei=tei_int)
         elif(opts['INTEGRAL_TYPE']=="DF"):
-            tei_int = TEIDF(C_in, 0, 0, ras1, ras2, ras3, conf_space, np_tei=tei_int, np_J=J_in)
+            tei_int = TEIDF(C_in, 0, 0, ras1, ras2, ras3, conf_space,
+                            np_tei=tei_int, np_J=J_in)
     # determine number of spin-flips and total change in electron count
     n_SF = min(delta_a, delta_b)
     delta_ec = delta_b - delta_a
     # generate list of determinants (for counting and other purposes)
-    print(opts)
-    print(conf_space)
     det_list = generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3)
-    n_dets = len(det_list)
-    # make sure n_dets is an int (for newer Python versions)
-    n_dets = int(n_dets)
-    # setup for method
-    print("Performing %iSF with electron count change of %i..." %(n_SF, delta_ec) )
-    print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(ras1, ras2, ras3) )
-    print("Number of determinants:", n_dets)
+    n_dets = int(len(det_list))
     # make sure we're only solving for an appropriate number of roots
-    # should make RSP later for small Hamiltonian sizes
+    # TODO: make RSP option for small Hamiltonian sizes
     num_roots = opts['NUM_ROOTS']
     if( num_roots >= n_dets ):
         num_roots = n_dets - 1
     num_roots = int(num_roots)
-    print("Number of roots:", num_roots)
-    a_occ = ras1 + ras2
-    b_occ = ras1
-    a_virt = ras3
-    b_virt = ras2 + ras3
-    # Generate appropriate guesses
-    guess_vect = None
-    A = LinOpH((n_dets,n_dets), e, ras1, ras2, ras3, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in=conf_space)
-    # run method
-    print("Running Fock-space CI...")
-    print("\tSpin-Flips: %3i\n\tElectron Count Change: %3i\n" %(n_SF, delta_ec))
+    # print info about calculation
+    print("Performing %iSF with electron count change of %i..."
+          %(n_SF, delta_ec) )
+    print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(ras1, ras2, ras3) )
+    print("Number of Roots:", num_roots)
+    print("Number of Determinants:", n_dets)
+    print("Configuration Space:", conf_space)
+    print("Additional Options:", opts)
+    print("\tSpin-Flips: %3i\n\tElectron Count Change: %3i\n"
+          %(n_SF, delta_ec))
     print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(ras1, ras2, ras3) )
     if(n_dets < 250):
         opts['SF_DIAG_METHOD'] = "LANCZOS"
-    print("\tDiagonalization: %s\n\tGuess: %s" %(opts['SF_DIAG_METHOD'], opts['GUESS_TYPE']))
+    print("\tDiagonalization: %s\n\tGuess: %s" %(opts['SF_DIAG_METHOD'],
+                                                 opts['GUESS_TYPE']))
+    # setup
+    A = LinOpH((n_dets,n_dets), e, ras1, ras2, ras3, Fa, Fb, tei_int, n_SF,
+               delta_ec, conf_space_in=conf_space)
+    # use built-in Lanczos method
+    # TODO: Support other guess options
     if(opts['SF_DIAG_METHOD'] == "LANCZOS"):
-        # generate guess vector
-        #if(guess_type == "CAS"):
-        #    if(conf_space==""):
-        #        guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
-        #        print(guess_vect.shape)
-        #    else:
-        #        cas_A = linop.LinOpH((ras2*ras2,ras2*ras2), e, a_occ, b_occ, a_virt, b_virt, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
-        #        cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=1)
-        #        v3_guess_padding = np.zeros((n_dets-(ras2*ras2), 1)) 
-        #        guess_vect = np.vstack((cas_vects, v3_guess_padding)).T
         # do LANCZOS
-        if(conf_space==""):
-            vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
-        else:
-            #vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA', v0=guess_vect)
-            vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
+        vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
+    # use Davidson method
     elif(opts['SF_DIAG_METHOD'] == "DAVIDSON"):
         # generate guess vector
+        guess_vect = None
+        # CAS guess
         if(opts['GUESS_TYPE'] == "CAS"):
             if(conf_space==""):
                 guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
@@ -143,30 +125,41 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e, conf_space=
                 elif(n_SF==0 and (delta_ec==-1 or delta_ec==1)):
                     n_cas_dets = int(ras2)
                 # TODO: Modify CAS root number if needed
-                cas_A = LinOpH((n_cas_dets,n_cas_dets), e, ras1, ras2, ras3, Fa, Fb, tei_int, n_SF, delta_ec, conf_space_in="")
-                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA', k=num_roots)
+                cas_A = LinOpH((n_cas_dets,n_cas_dets), e, ras1, ras2, ras3,
+                                Fa, Fb, tei_int, n_SF, delta_ec,
+                                conf_space_in="")
+                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA',
+                                                  k=num_roots)
                 v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
                 guess_vect = np.vstack((cas_vects, v3_guess))
+        # random guess vector
         elif(opts['GUESS_TYPE'] == "RANDOM"):
             guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
+        # otherwise, just use identity
         else:
             guess_vect = np.zeros((n_dets, num_roots))
             for i in range(num_roots):
                 guess_vect[i,i] = 1.0 
+        # do Davidson
         vals, vects = davidson(A, guess_vect)
     else:
-        print("Diag method not yet supported. Please enter DAVIDSON or LANCZOS.")
+        print("Diag method not yet supported. \
+               Please enter DAVIDSON or LANCZOS.")
         exit()
+    # printing energy and S**2 results
     print("\nROOT No.\tEnergy\t\tS**2")
     print("------------------------------------------------")
     for i, corr in enumerate(vals):
-        s2 = calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i], ras1, ras2, ras3)
+        s2 = calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i],
+                            ras1, ras2, ras3)
         print("   %i\t\t%6.6f\t%8.6f" % (i, corr, s2))
     print("------------------------------------------------\n")
+    # print info about determinants and coefficients
     print("Most Important Determinants Data:")
     for i, corr in enumerate(vals):
         print("\nROOT %i: %12.12f" %(i, corr))
-        s2 = print_dets(vects[:,i], n_SF, delta_ec, conf_space, n_dets, ras1, ras2, ras3)
+        s2 = print_dets(vects[:,i], n_SF, delta_ec, conf_space, ras1,
+                        ras2, ras3)
     print("\n\n\t  Fock Space CI Complete! \n")
     # Return appropriate things
     if(opts['RETURN_VECTS']):

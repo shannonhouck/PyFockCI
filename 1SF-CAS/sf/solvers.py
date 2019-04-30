@@ -5,17 +5,19 @@ from scipy.sparse import diags
 from scipy.sparse.linalg import inv as sparse_inv
 from scipy.sparse.linalg import spsolve
 
-# Solves for the eigenvalues and eigenvectors of a Hamiltonian.
-# Parameters:
-#    A               Hamiltonian (LinOp object)
-#    vInit           Initial guess vector (numpy)
-#    e_conv          Cutoff for energy convergence (default: 1e-6)
-#    r_conv          Cutoff for residual squared convergence (default: 1e-4)
-#    vect_cutoff     Cutoff for adding vectors to Krylov space (default: 1e-8)
-#    maxIter         Maximum number of iterations
-# Returns:
-#    Eigenvalues/eigenvectors for the Hamiltonian.
-def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200, collapse_per_root=20 ):
+def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5,
+              maxIter=200, collapse_per_root=20 ):
+    """Solves for the eigenvalues and eigenvectors of a Hamiltonian.
+       Input
+           A -- Hamiltonian (LinOp object)
+           vInit -- Initial guess vector (numpy)
+           e_conv -- Cutoff for energy convergence
+           r_conv -- Cutoff for residual squared convergence
+           vect_cutoff -- Cutoff for adding vectors to Krylov space
+           maxIter -- Maximum number of iterations
+       Returns
+           Eigenvalues/eigenvectors for the Hamiltonian.
+    """
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
@@ -67,7 +69,8 @@ def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200
         r = None;
         # compute residuals
         for i in range(k):
-            rNew = np.dot(sig, eVects[:,i]) - eVals[i]*np.dot(vSpace, eVects[:,i]);
+            rNew = (np.dot(sig, eVects[:,i]) 
+                   - eVals[i]*np.dot(vSpace, eVects[:,i]))
             if(type(r)==type(None)):
                 r = rNew
             else:
@@ -76,7 +79,8 @@ def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200
         # print info about this iteration
         print("\nIteration: %4i" % j)
         for i, val in enumerate(eVals):
-            print("\tROOT %2i: %16.8f\t%E\t%E" % (i, val, eVals[i]-lastVals[i], LIN.norm(r[:,i])))
+            print("\tROOT %2i: %16.8f\t%E\t%E" 
+                  % (i, val, eVals[i]-lastVals[i], LIN.norm(r[:,i])))
 
         # check residuals for convergence
         all_converged = True
@@ -113,7 +117,8 @@ def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200
             for l in range(k):
                 newVect = np.zeros((A.shape[0],1))
                 for i in range(vSpace.shape[1]):
-                    newVect = newVect + np.dot(eVects[i,l], vSpace[:,i]).reshape((A.shape[0],1))
+                    newVect = newVect + np.dot(eVects[i,l],
+                              vSpace[:,i]).reshape((A.shape[0],1))
                 # orthonormalize
                 newVect = newVect/LIN.norm(newVect)
                 if(vSpaceNew is None):
@@ -138,7 +143,8 @@ def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200
                     lastSig = lastSig + 1
         # error check for user adding too many guess vects
         if ( vSpace.shape[1] > A.shape[1] ):
-            print("...\nError: Make sure your inputs for Davidson are reasonable!\n\n");
+            print("...\nError: Make sure your inputs for Davidson are \
+                   reasonable!\n\n");
             exit()
         # save the eigenvalues
         lastVals = eVals

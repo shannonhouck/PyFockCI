@@ -9,21 +9,37 @@ Refs:
 Psi4NumPy Tutorials
 """
 
-# Class for two-electron integral object handling. Uses Psi4.
 class TEI:
+    """Class for two-electron integral object handling. Uses Psi4.
+    """
     def __init__(self):
+        """Initialize TEI object.
+        """
         pass
 
-    ''' 
-    Returns a given subblock of the ERI matrix.
-    '''
     def get_subblock(self, a, b, c, d): 
+        """Returns a given subblock of the ERI matrix.
+        """
         pass
 
 # Class for full TEI integrals.
 #   np_tei         Allows for importing a previously-computed TEI integral (in NumPy martrix form)
 class TEIFull(TEI):
-    def __init__(self, C, basis, ras1, ras2, ras3, ref_method='PSI4', np_tei=None):
+    def __init__(self, C, basis, ras1, ras2, ras3, ref_method='PSI4',
+                 np_tei=None):
+        """Initialize TEI object.
+           Input
+               C -- MO coefficient matrix (NumPy array)
+               basis -- Basis set object (Psi4 BasisSet)
+               ras1 -- RAS1 orbitals (int)
+               ras2 -- RAS2 orbitals (int)
+               ras3 -- RAS3 orbitals (int)
+               ref_method -- Program to use to generate TEIs
+               np_tei -- NumPy array for previously-constructed integrals.
+                         This allows us to avoid integral construction.
+           Return
+               Initialized TEI object
+        """
         if(not type(np_tei)==type(None)):
             print("Reading in two-electron integrals...")
             self.eri = np_tei
@@ -43,19 +59,52 @@ class TEIFull(TEI):
                 print("ERROR: Method not yet supported. Exiting...")
                 exit()
         # ind stores the indexing of ras1/ras2/ras3 for get_subblock method
-        self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[ras1+ras2,ras1+ras2+ras3]]
+        self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],
+                    [ras1+ras2,ras1+ras2+ras3]]
 
     def get_subblock(self, a, b, c, d):
-        return self.eri[self.ind[a][0]:self.ind[a][1], self.ind[b][0]:self.ind[b][1], self.ind[c][0]:self.ind[c][1], self.ind[d][0]:self.ind[d][1]]
+        """Returns a given subblock of the two-electron integrals.
+           The RAS space to return is given by a, b, c, and d, and 
+           the returned integral has the form <ab|cd>.
+           So to get the block with a and c in RAS1 and b and d in RAS2,
+           one would use get_subblock(1, 2, 1, 2).
+           Input
+               a -- RAS space of index 1
+               b -- RAS space of index 2
+               c -- RAS space of index 3
+               d -- RAS space of index 4
+           Returns
+               Desired subblock (NumPy array)
+        """
+        return self.eri[self.ind[a][0]:self.ind[a][1],
+                        self.ind[b][0]:self.ind[b][1],
+                        self.ind[c][0]:self.ind[c][1],
+                        self.ind[d][0]:self.ind[d][1]]
 
     def get_full(self):
+        """Returns the full set of two-electron integrals as a NumPy array.
+        """
         return self.eri
 
 # Class for full TEI integrals.
 class TEIDF(TEI):
     # Used Psi4NumPy for reference for this section
-    # ras1, ras2, ras3 indicate the number of orbitals in each section
-    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space, ref_method='PSI4', np_tei=None, np_J=None):
+    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space,
+                 ref_method='PSI4', np_tei=None, np_J=None):
+        """Initialize density-fitted TEI object.
+           Input
+               C -- MO coefficient matrix (NumPy array)
+               basis -- Basis set object (Psi4 BasisSet)
+               ras1 -- RAS1 orbitals (int)
+               ras2 -- RAS2 orbitals (int)
+               ras3 -- RAS3 orbitals (int)
+               ref_method -- Program to use to generate TEIs
+               np_tei -- NumPy array for previously-constructed integrals.
+                         This allows us to avoid integral construction.
+               J_tei -- Previously-constructed J matrix (NumPy)
+           Return
+               Initialized TEI object
+        """
         if(not type(np_tei)==type(None)):
             eri = np_tei
             J = np_J
@@ -65,7 +114,8 @@ class TEIDF(TEI):
                 zero = psi4.core.BasisSet.zero_ao_basis_set()
                 mints = psi4.core.MintsHelper(basis)
                 # (Q|pq)
-                eri = psi4.core.Matrix.to_array(mints.ao_eri(zero, aux, basis, basis))
+                eri = psi4.core.Matrix.to_array(
+                      mints.ao_eri(zero, aux, basis, basis))
                 eri = np.squeeze(eri)
                 C = psi4.core.Matrix.to_array(C)
                 # set up J^-1/2 (don't need to keep)
@@ -110,9 +160,20 @@ class TEIDF(TEI):
             self.B31 = np.einsum('PAq,qJ->PAJ', B3m, C_ras1)
             self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
 
-    # a, b, c, d defined as RAS(1/2/3) spaces, integers
     def get_subblock(self, a, b, c, d):
-        # the B matrices are still in chemists' notation, don't switch b/c until end
+        """Returns a given subblock of the two-electron integrals (DF).
+           The RAS space to return is given by a, b, c, and d, and 
+           the returned integral has the form <ab|cd>.
+           Input
+               a -- RAS space of index 1
+               b -- RAS space of index 2
+               c -- RAS space of index 3
+               d -- RAS space of index 4
+           Returns
+               Desired subblock (NumPy array)
+        """
+        # the B matrices are still in chemists' notation
+        # don't switch b and c index until end
         if(a == 1):
             if(c == 1):
                 B_bra = self.B11
@@ -158,41 +219,4 @@ class TEIDF(TEI):
                 B_ket = self.B33
 
         return np.einsum("Pij,Pkl->ijkl", B_bra, B_ket).transpose(0, 2, 1, 3)
-
-# Class for full TEI integrals.
-class TEISpin(TEI):
-    def __init__(self, ras1, ras2, ras3):
-        self.nbf = ras1 + ras2 + ras3
-        nbf = ras1 + ras2 + ras3
-        self.eri = np.zeros((2*nbf, 2*nbf, 2*nbf, 2*nbf))
-        for i in range(nbf):
-            for j in range(nbf):
-                #self.eri[i+nbf, j, i, j+nbf] = 0
-                self.eri[i+nbf, j, i, j+nbf] = -1.0
-                self.eri[i+nbf, j, j+nbf, i] = -1.0
-                self.eri[i, j+nbf, j+nbf, i] = -1.0
-                self.eri[i, j+nbf, i, j+nbf] = -1.0
-                #self.eri[i, j+nbf, i+nbf, j] = -1.0
-                #self.eri[i+nbf, j, j+nbf, i] = -1.0
-                #self.eri[i, j+nbf, j, i+nbf] = -1.0
-                #self.eri[i+nbf, j, i+nbf, j] = 1.0
-                #self.eri[i, j+nbf, i, j+nbf] = 1.0
-        self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[ras1+ras2,ras1+ras2+ras3]]
-
-    # s1, s2, s3, s4    Alpha or beta spin (0=alpha, 1=beta)
-    def get_subblock(self, a, b, c, d, s1, s2, s3, s4): 
-        nbf = self.nbf
-        return self.eri[(s1*nbf)+self.ind[a][0]:(s1*nbf)+self.ind[a][1], (s2*nbf)+self.ind[b][0]:(s2*nbf)+self.ind[b][1],
-                        (s3*nbf)+self.ind[c][0]:(s3*nbf)+self.ind[c][1], (s4*nbf)+self.ind[d][0]:(s4*nbf)+self.ind[d][1]]
-
-    def full(self):
-        return self.eri
-
-    def get_alpha(self):
-        nbf = self.nbf
-        return self.eri[:nbf, :nbf, :nbf, :nbf]
-
-    def get_beta(self):
-        nbf = self.nbf
-        return self.eri[nbf:, nbf:, nbf:, nbf:]
 
