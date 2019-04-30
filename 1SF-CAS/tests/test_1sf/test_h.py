@@ -65,6 +65,6 @@ def test_3():
     time.sleep(0.1)
     options = {"basis": "cc-pvdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'diag_method': 'rsp'}
     expected = sf_cas_ref( 0, 1, o2, conf_space="h", add_opts=options )
-    e = fock_ci( 1, 1, o2, conf_space="h", ref_opts=options, sf_opts={'NUM_ROOTS': 2} )
+    e = fock_ci( 1, 1, o2, conf_space="h", ref_opts=options, sf_opts={'NUM_ROOTS': 2, 'SF_DIAG_METHOD': 'LANCZOS'} )
     assert abs(e[0] - expected) < threshold
 

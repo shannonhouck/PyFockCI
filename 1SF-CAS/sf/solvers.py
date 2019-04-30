@@ -15,7 +15,7 @@ from scipy.sparse.linalg import spsolve
 #    maxIter         Maximum number of iterations
 # Returns:
 #    Eigenvalues/eigenvectors for the Hamiltonian.
-def davidson( A, vInit, e_conv=1e-10, r_conv=1e-6, vect_cutoff=1e-5, maxIter=200, collapse_per_root=20 ):
+def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5, maxIter=200, collapse_per_root=20 ):
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
     vSpace = vInit
