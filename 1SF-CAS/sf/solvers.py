@@ -47,20 +47,23 @@ def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5,
         # first iteration
         if(type(sig)==type(None)):
             # form k sigma vectors
+            sig = A.matmat(vSpace)
+            """
             for i in range(0, vSpace.shape[1]):
                 if(type(sig)==type(None)):
                     sig = A.matvec(vSpace[:,i])
                     sig = sig.reshape((vSpace.shape[0],1))
                 else:
                     sig = np.column_stack((sig, A.matvec(vSpace[:,i])))
+            """
 
         # form k sigma vectors
         else:
-            for i in range(sig.shape[1], vSpace.shape[1]):
-                sig = np.column_stack((sig, A.matvec(vSpace[:,i])))
+            sig = np.column_stack((sig, A.matmat(vSpace[:, sig.shape[1]:])))
   
         # form subspace matrix
         Av = np.dot(vSpace.T, sig)
+        print(Av.shape)
         # solve for k lowest eigenvalues/vectors
         eVals, eVects = LIN.eigh(Av)
         eVals = eVals[:k]

@@ -5,6 +5,7 @@ import math
 # importing numpy
 import numpy as np
 from numpy import linalg as LIN
+from scipy import linalg as SCILIN
 from scipy.sparse import linalg as SPLIN
 
 # importing Psi4
@@ -81,7 +82,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     # TODO: make RSP option for small Hamiltonian sizes
     num_roots = opts['NUM_ROOTS']
     if( num_roots >= n_dets ):
-        num_roots = n_dets - 1
+        num_roots = n_dets
     num_roots = int(num_roots)
     # print info about calculation
     print("Performing %iSF with electron count change of %i..."
@@ -105,7 +106,11 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     # TODO: Support other guess options
     if(opts['SF_DIAG_METHOD'] == "LANCZOS"):
         # do LANCZOS
-        vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
+        if(num_roots == n_dets):
+            H_full = A.matmat(np.eye(n_dets))
+            vals, vects = SCILIN.eigh(H_full)
+        else:
+            vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
     # use Davidson method
     elif(opts['SF_DIAG_METHOD'] == "DAVIDSON"):
         # generate guess vector
@@ -124,14 +129,28 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
                 # CAS-IP/EA
                 elif(n_SF==0 and (delta_ec==-1 or delta_ec==1)):
                     n_cas_dets = int(ras2)
-                # TODO: Modify CAS root number if needed
+                # Modify CAS root number if needed
                 cas_A = LinOpH((n_cas_dets,n_cas_dets), e, ras1, ras2, ras3,
                                 Fa, Fb, tei_int, n_SF, delta_ec,
                                 conf_space_in="")
-                cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA',
+                if(num_roots > n_cas_dets):
+                    print("Number of roots requested is greater than number \
+                           of CAS determinants. Using RANDOM guess instead.")
+                    guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
+                elif(num_roots == n_cas_dets):
+                    print(num_roots)
+                    print(n_cas_dets)
+                    H_full = cas_A.matmat(np.eye(n_cas_dets))
+                    cas_vals, cas_vects = SCILIN.eigh(H_full)
+                    v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
+                    print(cas_vects.shape)
+                    print(v3_guess.shape)
+                    guess_vect = np.vstack((cas_vects, v3_guess))
+                else:
+                    cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA',
                                                   k=num_roots)
-                v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
-                guess_vect = np.vstack((cas_vects, v3_guess))
+                    v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
+                    guess_vect = np.vstack((cas_vects, v3_guess))
         # random guess vector
         elif(opts['GUESS_TYPE'] == "RANDOM"):
             guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))

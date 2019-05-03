@@ -10,7 +10,7 @@ from sf import post_ci_analysis
 import time
 
 # threshold for value equality
-threshold = 1e-7
+threshold = 1e-6
 # setting up molecule
 n2_7 = psi4.core.Molecule.create_molecule_from_string("""
 0 7
