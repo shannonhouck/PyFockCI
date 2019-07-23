@@ -32,6 +32,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         na = na - 1
     det_list = generate_dets(n_SF, delta_ec, conf_space, docc, socc, virt)
     # construct Sz*Sz
+    sz_final = 0
     for i, v in enumerate(vect):
         # grab determinants
         det = det_list[i]
@@ -80,7 +81,10 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
                 else:
                     if(abs(sz_vect[i]) == 0.5):
                         tmp = tmp + 0.75
+        sz_final = sz_final + v*v*np.sum(sz_vect)
         s2 = s2 + v*v*tmp
+
+    print(sz_final)
 
     '''
     OLD CODE (maybe useful for future??)
