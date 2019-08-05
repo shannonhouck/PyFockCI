@@ -1,11 +1,12 @@
 from __future__ import print_function
 import numpy as np
+import math
 from scipy import linalg as LIN
 from scipy.sparse import diags
 from scipy.sparse.linalg import inv as sparse_inv
 from scipy.sparse.linalg import spsolve
 
-def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5,
+def davidson( A, vInit, e_conv=1e-8, r_conv=1e-4, vect_cutoff=1e-5,
               maxIter=200, collapse_per_root=20 ):
     """Solves for the eigenvalues and eigenvectors of a Hamiltonian.
        Input
@@ -136,12 +137,12 @@ def davidson( A, vInit, e_conv=1e-10, r_conv=1e-4, vect_cutoff=1e-5,
             for i in range(k) :
                 # apply preconditioner
                 sNew = (1.0/(D-eVals[i]))*r[:,i]
-                if ( LIN.norm(sNew) > vect_cutoff ):
+                if ( math.sqrt(np.dot(sNew.T, sNew)) > vect_cutoff ):
                     # orthogonalize
                     h = np.dot(vSpace.T, sNew);
                     sNew = sNew - np.dot(vSpace,h);
                     # normalize
-                    sNew = (1.0/LIN.norm(sNew))*sNew
+                    sNew = (1.0/math.sqrt(np.dot(sNew.T, sNew)))*sNew
                     vSpace = np.column_stack((vSpace, sNew))
                     lastSig = lastSig + 1
         # error check for user adding too many guess vects

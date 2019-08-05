@@ -138,13 +138,10 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
                            of CAS determinants. Using RANDOM guess instead.")
                     guess_vect = LIN.orth(np.random.rand(n_dets, num_roots))
                 elif(num_roots == n_cas_dets):
-                    print(num_roots)
-                    print(n_cas_dets)
                     H_full = cas_A.matmat(np.eye(n_cas_dets))
                     cas_vals, cas_vects = SCILIN.eigh(H_full)
                     v3_guess = np.zeros((n_dets-(n_cas_dets), num_roots)) 
-                    print(cas_vects.shape)
-                    print(v3_guess.shape)
+                    print(cas_vals)
                     guess_vect = np.vstack((cas_vects, v3_guess))
                 else:
                     cas_vals, cas_vects = SPLIN.eigsh(cas_A, which='SA',
@@ -171,7 +168,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     for i, corr in enumerate(vals):
         s2 = calc_s_squared(n_SF, delta_ec, conf_space, vects[:, i],
                             ras1, ras2, ras3)
-        print("   %i\t\t%6.6f\t%8.6f" % (i, corr, s2))
+        print("   %i\t\t%12.12f\t%8.6f" % (i, corr, s2))
     print("------------------------------------------------\n")
     # print info about determinants and coefficients
     print("Most Important Determinants Data:")
