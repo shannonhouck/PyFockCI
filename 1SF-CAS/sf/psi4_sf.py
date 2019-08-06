@@ -62,11 +62,7 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
                         ras3, conf_space, ref_method='PSI4')
     out = do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
                    conf_space=conf_space, sf_opts=sf_opts)
-    # return appropriate values
-    if(isinstance(out, tuple)):
-        if(sf_opts['RETURN_WFN']):
-            out = out + (wfn,)
-    elif(sf_opts['RETURN_WFN']):
-        out = (out,) + (wfn,)
+    # write Psi4 wavefunction to output object
+    out.wfn = wfn
     return out
 

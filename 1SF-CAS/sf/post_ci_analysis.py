@@ -7,23 +7,8 @@ These are functions to handle post-CI analysis, primarily the S**2 values
 and information about the determinants.
 """
 
-def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
-    """Calculates S**2 for a given CI vector.
-       Input
-           n_SF -- Number of spin-flips
-           delta_ec -- Change in electron count
-           conf_space -- Excitation scheme (Options: "", "h", "p", "h,p")
-           vect -- Eigenvector (CI coefficients)
-           docc -- Number of doubly occupied orbitals
-           socc -- Number of singly occupied orbitals
-           virt -- Number of doubly unoccupied orbitals
-       Returns
-           s2 -- The S**2 expectation value for the state
-    """
-    s2 = 0.0
+def calc_sz(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
     # obtain Sz and Sz (same general formula regardless of method)
-    #na = socc - n_SF
-    #nb = n_SF
     na = docc + socc - n_SF
     nb = docc + n_SF
     if(delta_ec==1): # IP
@@ -72,6 +57,71 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
             if o in add_b:
                 if o not in add_a:
                     sz_vect[o] = -0.5
+        sz_final = sz_final + v*v*np.sum(sz_vect)
+    return sz_final
+
+def calc_s2(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
+    """Calculates S**2 for a given CI vector.
+       Input
+           n_SF -- Number of spin-flips
+           delta_ec -- Change in electron count
+           conf_space -- Excitation scheme (Options: "", "h", "p", "h,p")
+           vect -- Eigenvector (CI coefficients)
+           docc -- Number of doubly occupied orbitals
+           socc -- Number of singly occupied orbitals
+           virt -- Number of doubly unoccupied orbitals
+       Returns
+           s2 -- The S**2 expectation value for the state
+    """
+    s2 = 0.0
+    # obtain Sz and Sz (same general formula regardless of method)
+    na = docc + socc - n_SF
+    nb = docc + n_SF
+    if(delta_ec==1): # IP
+        nb = nb + 1
+    if(delta_ec==-1): # EA
+        na = na - 1
+    det_list = generate_dets(n_SF, delta_ec, conf_space, docc, socc, virt)
+    # construct Sz*Sz
+    for i, v in enumerate(vect):
+        # grab determinants
+        det = det_list[i]
+        rem_a = det[0][0]
+        rem_b = det[0][1]
+        add_a = det[1][0]
+        add_b = det[1][1]
+        # construct Sz for each orbital
+        sz_vect = np.zeros(docc+socc+virt)
+        # RAS 1 orbitals
+        for o in range(docc):
+            if o in rem_a:
+                if o not in rem_b:
+                    sz_vect[o] = -0.5
+            if o in rem_b:
+                if o not in rem_a:
+                    sz_vect[o] = 0.5
+        # RAS 2
+        for o in range(docc, docc+socc):
+            sz_vect[o] = 0.5
+            if o in rem_a:
+                if o not in add_b:
+                    sz_vect[o] = 0.0
+            if o in add_a:
+                if o not in add_b:
+                    sz_vect[o] = 0.5
+            if o in add_b:
+                if o not in rem_a:
+                    sz_vect[o] = 0.0
+                if o in rem_a:
+                    sz_vect[o] = -0.5
+        # RAS 3
+        for o in range(docc+socc, docc+socc+virt):
+            if o in add_a:
+                if o not in add_b:
+                    sz_vect[o] = 0.5
+            if o in add_b:
+                if o not in add_a:
+                    sz_vect[o] = -0.5
         # now evaluate Sz*Sz (over all orbitals i and j)
         tmp = 0.0
         for i in range(docc+socc+virt):
@@ -81,10 +131,7 @@ def calc_s_squared(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
                 else:
                     if(abs(sz_vect[i]) == 0.5):
                         tmp = tmp + 0.75
-        sz_final = sz_final + v*v*np.sum(sz_vect)
         s2 = s2 + v*v*tmp
-
-    print(sz_final)
 
     '''
     OLD CODE (maybe useful for future??)
