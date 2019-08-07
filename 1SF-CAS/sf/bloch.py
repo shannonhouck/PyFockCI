@@ -21,20 +21,7 @@ def lowdin_orth_2(A):
     #print(sal)
     return A @ X
 
-"""
-def lowdin_orth(A):
-    ATA = np.dot(A.T, A)
-    m = LIN.fractional_matrix_power(ATA, -0.5)
-    print("A")
-    print(A)
-    print("ATA")
-    print(ATA)
-    print("m")
-    print(m)
-    return A @ m
-"""
-
-def do_bloch(wfn, s2, molden_file='orbs.molden'):
+def do_bloch(wfn, molden_file='orbs.molden'):
 
     np.set_printoptions(suppress=True)
 
@@ -65,17 +52,6 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
     v_b1 = np.einsum("ba,ibn->ian", U, v_b1)
     wfn.local_vecs = np.reshape(v_b1, (ras2*ras2, n_roots))
 
-    # Remove any roots that have the wrong S**2 value
-    """
-    deleted = 0
-    for i in range(n_roots):
-        # if not the right S**2, delete
-        if(abs(wfn.s2[i] - s2) > 1e-5):
-            v_b1 = np.delete(v_b1, i-deleted, axis=2)
-            e = np.delete(e, i-deleted, axis=0)
-            deleted = deleted + 1
-    """
-
     # write localized orbitals to molden
     psi4_wfn.Ca().copy(loc.L)
     psi4_wfn.Cb().copy(loc.L)
@@ -95,17 +71,6 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
         else:
             v_n = np.vstack((v_n, v_new))
     v_n = v_n.T # make sure columns are states rather than rows
-
-    # remove any non-neutral determinants
-    """
-    deleted = 0
-    for i in range(v_n.shape[1]):
-        # if not primarily neutral, delete
-        if(sum(abs(v_n[:, i])) < 0.25):
-            print("DELETE")
-            v_n = np.delete(v_n, i-deleted, axis=1)
-            deleted = deleted + 1
-    """
 
     #print("VECS")
     #print(v_b1)
