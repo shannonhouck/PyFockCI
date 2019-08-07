@@ -6,11 +6,10 @@ import scipy.linalg as LIN
 def lowdin_orth(A):
     print("RANK: ", np.linalg.matrix_rank(A))
     U, S, V = LIN.svd(A)
-    return np.dot(U, V)
+    return U @ V
 
-"""
 def lowdin_orth_2(A):
-    sal, svec = np.linalg.eigh(np.dot(A, A.T))
+    sal, svec = np.linalg.eigh(np.dot(A.T, A))
     #print(sal)                                        
     idx = sal.argsort()[::-1]                         
     sal = sal[idx]                                    
@@ -20,8 +19,9 @@ def lowdin_orth_2(A):
     X = svec.dot(sal.dot(svec.T))   
     #print(X)
     #print(sal)
-    return X
+    return A @ X
 
+"""
 def lowdin_orth(A):
     ATA = np.dot(A.T, A)
     m = LIN.fractional_matrix_power(ATA, -0.5)
@@ -115,7 +115,7 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
     #v_orth_2 = LIN.orth(v_n)
     #print(v_orth_2)
     print(v_n.shape)
-    v_orth = lowdin_orth(v_n)
+    v_orth = lowdin_orth_2(v_n)
     #v_orth = lowdin_orth(v_n)
 
     # 5.
