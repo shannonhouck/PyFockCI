@@ -16,7 +16,6 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
     n_roots = v_b1.shape[1]
     v_b1 = np.reshape(v_b1, (ras2,ras2,n_roots)) # v[i,a]
 
-
     # Remove any roots that have the wrong S**2 value
     for i in range(n_roots):
         # if not the right S**2, delete
