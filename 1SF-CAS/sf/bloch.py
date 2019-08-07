@@ -3,7 +3,39 @@ import numpy as np
 import psi4
 import scipy.linalg as LIN
 
+def lowdin_orth_2(A):
+    U, S, V = LIN.svd(A)
+    return U
+
+def lowdin_orth(A):
+    sal, svec = np.linalg.eigh(np.dot(A, A.T))
+    #print(sal)                                        
+    idx = sal.argsort()[::-1]                         
+    sal = sal[idx]                                    
+    svec = svec[:, idx]                               
+    sal = sal**-0.5                                   
+    sal = np.diagflat(sal)                            
+    X = svec.dot(sal.dot(svec.T))   
+    #print(X)
+    #print(sal)
+    return X
+
+"""
+def lowdin_orth(A):
+    ATA = np.dot(A.T, A)
+    m = LIN.fractional_matrix_power(ATA, -0.5)
+    print("A")
+    print(A)
+    print("ATA")
+    print(ATA)
+    print("m")
+    print(m)
+    return A @ m
+"""
+
 def do_bloch(wfn, s2, molden_file='orbs.molden'):
+
+    np.set_printoptions(suppress=True)
 
     print("Doing Bloch Hamiltonian analysis...")
 
@@ -16,13 +48,6 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
     n_roots = v_b1.shape[1]
     v_b1 = np.reshape(v_b1, (ras2,ras2,n_roots)) # v[i,a]
 
-    # Remove any roots that have the wrong S**2 value
-    for i in range(n_roots):
-        # if not the right S**2, delete
-        if(wfn.s2[i] - s2 > 1e-5):
-            v_b1 = np.delete(v_b1, i, axis=2)
-            e = np.delete(e, i, axis=0)
-
     # Obtain info for orbital localization and localize v
 
     # C is given in the form C_ui where i=MO and u=AO basis
@@ -33,9 +58,18 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
     loc.localize()
     # U seems to be given in the form U_iu where i=MO and u=AO basis
     U = psi4.core.Matrix.to_array(loc.U, copy=True)
+    print(v_b1)
     # localize
     v_b1 = np.einsum("ji,jbn->ibn", U, v_b1)
     v_b1 = np.einsum("ba,ibn->ian", U, v_b1)
+    wfn.local_vecs = np.reshape(v_b1, (ras2*ras2, n_roots))
+
+    # Remove any roots that have the wrong S**2 value
+    for i in range(n_roots):
+        # if not the right S**2, delete
+        if(abs(wfn.s2[i] - s2) > 1e-5):
+            v_b1 = np.delete(v_b1, i, axis=2)
+            e = np.delete(e, i, axis=0)
 
     # write localized orbitals to molden
     psi4_wfn.Ca().copy(loc.L)
@@ -56,16 +90,22 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
         else:
             v_n = np.vstack((v_n, v_new))
     v_n = v_n.T # make sure columns are states rather than rows
+    #print("VECS")
+    #print(v_b1)
+    #print(v_n)
 
     # orthonormalize (SVD)
-    v_orth = LIN.orth(v_n)
+    #v_orth_2 = LIN.orth(v_n)
+    #print(v_orth_2)
+    v_orth = lowdin_orth_2(v_n)
+    #v_orth = lowdin_orth(v_n)
 
     # 5.
     # Build Bloch Hamiltonian
     #H = np.dot(S, v_orth)
     H = v_orth
     H = np.dot(H, np.diag(e))
-    H = np.dot(H, LIN.inv(v_orth)) # invert v_orth
+    H = np.dot(H, v_orth.T) # invert v_orth
     print("Bloch Effective Hamiltonian:")
     print(H)
 

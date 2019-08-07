@@ -26,9 +26,11 @@ Performs Fock-space CI using NumPy arrays as input for integrals.
 """
 
 class wfn_sf:
-    def __init__(self, n_SF, ras1, ras2, ras3, n_roots, n_dets):
+    def __init__(self, n_SF, delta_ec, conf_space, ras1, ras2, ras3, n_roots, n_dets):
         # active space info
         self.n_SF = n_SF
+        self.delta_ec = delta_ec
+        self.conf_space = conf_space
         self.ras1 = ras1
         self.ras2 = ras2
         self.ras3 = ras3
@@ -37,6 +39,7 @@ class wfn_sf:
         # eigs info
         self.e = np.zeros((n_roots))
         self.vecs = np.zeros((n_dets, n_roots))
+        self.local_vecs = np.zeros((n_dets, n_roots))
         # spin/multiplicity info
         self.s = np.zeros((n_roots))
         self.sz = np.zeros((n_roots))
@@ -50,6 +53,20 @@ class wfn_sf:
         for i in range(self.n_roots):
             print("   %i\t\t%12.12f\t\t%3.3f\t%8.6f" % (i, self.e[i], self.sz[i], self.s2[i]))
         print("----------------------------------------------------------\n")
+
+    def print_important_dets(self):
+        print("Most Important Determinants Data:")
+        for i, corr in enumerate(self.e):
+            print("\nROOT %i: %12.12f" %(i, corr))
+            print_dets(self.vecs[:,i], self.n_SF, self.delta_ec, self.conf_space, self.ras1,
+                       self.ras2, self.ras3)
+
+    def print_local_dets(self):
+        print("Most Important Determinants Data (Localized):")
+        for i, corr in enumerate(self.e):
+            print("\nROOT %i: %12.12f" %(i, corr))
+            print_dets(self.local_vecs[:,i], self.n_SF, self.delta_ec, self.conf_space, self.ras1,
+                       self.ras2, self.ras3)
 
 def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
              conf_space="", sf_opts={}, J_in=None, C_in=None):
@@ -111,7 +128,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
         num_roots = n_dets
     num_roots = int(num_roots)
     # set up wfn (for returning)
-    wfn = wfn_sf(n_SF, ras1, ras2, ras3, num_roots, n_dets)
+    wfn = wfn_sf(n_SF, delta_ec, conf_space, ras1, ras2, ras3, num_roots, n_dets)
     # set up LinOp for diagaonalization
     A = LinOpH((n_dets,n_dets), e, ras1, ras2, ras3, Fa, Fb, tei_int, n_SF,
                delta_ec, conf_space_in=conf_space)
@@ -206,13 +223,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
 
     # print info about determinants and coefficients
     wfn.print_roots()
-    print("Most Important Determinants Data:")
-    for i, corr in enumerate(vals):
-        print("\nROOT %i: %12.12f" %(i, corr))
-        s2 = print_dets(vects[:,i], n_SF, delta_ec, conf_space, ras1,
-                        ras2, ras3)
-
-    print("\n\n\t  Fock Space CI Complete! \n")
+    wfn.print_important_dets()
     
     return wfn
 
