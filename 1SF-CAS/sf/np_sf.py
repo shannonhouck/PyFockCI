@@ -26,8 +26,9 @@ Performs Fock-space CI using NumPy arrays as input for integrals.
 """
 
 class wfn_sf:
-    def __init__(self, ras1, ras2, ras3, n_roots, n_dets):
+    def __init__(self, n_SF, ras1, ras2, ras3, n_roots, n_dets):
         # active space info
+        self.n_SF = n_SF
         self.ras1 = ras1
         self.ras2 = ras2
         self.ras3 = ras3
@@ -110,7 +111,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
         num_roots = n_dets
     num_roots = int(num_roots)
     # set up wfn (for returning)
-    wfn = wfn_sf(ras1, ras2, ras3, num_roots, n_dets)
+    wfn = wfn_sf(n_SF, ras1, ras2, ras3, num_roots, n_dets)
     # set up LinOp for diagaonalization
     A = LinOpH((n_dets,n_dets), e, ras1, ras2, ras3, Fa, Fb, tei_int, n_SF,
                delta_ec, conf_space_in=conf_space)

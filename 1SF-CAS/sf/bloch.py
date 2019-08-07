@@ -3,11 +3,14 @@ import numpy as np
 import psi4
 import scipy.linalg as LIN
 
-def do_bloch(wfn, n_SF, ras1, ras2, s2, molden_file='orbs.molden'):
+def do_bloch(wfn, s2, molden_file='orbs.molden'):
 
     print("Doing Bloch Hamiltonian analysis...")
 
     # Put input vector into block form (only need CAS-1SF block!!)
+    n_SF = wfn.n_SF
+    ras1 = wfn.ras1
+    ras2 = wfn.ras2
     e = wfn.e.copy()
     v_b1 = wfn.vecs[:(ras2*ras2), :].copy()
     n_roots = v_b1.shape[1]

@@ -13,7 +13,7 @@ from sf import fock_ci
 import numpy as np
 
 # Psi4 Molecule object
-n2_7 = psi4.core.Molecule.create_molecule_from_string("""
+n2_7 = psi4.core.Molecule.from_string("""
 0 7
 N 0 0 0 
 N 0 0 2.5 
@@ -58,21 +58,63 @@ sf_opts -- Additional options for stand-alone SF code (dict)
 ```
 # Important Parameters
 ### Number of Spin-Flips/IP/EA ###
-The first and second values define the number of alpha electrons added and number of beta electrons removed, respectively. This allows you to 
+The first and second values define the number of alpha electrons added and 
+number of beta electrons removed, respectively. This allows you to 
 control the number of spin-flips and the number of IP/EA.
 ### Excitation Level ###
-The `conf_space` parameter allows you to add single hole and/or particle excitations. The default is CAS-nSF (`""`). Hole excitations are added by specifying `conf_space="h"` and particle excitations are specified with `conf_space="p"`.
+The `conf_space` parameter allows you to add single hole and/or particle 
+excitations. The default is CAS-nSF (`""`). Hole excitations are added by 
+specifying `conf_space="h"` and particle excitations are specified with 
+`conf_space="p"`. 
+### Examples ###
 Some example function calls for various methods can be found below.
 ```
 # CAS-IP
-wfn = fock_ci( 1, 0, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
+wfn = fock_ci( 1, 0, mol, conf_space="")
 # CAS-1SF
-wfn = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
+wfn = fock_ci( 1, 1, mol, conf_space="")
 # CAS-1SF-EA
-wfn = fock_ci( 1, 2, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
+wfn = fock_ci( 1, 2, mol, conf_space="")
 # RAS(h)-1SF
-wfn = fock_ci( 2, 1, n2_7, conf_space="h", ref_opts=options, sf_opts=sf_options)
+wfn = fock_ci( 2, 1, mol, conf_space="h")
 # RAS(h,p)-1SF
-wfn = fock_ci( 2, 1, n2_7, conf_space="hp", ref_opts=options, sf_opts=sf_options)
+wfn = fock_ci( 2, 1, mol, conf_space="hp")
 ```
 
+# Bloch Effective Hamiltonian Analysis
+A Bloch effective Hamiltonian can be built in order to extract information 
+about coupling between atoms (for example in a mixed-valent complex). A 
+sample input file for such a situation is shown below. Note that 
+currently, only 1SF methods are supported.
+```
+import os
+import psi4
+import numpy as np
+import sf
+from sf import fock_ci
+from sf import bloch
+import numpy as np
+import numpy.linalg as LIN
+
+mol = psi4.core.Molecule.from_string("""
+0 5
+H 0 0 0
+H 2 0 0
+H 0 2 0
+H 2 2 0
+symmetry c1
+""")
+
+options = {"BASIS": "sto-3g", 'reference': 'rohf'}
+sf_options = {'NUM_ROOTS': 5}
+
+wfn = fock_ci( 1, 1, mol, ref_opts=options, sf_opts=sf_options)
+H = bloch.do_bloch(wfn, 2.0)
+```
+The Bloch Hamiltonian builder function takes the following form:
+```
+do_bloch(wfn, n_SF, s2, molden_file='orbs.molden')
+wfn -- Wavefunction object (contains info about SF calculation)
+s2 -- The desired S**2 value
+molden_file (optional) -- Name of Molden file for localized orbitals
+```
