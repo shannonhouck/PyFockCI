@@ -23,11 +23,12 @@ symmetry c1
 # Psi4 options
 options = {"BASIS": "cc-pvdz", 'scf_type': 'pk', 'guess': 'gwh'}
 # Fock CI options
-sf_options = {'RETURN_VECTS': True, 'RETURN_WFN': True, 'NUM_ROOTS': 2}
+sf_options = {'RETURN_VECTS': True, 'NUM_ROOTS': 2}
 
 # do a 1SF
-e, vects, wfn = fock_ci( 1, 1, n2_7, conf_space="p", ref_opts=options, sf_opts=sf_options)
+wfn = fock_ci( 1, 1, n2_7, conf_space="p", ref_opts=options, sf_opts=sf_options)
 ```
+The object returned is a wfn_sf object. Any additional information needed can then be extracted from this object (ex. S**2 values or NumPy arrays of the eigenvectors). For example, you could get an array of the eigenvalues using `wfn.e`.
 The primary function call is `fock_ci`, which is defined as follows:
 ```
 fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts="", sf_opts="")
@@ -54,5 +55,24 @@ sf_opts -- Additional options for stand-alone SF code (dict)
                       integral_type  Which integrals to use (DF or FULL)
                            "FULL" Use full integrals (no density fitting)
                            "DF" Use density fit integrals
-                      return_vects -- Whether to return eigenvectors
 ```
+# Important Parameters
+### Number of Spin-Flips/IP/EA ###
+The first and second values define the number of alpha electrons added and number of beta electrons removed, respectively. This allows you to 
+control the number of spin-flips and the number of IP/EA.
+### Excitation Level ###
+The `conf_space` parameter allows you to add single hole and/or particle excitations. The default is CAS-nSF (`""`). Hole excitations are added by specifying `conf_space="h"` and particle excitations are specified with `conf_space="p"`.
+Some example function calls for various methods can be found below.
+```
+# CAS-IP
+wfn = fock_ci( 1, 0, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
+# CAS-1SF
+wfn = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
+# CAS-1SF-EA
+wfn = fock_ci( 1, 2, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
+# RAS(h)-1SF
+wfn = fock_ci( 2, 1, n2_7, conf_space="h", ref_opts=options, sf_opts=sf_options)
+# RAS(h,p)-1SF
+wfn = fock_ci( 2, 1, n2_7, conf_space="hp", ref_opts=options, sf_opts=sf_options)
+```
+
