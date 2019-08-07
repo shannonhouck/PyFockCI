@@ -201,8 +201,10 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
                             ras1, ras2, ras3)
         wfn.s2[i] = calc_s2(n_SF, delta_ec, conf_space, vects[:, i],
                             ras1, ras2, ras3)
-    wfn.print_roots()
+        wfn.s[i] = 0.5*(math.sqrt(1.0+4.0*wfn.s2[i]))-0.5
+
     # print info about determinants and coefficients
+    wfn.print_roots()
     print("Most Important Determinants Data:")
     for i, corr in enumerate(vals):
         print("\nROOT %i: %12.12f" %(i, corr))
