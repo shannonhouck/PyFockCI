@@ -3,11 +3,13 @@ import numpy as np
 import psi4
 import scipy.linalg as LIN
 
-def lowdin_orth_2(A):
-    U, S, V = LIN.svd(A)
-    return U
-
 def lowdin_orth(A):
+    print("RANK: ", np.linalg.matrix_rank(A))
+    U, S, V = LIN.svd(A)
+    return np.dot(U, V)
+
+"""
+def lowdin_orth_2(A):
     sal, svec = np.linalg.eigh(np.dot(A, A.T))
     #print(sal)                                        
     idx = sal.argsort()[::-1]                         
@@ -20,7 +22,6 @@ def lowdin_orth(A):
     #print(sal)
     return X
 
-"""
 def lowdin_orth(A):
     ATA = np.dot(A.T, A)
     m = LIN.fractional_matrix_power(ATA, -0.5)
@@ -65,11 +66,15 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
     wfn.local_vecs = np.reshape(v_b1, (ras2*ras2, n_roots))
 
     # Remove any roots that have the wrong S**2 value
+    """
+    deleted = 0
     for i in range(n_roots):
         # if not the right S**2, delete
         if(abs(wfn.s2[i] - s2) > 1e-5):
-            v_b1 = np.delete(v_b1, i, axis=2)
-            e = np.delete(e, i, axis=0)
+            v_b1 = np.delete(v_b1, i-deleted, axis=2)
+            e = np.delete(e, i-deleted, axis=0)
+            deleted = deleted + 1
+    """
 
     # write localized orbitals to molden
     psi4_wfn.Ca().copy(loc.L)
@@ -90,6 +95,18 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
         else:
             v_n = np.vstack((v_n, v_new))
     v_n = v_n.T # make sure columns are states rather than rows
+
+    # remove any non-neutral determinants
+    """
+    deleted = 0
+    for i in range(v_n.shape[1]):
+        # if not primarily neutral, delete
+        if(sum(abs(v_n[:, i])) < 0.25):
+            print("DELETE")
+            v_n = np.delete(v_n, i-deleted, axis=1)
+            deleted = deleted + 1
+    """
+
     #print("VECS")
     #print(v_b1)
     #print(v_n)
@@ -97,7 +114,8 @@ def do_bloch(wfn, s2, molden_file='orbs.molden'):
     # orthonormalize (SVD)
     #v_orth_2 = LIN.orth(v_n)
     #print(v_orth_2)
-    v_orth = lowdin_orth_2(v_n)
+    print(v_n.shape)
+    v_orth = lowdin_orth(v_n)
     #v_orth = lowdin_orth(v_n)
 
     # 5.
