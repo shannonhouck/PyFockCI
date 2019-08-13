@@ -70,12 +70,16 @@ def do_bloch(wfn, molden_file='orbs.molden'):
 
     # Build Bloch Hamiltonian
     #H = np.dot(S, v_orth)
-    J = v_orth
-    J = np.dot(J, np.diag(e))
-    J = np.dot(J, v_orth.T) # invert v_orth
+    H = v_orth
+    H = np.dot(H, np.diag(e))
+    H = np.dot(H, v_orth.T) # invert v_orth
+    J = np.zeros(H.shape)
+    print("Effective Hamiltonian")
+    print(H)
     print("J Couplings:")
     for i in range(n_roots):
         for j in range(i):
+            J[i,j] = J[j,i] = -1.0*H[i,j]
             print("\tJ%i%i = %6.6f" %(i, j, J[i,j]))
 
     return J

@@ -56,6 +56,8 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         # is to use the one from Psi4 wfn
         if(sf_opts['AUX_BASIS_NAME'] == ""):
             aux_basis_name = wfn.basisset().name()
+        else:
+            aux_basis_name = sf_opts['AUX_BASIS_NAME']
         aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", 
                                              "JKFIT", aux_basis_name)
         tei_int = TEIDF(wfn.Ca(), wfn.basisset(), aux_basis, ras1, ras2,

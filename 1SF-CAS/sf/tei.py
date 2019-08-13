@@ -105,6 +105,7 @@ class TEIDF(TEI):
            Return
                Initialized TEI object
         """
+        print("Inititalizing DF-TEI Object....")
         if(not type(np_tei)==type(None)):
             eri = np_tei
             J = np_J
