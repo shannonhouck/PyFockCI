@@ -36,7 +36,7 @@ class heis_ham:
         for i in range(n_sites):
             Sz = Sz + self.recursive_kron([i], 'z', 0, max_ind)
             for j in range(i):
-                H = H - 2.0*J[i,j]*(self.recursive_kron([i,j], 'x', 0, max_ind) +
+                H = H + 2.0*J[i,j]*(self.recursive_kron([i,j], 'x', 0, max_ind) +
                                 self.recursive_kron([i,j], 'y', 0, max_ind) +
                                 self.recursive_kron([i,j], 'z', 0, max_ind) )
         c = 0.3891124
