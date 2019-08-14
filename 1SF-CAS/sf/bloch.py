@@ -17,7 +17,7 @@ def lowdin_orth_2(A):
     X = svec.dot(sal.dot(svec.T))   
     return np.dot(A, X)
 
-def do_bloch(wfn, molden_file='orbs.molden', skip_localization=True):
+def do_bloch(wfn, molden_file='orbs.molden', skip_localization=False):
 
     np.set_printoptions(suppress=True)
 
@@ -35,7 +35,7 @@ def do_bloch(wfn, molden_file='orbs.molden', skip_localization=True):
     # Obtain info for orbital localization and localize v
     psi4_wfn = wfn.wfn
     C = psi4.core.Matrix.to_array(psi4_wfn.Ca(), copy=True)
-    if(!skip_localization):
+    if(not skip_localization):
         ras2_C = C[:, ras1:ras1+ras2]
         loc = psi4.core.Localizer.build('BOYS', psi4_wfn.basisset(), psi4.core.Matrix.from_array(ras2_C))
         loc.localize()
