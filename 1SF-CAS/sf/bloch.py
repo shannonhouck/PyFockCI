@@ -5,7 +5,7 @@ import scipy.linalg as LIN
 
 def lowdin_orth(A):
     U, S, V = LIN.svd(A)
-    return U @ V
+    return np.dot(U, V)
 
 def lowdin_orth_2(A):
     sal, svec = np.linalg.eigh(np.dot(A.T, A))
@@ -15,7 +15,7 @@ def lowdin_orth_2(A):
     sal = sal**-0.5                                   
     sal = np.diagflat(sal)                            
     X = svec.dot(sal.dot(svec.T))   
-    return A @ X
+    return np.dot(A, X)
 
 def do_bloch(wfn, molden_file='orbs.molden'):
 

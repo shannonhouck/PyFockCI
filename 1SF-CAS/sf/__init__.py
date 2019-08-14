@@ -59,6 +59,8 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
 
     # update options to pass into SF code
     tmp_opts = {'SF_DIAG_METHOD': 'DAVIDSON',
+                'READ_PSI4_WFN': False,
+                'PSI4_WFN': None,
                 'NUM_ROOTS': 6,
                 'GUESS_TYPE': 'CAS',
                 'INTEGRAL_TYPE': 'FULL',

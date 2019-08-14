@@ -38,7 +38,11 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     psi4_opts.update(ref_opts)
     psi4.set_options(psi4_opts)
     # run ROHF
-    e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
+    if(sf_opts['READ_PSI4_WFN']):
+        wfn = sf_opts['PSI4_WFN']
+        e = wfn.energy()
+    else:
+        e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
     # obtain RAS spaces
     ras1 = wfn.doccpi()[0]
     ras2 = wfn.soccpi()[0]
