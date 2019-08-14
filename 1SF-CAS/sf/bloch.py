@@ -17,7 +17,7 @@ def lowdin_orth_2(A):
     X = svec.dot(sal.dot(svec.T))   
     return np.dot(A, X)
 
-def do_bloch(wfn, molden_file='orbs.molden'):
+def do_bloch(wfn, molden_file='orbs.molden', skip_localization=True):
 
     np.set_printoptions(suppress=True)
 
@@ -35,19 +35,20 @@ def do_bloch(wfn, molden_file='orbs.molden'):
     # Obtain info for orbital localization and localize v
     psi4_wfn = wfn.wfn
     C = psi4.core.Matrix.to_array(psi4_wfn.Ca(), copy=True)
-    ras2_C = C[:, ras1:ras1+ras2]
-    loc = psi4.core.Localizer.build('BOYS', psi4_wfn.basisset(), psi4.core.Matrix.from_array(ras2_C))
-    loc.localize()
-    U = psi4.core.Matrix.to_array(loc.U, copy=True)
-    # localize
-    v_b1 = np.einsum("ji,jbn->ibn", U, v_b1)
-    v_b1 = np.einsum("ba,ibn->ian", U, v_b1)
-    wfn.local_vecs = np.reshape(v_b1, (ras2*ras2, n_roots))
+    if(!skip_localization):
+        ras2_C = C[:, ras1:ras1+ras2]
+        loc = psi4.core.Localizer.build('BOYS', psi4_wfn.basisset(), psi4.core.Matrix.from_array(ras2_C))
+        loc.localize()
+        U = psi4.core.Matrix.to_array(loc.U, copy=True)
+        # localize
+        v_b1 = np.einsum("ji,jbn->ibn", U, v_b1)
+        v_b1 = np.einsum("ba,ibn->ian", U, v_b1)
+        wfn.local_vecs = np.reshape(v_b1, (ras2*ras2, n_roots))
 
-    # write localized orbitals to wfn and molden
-    psi4_wfn.Ca().copy(loc.L)
-    psi4_wfn.Cb().copy(loc.L)
-    psi4.molden(psi4_wfn, molden_file)
+        # write localized orbitals to wfn and molden
+        psi4_wfn.Ca().copy(loc.L)
+        psi4_wfn.Cb().copy(loc.L)
+        psi4.molden(psi4_wfn, molden_file)
 
     # Obtain S
     # not needed -- S should be I if states are orthonormal
