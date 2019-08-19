@@ -1,5 +1,6 @@
 from __future__ import print_function
 import numpy as np
+import math
 import psi4
 import scipy.linalg as LIN
 
@@ -85,27 +86,40 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
             v_n = np.vstack((v_n, v_new))
     v_n = v_n.T # make sure columns are states rather than rows
 
-    # orthonormalize (SVD)
-    #v_orth = LIN.orth(v_n)
-    v_orth = lowdin_orth(v_n)
-
     # Permute v_n appropriately
+    perm = []
     # for each orbital, determine its center
     for i in range(ras2):
         diff = abs(N[:, i]-1)
-        print(diff)
-        print(np.argmin(diff))
+        perm.append(np.argmin(diff))
+    print("Reordering RAS2 determinants as follows:")
+    print(perm)
+    # permute!
+    v_n = v_n[np.argsort(perm), :]
+
+    # construct CG coeff matrix
+    R = np.zeros((ras2, len(site_list)))
+    tmp, orbs_per_site = np.unique(perm, return_counts=True)
+    for i, site in enumerate(np.sort(perm)):
+        R[i, site] = 1.0/math.sqrt(orbs_per_site[site])
+    print(R)
+
+    # orthonormalize (SVD)
+    #v_orth = LIN.orth(v_n)
+    v_orth = lowdin_orth(v_n)
 
     # Build Bloch Hamiltonian
     #H = np.dot(S, v_orth)
     H = v_orth
     H = np.dot(H, np.diag(e))
     H = np.dot(H, v_orth.T) # invert v_orth
+    # rotate using CG coeffs if needed
+    H = np.dot(R.T, np.dot(H, R))
     J = np.zeros(H.shape)
     print("Effective Hamiltonian")
     print(H)
     print("J Couplings:")
-    for i in range(n_roots):
+    for i in range(len(site_list)):
         for j in range(i):
             J[i,j] = J[j,i] = -1.0*H[i,j]
             print("\tJ%i%i = %6.6f" %(i, j, J[i,j]))
