@@ -17,7 +17,7 @@ def lowdin_orth_2(A):
     X = svec.dot(sal.dot(svec.T))   
     return np.dot(A, X)
 
-def do_bloch(wfn, molden_file='orbs.molden', skip_localization=False):
+def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False):
 
     np.set_printoptions(suppress=True)
 
@@ -36,7 +36,9 @@ def do_bloch(wfn, molden_file='orbs.molden', skip_localization=False):
     psi4_wfn = wfn.wfn
     C = psi4.core.Matrix.to_array(psi4_wfn.Ca(), copy=True)
     if(not skip_localization):
+        ras1_C = C[:, :ras1]
         ras2_C = C[:, ras1:ras1+ras2]
+        ras3_C = C[:, ras1+ras2:]
         loc = psi4.core.Localizer.build('BOYS', psi4_wfn.basisset(), psi4.core.Matrix.from_array(ras2_C))
         loc.localize()
         U = psi4.core.Matrix.to_array(loc.U, copy=True)
@@ -45,10 +47,28 @@ def do_bloch(wfn, molden_file='orbs.molden', skip_localization=False):
         v_b1 = np.einsum("ba,ibn->ian", U, v_b1)
         wfn.local_vecs = np.reshape(v_b1, (ras2*ras2, n_roots))
 
+        C_full_loc = psi4.core.Matrix.from_array(np.column_stack((ras1_C, psi4.core.Matrix.to_array(loc.L), ras3_C)))
         # write localized orbitals to wfn and molden
-        psi4_wfn.Ca().copy(loc.L)
-        psi4_wfn.Cb().copy(loc.L)
+        psi4_wfn.Ca().copy(C_full_loc)
+        psi4_wfn.Cb().copy(C_full_loc)
         psi4.molden(psi4_wfn, molden_file)
+
+    # determine which orbitals belong to which centers
+    # C given in C_iu basis
+    N = np.zeros((len(site_list), ras2))
+    bas = psi4_wfn.basisset()
+    S = psi4.core.Matrix.to_array(psi4_wfn.S())
+    C = psi4.core.Matrix.to_array(psi4_wfn.Ca())
+    CS = np.einsum("vi,vu->ui", C, S)
+    for atom, A in enumerate(site_list):
+        for i in range(ras2):
+            for mu in range(C.shape[1]):
+                if(bas.function_to_center(mu) == A):
+                    print(A, mu)
+                    N[atom, i] += C[mu, ras1+i] * CS[mu, ras1+i]
+                    #N[atom, i] += C[ras1+i, mu] * CS[ras1+i, mu]
+    print("N") # for debugging
+    print(N) # for debugging
 
     # Obtain S
     # not needed -- S should be I if states are orthonormal
@@ -68,6 +88,13 @@ def do_bloch(wfn, molden_file='orbs.molden', skip_localization=False):
     # orthonormalize (SVD)
     #v_orth = LIN.orth(v_n)
     v_orth = lowdin_orth(v_n)
+
+    # Permute v_n appropriately
+    # for each orbital, determine its center
+    for i in range(ras2):
+        diff = abs(N[:, i]-1)
+        print(diff)
+        print(np.argmin(diff))
 
     # Build Bloch Hamiltonian
     #H = np.dot(S, v_orth)
