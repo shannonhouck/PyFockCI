@@ -17,7 +17,7 @@ install:
   - conda update -q conda
 
   # Replace dep1 dep2 ... with your dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy psi4
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy psi4 --yes
   - source activate test-environment
   - python setup.py install
 
