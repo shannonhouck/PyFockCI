@@ -23,9 +23,9 @@ install:
   - python setup.py install
 
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      conda install psi4 python=2.7 -c psi4
+      conda install psi4 python=2.7 -c psi4;
     else
-      conda install psi4 python=3.6 -c psi4
+      conda install psi4 python=3.6 -c psi4;
     fi
 
 # command to run tests
