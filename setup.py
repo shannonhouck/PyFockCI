@@ -10,7 +10,7 @@ setup(
     url='',
     license='LICENSE.txt',
     description='Stand-alone RAS-SF-IP/EA code.',
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
     install_requires=[
     ],
 )
