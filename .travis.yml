@@ -1,7 +1,6 @@
 language: python
 python:
-  - "2.7"
-  - "3.6"      # current detault Python on Travis CI
+  - "3.6"
 # command to install dependencies
 install:
   - sudo apt-get update
@@ -20,13 +19,10 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy
   - source activate test-environment
-  - pip install -e .
 
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      conda install psi4 python=2.7 -c psi4;
-    else
-      conda install psi4 python=3.6 -c psi4;
-    fi
+  - conda install psi4 python=3.6 -c psi4;
+  - python setup.py install
+  #- pip install -e .
 
 # command to run tests
 script:
