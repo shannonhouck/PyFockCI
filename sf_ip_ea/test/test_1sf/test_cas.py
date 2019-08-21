@@ -1,6 +1,5 @@
 import psi4
 import sf_ip_ea
-from sf_ip_ea import fock_ci
 import time
 
 # threshold for value equality
@@ -33,7 +32,7 @@ def test_1():
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     sf_opts = {"NUM_ROOTS": 4}
     expected = [-108.771464507401, -108.766379708730, -108.672439123601, -108.667055270021]
-    wfn = fock_ci(1, 1, n2_7, conf_space="", ref_opts = options, sf_opts=sf_opts)
+    wfn = sf_ip_ea.fock_ci(1, 1, n2_7, conf_space="", ref_opts = options, sf_opts=sf_opts)
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
@@ -44,7 +43,7 @@ def test_2():
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct'}
     sf_opts = {"NUM_ROOTS": 4}
     expected = [-108.779860044370, -108.717563861440, -108.717563861440, -108.711324264599]
-    wfn = fock_ci(1, 1, n2_3, conf_space="", ref_opts = options, sf_opts=sf_opts)
+    wfn = sf_ip_ea.fock_ci(1, 1, n2_3, conf_space="", ref_opts = options, sf_opts=sf_opts)
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
@@ -54,7 +53,7 @@ def test_3():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'diag_method': 'rsp'}
     expected = [-149.609461120738757, -149.561899036996437]
-    wfn = fock_ci(1, 1, o2, conf_space="", ref_opts=options, sf_opts={'NUM_ROOTS': 2})
+    wfn = sf_ip_ea.fock_ci(1, 1, o2, conf_space="", ref_opts=options, sf_opts={'NUM_ROOTS': 2})
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
