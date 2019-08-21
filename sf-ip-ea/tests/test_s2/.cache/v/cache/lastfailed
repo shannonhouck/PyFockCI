@@ -1,0 +1,10 @@
+{
+  "test_cas.py::test_cas": true, 
+  "test_cas.py::test_cas_1sfea": true, 
+  "test_cas.py::test_cas_1sfip": true, 
+  "test_cas.py::test_cas_2sf": true, 
+  "test_cas.py::test_h_1sfip": true, 
+  "test_cas.py::test_h_ip": true, 
+  "test_cas.py::test_p_1sf": true, 
+  "test_cas.py::test_p_1sfea": true
+}
