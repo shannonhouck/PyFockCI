@@ -96,7 +96,6 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
     print(perm)
     # permute!
     v_n = v_n[np.argsort(perm), :]
-
     # construct CG coeff matrix
     R = np.zeros((ras2, len(site_list)))
     tmp, orbs_per_site = np.unique(perm, return_counts=True)

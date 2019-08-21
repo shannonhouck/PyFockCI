@@ -10357,3 +10357,96 @@ Wall Time:        0.35 seconds
 -----------------------------------------------------------
 
 ***********************************************************
+
+Host: Spektor
+
+Timers On : Wed Aug 21 11:59:49 2019
+Timers Off: Wed Aug 21 11:59:49 2019
+
+Wall Time:        0.41 seconds
+
+
+-----------------------------------------------------------
+
+***********************************************************
+
+Host: Spektor
+
+Timers On : Wed Aug 21 12:00:01 2019
+Timers Off: Wed Aug 21 12:00:12 2019
+
+Wall Time:       11.05 seconds
+
+DFH: initialize()           :      0.200u      0.000s      0.117w      4 calls
+DFH: sparsity prep          :      0.050u      0.000s      0.034w      4 calls
+DFH: AO Construction        :      0.050u      0.000s      0.019w      4 calls
+DFH: AO-Met. Contraction    :      0.000u      0.000s      0.002w      4 calls
+HF: Form H                  :      0.000u      0.000s      0.006w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.001w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      2.067u      0.000s      1.249w    132 calls
+JK: D                       :      0.000u      0.000s      0.000w    132 calls
+JK: USO2AO                  :      0.000u      0.000s      0.000w    132 calls
+JK: JK                      :      2.067u      0.000s      1.247w    132 calls
+DFH: compute_JK()           :      0.017u      0.000s      0.016w     66 calls
+DFH: Grabbing AOs           :      0.000u      0.000s      0.000w     66 calls
+DFH: compute_J              :      0.000u      0.000s      0.005w     66 calls
+DFH: compute_K              :      0.017u      0.000s      0.011w     66 calls
+PK computes JK              :      0.017u      0.000s      0.003w     34 calls
+JK: AO2USO                  :      0.000u      0.000s      0.000w    132 calls
+HF: Form F                  :      0.000u      0.000s      0.002w    132 calls
+HF: DIIS                    :      0.017u      0.000s      0.007w    132 calls
+DIISManager::add_entry      :      0.000u      0.000s      0.002w     60 calls
+DIISManager::extrapolate    :      0.017u      0.000s      0.004w     56 calls
+bMatrix setup               :      0.000u      0.000s      0.001w     56 calls
+bMatrix pseudoinverse       :      0.000u      0.000s      0.001w     56 calls
+New vector                  :      0.017u      0.000s      0.001w     56 calls
+HF: Form C                  :      0.017u      0.017s      0.008w    132 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    132 calls
+CIWave: CIvect write        :      0.017u      0.000s      0.004w    546 calls
+CIWave: CIvect read         :      0.083u      0.000s      0.033w   9126 calls
+CIWave: s2                  :      0.083u      0.033s      0.067w    539 calls
+CIWave: s1                  :      0.017u      0.000s      0.018w   1225 calls
+CIWave: s3                  :      0.267u      0.083s      0.242w   1029 calls
+CIWave: s3_mt               :      0.167u      0.033s      0.147w  55301 calls
+CIWave: opdm                :      0.017u      0.000s      0.003w      4 calls
+Total PK formation time     :      0.167u      0.000s      0.098w      2 calls
+
+-----------------------------------------------------------
+DFH: initialize()           :      0.200u      0.000s      0.117w      4 calls
+| DFH: sparsity prep        :      0.050u      0.000s      0.034w      4 calls
+| DFH: AO Construction      :      0.050u      0.000s      0.019w      4 calls
+| DFH: AO-Met. Contraction  :      0.000u      0.000s      0.002w      4 calls
+HF: Form H                  :      0.000u      0.000s      0.006w      6 calls
+HF: Form S/X                :      0.000u      0.000s      0.001w      6 calls
+HF: Guess                   :      0.000u      0.000s      0.001w      6 calls
+HF: Form G                  :      2.067u      0.000s      1.249w    132 calls
+| JK: D                     :      0.000u      0.000s      0.000w    132 calls
+| JK: USO2AO                :      0.000u      0.000s      0.000w    132 calls
+| JK: JK                    :      2.067u      0.000s      1.247w    132 calls
+| | DFH: compute_JK()       :      0.017u      0.000s      0.016w     66 calls
+| | | DFH: Grabbing AOs     :      0.000u      0.000s      0.000w     66 calls
+| | | DFH: compute_J        :      0.000u      0.000s      0.005w     66 calls
+| | | DFH: compute_K        :      0.017u      0.000s      0.011w     66 calls
+| | PK computes JK          :      0.017u      0.000s      0.003w     34 calls
+| JK: AO2USO                :      0.000u      0.000s      0.000w    132 calls
+HF: Form F                  :      0.000u      0.000s      0.002w    132 calls
+HF: DIIS                    :      0.017u      0.000s      0.007w    132 calls
+| DIISManager::add_entry    :      0.000u      0.000s      0.002w     60 calls
+| DIISManager::extrapolate  :      0.017u      0.000s      0.004w     56 calls
+| | bMatrix setup           :      0.000u      0.000s      0.001w     56 calls
+| | bMatrix pseudoinverse   :      0.000u      0.000s      0.001w     56 calls
+| | New vector              :      0.017u      0.000s      0.001w     56 calls
+HF: Form C                  :      0.017u      0.017s      0.008w    132 calls
+HF: Form D                  :      0.000u      0.000s      0.001w    132 calls
+CIWave: CIvect write        :      0.017u      0.000s      0.004w    546 calls
+CIWave: CIvect read         :      0.083u      0.000s      0.033w   9098 calls
+CIWave: s2                  :      0.083u      0.033s      0.067w    539 calls
+CIWave: s1                  :      0.017u      0.000s      0.018w   1225 calls
+CIWave: s3                  :      0.267u      0.083s      0.242w   1029 calls
+| CIWave: s3_mt             :      0.167u      0.033s      0.147w  55301 calls
+CIWave: opdm                :      0.017u      0.000s      0.003w      4 calls
+| CIWave: CIvect read       :      0.000u      0.000s      0.000w     28 calls
+Total PK formation time     :      0.167u      0.000s      0.098w      2 calls
+
+***********************************************************

@@ -37,8 +37,8 @@ def test_1():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     expected = sf_cas_ref( 0, 5, n2_7, conf_space="p", add_opts=options )
-    e = fock_ci( 1, 1, n2_7, conf_space="p", ref_opts=options )
-    assert abs(e[0] - expected) < threshold
+    wfn = fock_ci( 1, 1, n2_7, conf_space="p", ref_opts=options )
+    assert abs(wfn.e[0] - expected) < threshold
 
 def test_2():
     psi4.core.clean()
@@ -46,8 +46,8 @@ def test_2():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'calc_s_squared': True, 'scf_type': 'pk'}
     expected = sf_cas_ref( 0, 3, n2_3, conf_space="p", add_opts=options )
-    e = fock_ci( 1, 1, n2_3, conf_space="p", ref_opts=options )
-    assert abs(e[0] - expected) < threshold
+    wfn = fock_ci( 1, 1, n2_3, conf_space="p", ref_opts=options )
+    assert abs(wfn.e[0] - expected) < threshold
 
 def test_3():
     psi4.core.clean()
@@ -55,6 +55,6 @@ def test_3():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'diag_method': 'rsp'}
     expected = sf_cas_ref( 0, 1, o2, conf_space="p", add_opts=options )
-    e = fock_ci( 1, 1, o2, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 2} )
-    assert abs(e[0] - expected) < threshold
+    wfn = fock_ci( 1, 1, o2, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 2} )
+    assert abs(wfn.e[0] - expected) < threshold
 
