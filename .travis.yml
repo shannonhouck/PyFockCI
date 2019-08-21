@@ -21,9 +21,8 @@ install:
   - source activate test-environment
 
   - conda install psi4 python=3.6 -c psi4;
-  - python setup.py install
-  #- pip install -e .
+  - pip install -e .
 
 # command to run tests
 script:
-  - pytest
+  - pytest -m pytest
