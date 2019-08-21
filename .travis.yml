@@ -3,6 +3,7 @@ python:
   - "3.6"      # current detault Python on Travis CI
 # command to install dependencies
 install:
+  - pip install conda
   - conda install psi4 python=3.6 -c psi4
   - pip install numpy scipy
 # command to run tests
