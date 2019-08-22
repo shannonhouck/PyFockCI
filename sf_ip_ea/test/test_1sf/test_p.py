@@ -40,7 +40,7 @@ def test_1():
     psi4.core.clean_variables()
     expected = [-108.773240258070189, -108.766379708729545, -108.677933383504808, -108.671261012421127]
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
-    wfn = fock_ci( 1, 1, n2_7, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 4} )
+    wfn = sf_ip_ea.fock_ci( 1, 1, n2_7, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 4} )
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
@@ -50,7 +50,7 @@ def test_2():
     psi4.core.clean_variables()
     expected = [-108.787240209836739, -108.729125830987144, -108.729125830987130, -108.711324264599156]
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
-    wfn = fock_ci( 1, 1, n2_3, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 4} )
+    wfn = sf_ip_ea.fock_ci( 1, 1, n2_3, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 4} )
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
@@ -60,7 +60,7 @@ def test_3():
     psi4.core.clean_variables()
     expected = [-149.609461120738501, -149.562132340061027]
     options = {"basis": "cc-pvdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'diag_method': 'rsp'}
-    wfn = fock_ci( 1, 1, o2, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 2, 'SF_DIAG_METHOD': 'LANCZOS'} )
+    wfn = sf_ip_ea.fock_ci( 1, 1, o2, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 2, 'SF_DIAG_METHOD': 'LANCZOS'} )
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
