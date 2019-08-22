@@ -1,0 +1,180 @@
+
+*** tstart() called on shannon-book.local
+*** at Tue Jul 10 14:08:38 2018
+
+   => Loading Basis Set <=
+
+    Name: STO-3G
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1-2 entry N          line    71 file /usr/local/psi4/share/psi4/basis/sto-3g.gbs 
+
+
+         ---------------------------------------------------------
+                                   SCF
+            by Justin Turney, Rob Parrish, Andy Simmonett
+                             and Daniel Smith
+                             ROHF Reference
+                        1 Threads,   1907 MiB Core
+         ---------------------------------------------------------
+
+  ==> Geometry <==
+
+    Molecular point group: c1
+    Full point group: D_inf_h
+
+    Geometry (in Angstrom), charge = 0, multiplicity = 3:
+
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+           N         -0.750000000000     0.000000000000     0.000000000000    14.003074004780
+           N          0.750000000000     0.000000000000     0.000000000000    14.003074004780
+
+  Running in c1 symmetry.
+
+  Rotational constants: A = ************  B =      1.07009  C =      1.07009 [cm^-1]
+  Rotational constants: A = ************  B =  32080.51190  C =  32080.51190 [MHz]
+  Nuclear repulsion =   17.286455480606666
+
+  Charge       = 0
+  Multiplicity = 3
+  Electrons    = 14
+  Nalpha       = 8
+  Nbeta        = 6
+
+  ==> Algorithm <==
+
+  SCF Algorithm Type is PK.
+  DIIS enabled.
+  MOM disabled.
+  Fractional occupation disabled.
+  Guess Type is GWH.
+  Energy threshold   = 1.00e-08
+  Density threshold  = 1.00e-08
+  Integral threshold = 0.00e+00
+
+  ==> Primary Basis <==
+
+  Basis Set: STO-3G
+    Blend: STO-3G
+    Number of shells: 6
+    Number of basis function: 10
+    Number of Cartesian functions: 10
+    Spherical Harmonics?: true
+    Max angular momentum: 1
+
+  ==> Pre-Iterations <==
+
+   -------------------------------------------------------
+    Irrep   Nso     Nmo     Nalpha   Nbeta   Ndocc  Nsocc
+   -------------------------------------------------------
+     A         10      10       0       0       0       0
+   -------------------------------------------------------
+    Total      10      10       8       6       6       2
+   -------------------------------------------------------
+
+  ==> Integral Setup <==
+
+  Using in-core PK algorithm.
+   Calculation information:
+      Number of atoms:                   2
+      Number of AO shells:               6
+      Number of primitives:             18
+      Number of atomic orbitals:        10
+      Number of basis functions:        10
+
+      Integral cutoff                 1.00e-12
+      Number of threads:                 1
+
+  Performing in-core PK
+  Using 3080 doubles for integral storage.
+  We computed 230 shell quartets total.
+  Whereas there are 231 unique shell quartets.
+  ==> DiskJK: Disk-Based J/K Matrices <==
+
+    J tasked:                  Yes
+    K tasked:                  Yes
+    wK tasked:                  No
+    Memory (MB):              1430
+    Schwarz Cutoff:          1E-12
+
+    OpenMP threads:              1
+  Minimum eigenvalue in the overlap matrix is 4.3113275272E-01.
+  Using Symmetric Orthogonalization.
+
+  SCF Guess: Generalized Wolfsberg-Helmholtz.
+
+  ==> Iterations <==
+
+                        Total Energy        Delta E     RMS |[F,P]|
+
+   @ROHF iter   1:  -106.63150644312580   -1.06632e+02   6.29560e-02 
+   @ROHF iter   2:  -107.12614718043731   -4.94641e-01   1.70012e-02 DIIS
+   @ROHF iter   3:  -107.18456223998898   -5.84151e-02   4.22275e-03 DIIS
+   @ROHF iter   4:  -107.18805908150291   -3.49684e-03   1.95379e-04 DIIS
+   @ROHF iter   5:  -107.18806448584823   -5.40435e-06   1.89578e-05 DIIS
+   @ROHF iter   6:  -107.18806452297480   -3.71266e-08   4.01856e-07 DIIS
+   @ROHF iter   7:  -107.18806452299279   -1.79909e-11   2.20944e-09 DIIS
+
+  ==> Post-Iterations <==
+
+    Orbital Energies (a.u.)
+    -----------------------
+
+    Doubly Occupied:                                                      
+
+       1A    -15.405261     2A    -15.404674     3A     -1.112861  
+       4A     -0.756381     5A     -0.411002     6A     -0.352737  
+
+    Singly Occupied:                                                      
+
+       7A     -0.217954     8A     -0.060268  
+
+    Virtual:                                                              
+
+       9A      0.160025    10A      0.563177  
+
+    Final Occupation by Irrep:
+              A 
+    DOCC [     6 ]
+    SOCC [     2 ]
+
+  Energy converged.
+
+  @ROHF Final Energy:  -107.18806452299279
+
+   => Energetics <=
+
+    Nuclear Repulsion Energy =             17.2864554806066657
+    One-Electron Energy =                -181.2056204379631481
+    Two-Electron Energy =                  56.7311004343636966
+    Total Energy =                       -107.1880645229927893
+
+
+
+Properties will be evaluated at   0.000000,   0.000000,   0.000000 Bohr
+
+Properties computed using the SCF density matrix
+
+  Nuclear Dipole Moment: (a.u.)
+     X:     0.0000      Y:     0.0000      Z:     0.0000
+
+  Electronic Dipole Moment: (a.u.)
+     X:    -0.0000      Y:     0.0000      Z:     0.0000
+
+  Dipole Moment: (a.u.)
+     X:    -0.0000      Y:     0.0000      Z:     0.0000     Total:     0.0000
+
+  Dipole Moment: (Debye)
+     X:    -0.0000      Y:     0.0000      Z:     0.0000     Total:     0.0000
+
+
+*** tstop() called on shannon-book.local at Tue Jul 10 14:08:38 2018
+Module time:
+	user time   =       0.08 seconds =       0.00 minutes
+	system time =       0.01 seconds =       0.00 minutes
+	total time  =          0 seconds =       0.00 minutes
+Total time:
+	user time   =       0.08 seconds =       0.00 minutes
+	system time =       0.01 seconds =       0.00 minutes
+	total time  =          0 seconds =       0.00 minutes
