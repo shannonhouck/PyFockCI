@@ -34,6 +34,7 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
                  'scf_type': 'direct',
                  'e_convergence': 1e-10,
                  'd_convergence': 1e-10,
+                 'guess': 'gwh',
                  'reference': 'rohf'}
     psi4_opts.update(ref_opts)
     psi4.set_options(psi4_opts)
