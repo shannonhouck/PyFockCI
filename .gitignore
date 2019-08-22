@@ -1,5 +1,5 @@
 # ignore all pycaches/timers
-__pycache__/
+__pycache__
 timer.dat
 
 
