@@ -1,0 +1,13 @@
+{
+  "1SF-CAS/tests/test_1sf/test_h.py::test_1": true,
+  "1SF-CAS/tests/test_1sf/test_hp.py::test_1": true,
+  "1SF-CAS/tests/test_1sf/test_p.py::test_1": true,
+  "sf-ip-ea/test/test_1sf/test_cas.py": true,
+  "sf_ip_ea/test/test_davidson/test_general.py": true,
+  "sf_ip_ea/test/test_davidson/test_guesses.py": true,
+  "sf_ip_ea/test/test_df/test_df.py": true,
+  "sf_ip_ea/test/test_df/test_df_2.py": true,
+  "sf_ip_ea/test/test_df/test_df_3.py": true,
+  "sf_ip_ea/test/test_df/test_df_4.py": true,
+  "sf_ip_ea/test/test_s2/test_cas.py": true
+}

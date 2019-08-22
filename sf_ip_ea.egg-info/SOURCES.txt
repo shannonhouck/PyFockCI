@@ -1,0 +1,14 @@
+README.md
+sf_ip_ea/__init__.py
+sf_ip_ea/f.py
+sf_ip_ea/linop.py
+sf_ip_ea/np_sf.py
+sf_ip_ea/post_ci_analysis.py
+sf_ip_ea/psi4_sf.py
+sf_ip_ea/solvers.py
+sf_ip_ea/tei.py
+sf_ip_ea.egg-info/PKG-INFO
+sf_ip_ea.egg-info/SOURCES.txt
+sf_ip_ea.egg-info/dependency_links.txt
+sf_ip_ea.egg-info/top_level.txt
+sf_ip_ea/test/spinflip.py
