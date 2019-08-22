@@ -10,7 +10,7 @@ Psi4NumPy Tutorials
 """
 
 class TEI:
-    """Class for two-electron integral object handling. Uses Psi4.
+    """General class for two-electron integral object handling.
     """
     def __init__(self):
         """Initialize TEI object.

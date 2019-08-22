@@ -16,3 +16,4 @@ def get_F(wfn):
     Fa = np.dot(C.T, np.dot(Fa, C)) 
     Fb = np.dot(C.T, np.dot(Fb, C)) 
     return (Fa, Fb) 
+
