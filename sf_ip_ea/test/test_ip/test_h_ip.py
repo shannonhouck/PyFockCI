@@ -5,26 +5,19 @@ import sf_ip_ea
 # threshold for value equality
 threshold = 1e-7
 # setting up molecule
-h3 = psi4.core.Molecule.create_molecule_from_string("""
-0 4
-H 
-H 1 1.0 
-H 1 1.0 2 60.0
-symmetry c1
-""")
-n2_7 = psi4.core.Molecule.create_molecule_from_string("""
+n2_7 = psi4.core.Molecule.from_string("""
 0 7
 N 0 0 0
 N 0 0 2.5
 symmetry c1
 """)
-n2_3 = psi4.core.Molecule.create_molecule_from_string("""
+n2_3 = psi4.core.Molecule.from_string("""
 0 5
 N 0 0 0
 N 0 0 1.5
 symmetry c1
 """)
-o2 = psi4.core.Molecule.create_molecule_from_string("""
+o2 = psi4.core.Molecule.from_string("""
 0 3
 O
 O 1 1.2
