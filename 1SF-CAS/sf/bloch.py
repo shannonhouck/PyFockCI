@@ -85,6 +85,8 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
         else:
             v_n = np.vstack((v_n, v_new))
     v_n = v_n.T # make sure columns are states rather than rows
+    print("vectors")
+    print(v_n)
 
     # Permute v_n appropriately
     perm = []
@@ -105,15 +107,21 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
 
     # orthonormalize (SVD)
     #v_orth = LIN.orth(v_n)
-    v_orth = lowdin_orth(v_n)
+    print("Transformed vects")
+    v_R = np.dot(R.T, v_n)
+    print(v_R)
+    print("Transformed vects overlap")
+    print(np.dot(v_R.T, v_R))
+    print("Transformed vects orth")
+    v_orth = lowdin_orth(np.dot(R.T, v_n))
+    print(v_orth)
+    print(np.dot(v_orth.T, v_orth))
 
     # Build Bloch Hamiltonian
     #H = np.dot(S, v_orth)
     H = v_orth
     H = np.dot(H, np.diag(e))
     H = np.dot(H, v_orth.T) # invert v_orth
-    # rotate using CG coeffs if needed
-    H = np.dot(R.T, np.dot(H, R))
     J = np.zeros(H.shape)
     print("Effective Hamiltonian")
     print(H)

@@ -51,7 +51,7 @@ class wfn_sf:
         print("\nROOT No.\tEnergy\t\t\tSz\tS**2")
         print("----------------------------------------------------------")
         for i in range(self.n_roots):
-            print("   %i\t\t%12.12f\t\t%3.3f\t%8.6f" % (i, self.e[i], self.sz[i], self.s2[i]))
+            print("   %i\t\t%12.12f\t\t%3.3f\t%12.12f" % (i, self.e[i], self.sz[i], self.s2[i]))
         print("----------------------------------------------------------\n")
 
     def print_important_dets(self):
@@ -144,8 +144,10 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     print("\tSpin-Flips: %3i\n\tElectron Count Change: %3i\n"
           %(n_SF, delta_ec))
     print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(ras1, ras2, ras3) )
+    """
     if(n_dets < 250):
         opts['SF_DIAG_METHOD'] = "LANCZOS"
+    """
     print("\tDiagonalization: %s\n\tGuess: %s" %(opts['SF_DIAG_METHOD'],
                                                  opts['GUESS_TYPE']))
     # DIAGONALIZATION
@@ -158,6 +160,20 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
             vals, vects = SCILIN.eigh(H_full)
         else:
             vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
+    elif(opts['SF_DIAG_METHOD'] == "LANCZOS_NH"):
+        # do LANCZOS
+        print("************************doing lanczos NH")
+        if(num_roots == n_dets):
+            H_full = A.matmat(np.eye(n_dets))
+            vals, vects = SCILIN.eig(H_full)
+            idx = np.argsort(real(vals))
+            vals = real(vals[idx])
+            vects = real(vects[:, idx])
+        else:
+            vals, vects = SPLIN.eigs(A, k=num_roots, which='LM')
+            idx = np.argsort(np.real(vals))
+            vals = np.real(vals[idx])
+            vects = np.real(vects[:, idx])
     # use Davidson method
     elif(opts['SF_DIAG_METHOD'] == "DAVIDSON"):
         # generate guess vector

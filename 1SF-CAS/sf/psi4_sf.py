@@ -26,9 +26,9 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
            wfn (opt) -- The reference ROHF wavefunction object from Psi4
     """
     # cleanup in case of multiple calculations
-    psi4.core.clean()
-    psi4.core.clean_options()
-    psi4.core.clean_variables()
+    #psi4.core.clean()
+    #psi4.core.clean_options()
+    #psi4.core.clean_variables()
     # setting default options, reading in additional options from user
     psi4_opts = {'BASIS': 'cc-pvdz',
                  'scf_type': 'direct',
@@ -59,11 +59,11 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         # if user hasn't defined which aux basis to use, default behavior
         # is to use the one from Psi4 wfn
         if(sf_opts['AUX_BASIS_NAME'] == ""):
-            aux_basis_name = wfn.basisset().name()
+            aux_basis = wfn.get_basisset("DF_BASIS_SCF")
         else:
             aux_basis_name = sf_opts['AUX_BASIS_NAME']
-        aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", 
-                                             "JKFIT", aux_basis_name)
+            aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", 
+                                                 "JKFIT", aux_basis_name)
         tei_int = TEIDF(wfn.Ca(), wfn.basisset(), aux_basis, ras1, ras2,
                         ras3, conf_space, ref_method='PSI4')
     out = do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
