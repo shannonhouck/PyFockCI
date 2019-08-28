@@ -45,8 +45,8 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
     # set SF integral type based on Psi4
     # if(wfn.density_fitted()): # this would be ideal but doesn't work for ROHF for some reason
-    #if(psi4_opts['scf_type'] == 'DF'):
-    #    sf_opts.update({'INTEGRAL_TYPE': 'DF'})
+    if(psi4_opts['scf_type'].upper() == 'DF'):
+        sf_opts.update({'INTEGRAL_TYPE': 'DF'})
     
     # obtain RAS spaces
     ras1 = wfn.doccpi()[0]
