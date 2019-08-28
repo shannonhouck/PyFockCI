@@ -8,7 +8,7 @@ class heis_ham:
 
     def __init__(self, use_pickle=True):
         # if we have pre-generated Pauli matrices, use those
-        if((not use_pickle) and os.path.isfile('./paulis.pickle')):
+        if(use_pickle and os.path.isfile('./paulis.pickle')):
             with open('paulis.pickle', 'rb') as f:
                 self.pauli = pickle.load(f)
         # otherwise, use hardcoded S=1 case
@@ -25,6 +25,7 @@ class heis_ham:
             sig_s2 = np.dot(sig_x_1, sig_x_1) + np.dot(sig_y_1, sig_y_1) + np.dot(sig_z_1, sig_z_1)
             I_1 = np.eye(2)
             self.pauli.append({'x': sig_x_1, 'y': sig_y_1, 'z': sig_z_1, 's2': sig_s2, 'I': I_1})
+        print(self.pauli)
         # store matrices generated for later access
         self.vecs = None
         self.H = None
@@ -82,8 +83,7 @@ class heis_ham:
                                 self.recursive_kron([i,j], s, 'y', 0, max_ind) +
                                 self.recursive_kron([i,j], s, 'z', 0, max_ind) )
         c1 = 0.3891124
-        c2 = 0.2141255
-        tmp, HS_vecs = LIN.eigh(H + c1*Sz + c2*S2)
+        tmp, HS_vecs = LIN.eigh(H + c1*Sz)
         self.H = H
         self.Sx = Sx
         self.Sy = Sy
