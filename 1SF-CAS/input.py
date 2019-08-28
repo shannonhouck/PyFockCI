@@ -9,7 +9,7 @@ import numpy as np
 import numpy.linalg as LIN
 
 n2_7 = psi4.core.Molecule.create_molecule_from_string("""
-0 7
+0 5
 O 0.0 0.0 0.0
 O 2.0 0.0 0.0
 O 4.0 0.0 0.0

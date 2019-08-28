@@ -98,7 +98,7 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
     print(perm)
     # permute!
     v_n = v_n[np.argsort(perm), :]
-    # construct CG coeff matrix
+    # construct coeff matrix
     R = np.zeros((ras2, len(site_list)))
     tmp, orbs_per_site = np.unique(perm, return_counts=True)
     for i, site in enumerate(np.sort(perm)):
@@ -107,15 +107,8 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
 
     # orthonormalize (SVD)
     #v_orth = LIN.orth(v_n)
-    print("Transformed vects")
     v_R = np.dot(R.T, v_n)
-    print(v_R)
-    print("Transformed vects overlap")
-    print(np.dot(v_R.T, v_R))
-    print("Transformed vects orth")
     v_orth = lowdin_orth(np.dot(R.T, v_n))
-    print(v_orth)
-    print(np.dot(v_orth.T, v_orth))
 
     # Build Bloch Hamiltonian
     #H = np.dot(S, v_orth)

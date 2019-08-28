@@ -26,9 +26,9 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
            wfn (opt) -- The reference ROHF wavefunction object from Psi4
     """
     # cleanup in case of multiple calculations
-    #psi4.core.clean()
-    #psi4.core.clean_options()
-    #psi4.core.clean_variables()
+    psi4.core.clean()
+    psi4.core.clean_options()
+    psi4.core.clean_variables()
     # setting default options, reading in additional options from user
     psi4_opts = {'BASIS': 'cc-pvdz',
                  'scf_type': 'direct',
@@ -43,6 +43,11 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         e = wfn.energy()
     else:
         e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
+    # set SF integral type based on Psi4
+    # if(wfn.density_fitted()): # this would be ideal but doesn't work for ROHF for some reason
+    #if(psi4_opts['scf_type'] == 'DF'):
+    #    sf_opts.update({'INTEGRAL_TYPE': 'DF'})
+    
     # obtain RAS spaces
     ras1 = wfn.doccpi()[0]
     ras2 = wfn.soccpi()[0]

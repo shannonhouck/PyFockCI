@@ -156,24 +156,12 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     if(opts['SF_DIAG_METHOD'] == "LANCZOS"):
         # do LANCZOS
         if(num_roots == n_dets):
+            print(num_roots)
+            print(n_dets)
             H_full = A.matmat(np.eye(n_dets))
             vals, vects = SCILIN.eigh(H_full)
         else:
             vals, vects = SPLIN.eigsh(A, k=num_roots, which='SA')
-    elif(opts['SF_DIAG_METHOD'] == "LANCZOS_NH"):
-        # do LANCZOS
-        print("************************doing lanczos NH")
-        if(num_roots == n_dets):
-            H_full = A.matmat(np.eye(n_dets))
-            vals, vects = SCILIN.eig(H_full)
-            idx = np.argsort(real(vals))
-            vals = real(vals[idx])
-            vects = real(vects[:, idx])
-        else:
-            vals, vects = SPLIN.eigs(A, k=num_roots, which='LM')
-            idx = np.argsort(np.real(vals))
-            vals = np.real(vals[idx])
-            vects = np.real(vects[:, idx])
     # use Davidson method
     elif(opts['SF_DIAG_METHOD'] == "DAVIDSON"):
         # generate guess vector
