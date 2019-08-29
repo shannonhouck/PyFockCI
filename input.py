@@ -3,6 +3,7 @@ import psi4
 import numpy as np
 import sf_ip_ea
 from sf_ip_ea import fock_ci
+from sf_ip_ea import bloch
 import heisenberg
 import numpy as np
 import numpy.linalg as LIN
@@ -27,7 +28,7 @@ H 0 2 0
 H 2 2 0
 """
 
-options = {"BASIS": "6-31G*", 'e_convergence': 1e-12, 'd_convergence': 1e-4, 'scf_type': 'pk', 'guess': 'gwh', 'reference': 'rohf'}
+options = {"BASIS": "6-31G*", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}
 sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 4}
 
 print("***** TEST: NO READ PSI WFN")
@@ -50,8 +51,9 @@ np.set_printoptions(threshold=np.inf, linewidth=100000)
 #J = bloch.do_bloch(wfn, 4)
 J = bloch.do_bloch(wfn, 4)
 
+np.set_printoptions(precision=12)
 print("J")
-print(J*27.2114*1000)
+print(J)
 
 heis = heisenberg.heis_ham()
 heis.do_heisenberg([1,1,1,1], J)

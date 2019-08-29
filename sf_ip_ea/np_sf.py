@@ -51,7 +51,7 @@ class wfn_sf:
         print("\nROOT No.\tEnergy\t\t\tSz\tS**2")
         print("----------------------------------------------------------")
         for i in range(self.n_roots):
-            print("   %i\t\t%12.12f\t\t%3.3f\t%8.6f" % (i, self.e[i], self.sz[i], self.s2[i]))
+            print("   %i\t\t%12.12f\t%3.3f\t%8.6f" % (i, self.e[i], self.sz[i], self.s2[i]))
         print("----------------------------------------------------------\n")
 
     def print_important_dets(self):
