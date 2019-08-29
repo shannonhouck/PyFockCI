@@ -7,7 +7,7 @@ import time
 # threshold for value equality
 threshold = 1e-7
 # setting up molecule
-h4 = psi4.core.Molecule.create_molecule_from_string("""
+h4 = psi4.core.Molecule.from_string("""
 0 5
 H 0 0 0
 H 2 0 0
@@ -15,7 +15,7 @@ H 0 2 0
 H 2 2 0
 symmetry c1
 """)
-o3 = psi4.core.Molecule.create_molecule_from_string("""
+o3 = psi4.core.Molecule.from_string("""
 0 7
 O 0.0 0.0 0.0
 O 2.0 0.0 0.0
