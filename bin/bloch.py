@@ -18,10 +18,9 @@ def lowdin_orth_2(A):
     X = svec.dot(sal.dot(svec.T))   
     return np.dot(A, X)
 
-def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False):
+def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden', skip_localization=False):
 
     np.set_printoptions(suppress=True)
-
     print("Doing Bloch Hamiltonian analysis...")
 
     # Put input vector into block form (only need CAS-1SF block!!)
@@ -29,13 +28,14 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
     ras1 = wfn.ras1
     ras2 = wfn.ras2
     e = wfn.e.copy()
-    v_b1 = wfn.vecs[:(ras2*ras2), :].copy()
+    v_b1 = wfn.vecs[:(ras2*ras2), :n_sites].copy()
     n_roots = v_b1.shape[1]
     v_b1 = np.reshape(v_b1, (ras2,ras2,n_roots)) # v[i,a]
 
     # Obtain info for orbital localization and localize v
     psi4_wfn = wfn.wfn
     C = psi4.core.Matrix.to_array(psi4_wfn.Ca(), copy=True)
+    # Allow user to skip our localization and use their own if needed
     if(not skip_localization):
         ras1_C = C[:, :ras1]
         ras2_C = C[:, ras1:ras1+ras2]
@@ -43,38 +43,15 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
         loc = psi4.core.Localizer.build('BOYS', psi4_wfn.basisset(), psi4.core.Matrix.from_array(ras2_C))
         loc.localize()
         U = psi4.core.Matrix.to_array(loc.U, copy=True)
-        # localize
+        # localize vects
         v_b1 = np.einsum("ji,jbn->ibn", U, v_b1)
         v_b1 = np.einsum("ba,ibn->ian", U, v_b1)
         wfn.local_vecs = np.reshape(v_b1, (ras2*ras2, n_roots))
-
-        C_full_loc = psi4.core.Matrix.from_array(np.column_stack((ras1_C, psi4.core.Matrix.to_array(loc.L), ras3_C)))
         # write localized orbitals to wfn and molden
+        C_full_loc = psi4.core.Matrix.from_array(np.column_stack((ras1_C, psi4.core.Matrix.to_array(loc.L), ras3_C)))
         psi4_wfn.Ca().copy(C_full_loc)
         psi4_wfn.Cb().copy(C_full_loc)
         psi4.molden(psi4_wfn, molden_file)
-
-    # determine which orbitals belong to which centers
-    # C given in C_iu basis
-    N = np.zeros((len(site_list), ras2))
-    bas = psi4_wfn.basisset()
-    S = psi4.core.Matrix.to_array(psi4_wfn.S())
-    C = psi4.core.Matrix.to_array(psi4_wfn.Ca())
-    CS = np.einsum("vi,vu->ui", C, S)
-    for atom, A in enumerate(site_list):
-        for i in range(ras2):
-            for mu in range(C.shape[1]):
-                if(bas.function_to_center(mu) == A):
-                    print(A, mu)
-                    N[atom, i] += C[mu, ras1+i] * CS[mu, ras1+i]
-                    #N[atom, i] += C[ras1+i, mu] * CS[ras1+i, mu]
-    print("N") # for debugging
-    print(N) # for debugging
-
-    # Obtain S
-    # not needed -- S should be I if states are orthonormal
-
-    # Remove ionic determinants
 
     # Extract i=a part (neutral determinants only!!)
     v_n = None
@@ -86,41 +63,61 @@ def do_bloch(wfn, site_list, molden_file='orbs.molden', skip_localization=False)
             v_n = np.vstack((v_n, v_new))
     v_n = v_n.T # make sure columns are states rather than rows
 
-    # Permute v_n appropriately
-    perm = []
-    # for each orbital, determine its center
-    for i in range(ras2):
-        diff = abs(N[:, i]-1)
-        perm.append(np.argmin(diff))
-    print("Reordering RAS2 determinants as follows:")
-    print(perm)
-    # permute!
-    v_n = v_n[np.argsort(perm), :]
-    # construct CG coeff matrix
-    R = np.zeros((ras2, len(site_list)))
-    tmp, orbs_per_site = np.unique(perm, return_counts=True)
-    for i, site in enumerate(np.sort(perm)):
-        R[i, site] = 1.0/math.sqrt(orbs_per_site[site])
-    print(R)
+    # Obtain S
+    # S should be I if states are orthonormal
 
-    # orthonormalize (SVD)
-    #v_orth = LIN.orth(v_n)
+    # Handle grouping orbitals if needed
+    if(type(site_list) != type(None)):
+        # Construct density N for sites
+        N = np.zeros((len(site_list), ras2))
+        bas = psi4_wfn.basisset()
+        S = psi4.core.Matrix.to_array(psi4_wfn.S())
+        C = psi4.core.Matrix.to_array(psi4_wfn.Ca())
+        CS = np.einsum("vi,vu->ui", C, S)
+        for atom, A in enumerate(site_list):
+            for i in range(ras2):
+                for mu in range(C.shape[1]):
+                    if(bas.function_to_center(mu) == A):
+                        N[atom, i] += C[mu, ras1+i] * CS[mu, ras1+i]
+        # Reorder v_n rows so they're grouped by site
+        perm = []
+        for i in range(ras2):
+            diff = abs(N[:, i]-1)
+            perm.append(np.argmin(diff))
+        print("Reordering RAS2 determinants as follows:")
+        print(perm)
+        v_n = v_n[np.argsort(perm), :] # permute!
+        # construct coeff matrix
+        R = np.zeros((ras2, len(site_list)))
+        tmp, orbs_per_site = np.unique(perm, return_counts=True)
+        for i, site in enumerate(np.sort(perm)):
+            R[i, site] = 1.0/math.sqrt(orbs_per_site[site])
+        # orthonormalize (SVD)
+        v_n = np.dot(R.T, v_n)
+
+    # Else, assume 1 orbital per site
+    else:
+        orbs_per_site = n_sites*[1]
+
     v_orth = lowdin_orth(v_n)
+    S = np.dot(v_orth.T, v_orth)
+    print("Orthogonalized Orbital Overlap:")
+    print(S)
 
     # Build Bloch Hamiltonian
     #H = np.dot(S, v_orth)
     H = v_orth
     H = np.dot(H, np.diag(e))
     H = np.dot(H, v_orth.T) # invert v_orth
-    # rotate using CG coeffs if needed
-    H = np.dot(R.T, np.dot(H, R))
     J = np.zeros(H.shape)
     print("Effective Hamiltonian")
     print(H)
     print("J Couplings:")
-    for i in range(len(site_list)):
+    for i in range(n_sites):
         for j in range(i):
-            J[i,j] = J[j,i] = -1.0*H[i,j]
+            Sa = orbs_per_site[i]/2.0
+            Sb = orbs_per_site[j]/2.0
+            J[i,j] = J[j,i] = -1.0*H[i,j]/(2.0*math.sqrt(Sa*Sb))
             print("\tJ%i%i = %6.6f" %(i, j, J[i,j]))
 
     return J

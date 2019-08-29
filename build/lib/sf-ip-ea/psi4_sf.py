@@ -43,6 +43,11 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         e = wfn.energy()
     else:
         e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
+    # set SF integral type based on Psi4
+    # if(wfn.density_fitted()): # this would be ideal but doesn't work for ROHF for some reason
+    if(psi4_opts['scf_type'].upper() == 'DF'):
+        sf_opts.update({'INTEGRAL_TYPE': 'DF'})
+    
     # obtain RAS spaces
     ras1 = wfn.doccpi()[0]
     ras2 = wfn.soccpi()[0]
@@ -59,11 +64,11 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         # if user hasn't defined which aux basis to use, default behavior
         # is to use the one from Psi4 wfn
         if(sf_opts['AUX_BASIS_NAME'] == ""):
-            aux_basis_name = wfn.basisset().name()
+            aux_basis = wfn.get_basisset("DF_BASIS_SCF")
         else:
             aux_basis_name = sf_opts['AUX_BASIS_NAME']
-        aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", 
-                                             "JKFIT", aux_basis_name)
+            aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", 
+                                                 "JKFIT", aux_basis_name)
         tei_int = TEIDF(wfn.Ca(), wfn.basisset(), aux_basis, ras1, ras2,
                         ras3, conf_space, ref_method='PSI4')
     out = do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,

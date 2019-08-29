@@ -51,7 +51,7 @@ class wfn_sf:
         print("\nROOT No.\tEnergy\t\t\tSz\tS**2")
         print("----------------------------------------------------------")
         for i in range(self.n_roots):
-            print("   %i\t\t%12.12f\t\t%3.3f\t%8.6f" % (i, self.e[i], self.sz[i], self.s2[i]))
+            print("   %i\t\t%12.12f\t\t%3.3f\t%12.12f" % (i, self.e[i], self.sz[i], self.s2[i]))
         print("----------------------------------------------------------\n")
 
     def print_important_dets(self):
@@ -144,8 +144,10 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     print("\tSpin-Flips: %3i\n\tElectron Count Change: %3i\n"
           %(n_SF, delta_ec))
     print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(ras1, ras2, ras3) )
+    """
     if(n_dets < 250):
         opts['SF_DIAG_METHOD'] = "LANCZOS"
+    """
     print("\tDiagonalization: %s\n\tGuess: %s" %(opts['SF_DIAG_METHOD'],
                                                  opts['GUESS_TYPE']))
     # DIAGONALIZATION
@@ -154,6 +156,8 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     if(opts['SF_DIAG_METHOD'] == "LANCZOS"):
         # do LANCZOS
         if(num_roots == n_dets):
+            print(num_roots)
+            print(n_dets)
             H_full = A.matmat(np.eye(n_dets))
             vals, vects = SCILIN.eigh(H_full)
         else:
