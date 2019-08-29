@@ -25,7 +25,6 @@ class heis_ham:
             sig_s2 = np.dot(sig_x_1, sig_x_1) + np.dot(sig_y_1, sig_y_1) + np.dot(sig_z_1, sig_z_1)
             I_1 = np.eye(2)
             self.pauli.append({'x': sig_x_1, 'y': sig_y_1, 'z': sig_z_1, 's2': sig_s2, 'I': I_1})
-        print(self.pauli)
         # store matrices generated for later access
         self.vecs = None
         self.H = None

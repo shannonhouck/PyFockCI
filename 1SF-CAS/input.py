@@ -48,15 +48,14 @@ wfn = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
 """
 
 np.set_printoptions(threshold=np.inf, linewidth=100000)
+#J = bloch.do_bloch(wfn, 4)
 J = bloch.do_bloch(wfn, 4)
-#J = bloch.do_bloch(wfn, 3, [0, 1, 2])
 
 print("J")
 print(J*27.2114*1000)
 
 heis = heisenberg.heis_ham()
 heis.do_heisenberg([1,1,1,1], J)
-#heis.do_heisenberg([2, 2, 2], J)
 heis.print_roots()
 
 
