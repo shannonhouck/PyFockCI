@@ -1,5 +1,6 @@
 import psi4
 import sf_ip_ea
+import pytest
 
 # threshold for value equality
 threshold = 1e-7
@@ -24,6 +25,7 @@ symmetry c1
 """)
 
 # Test: 1SF-CAS
+@pytest.mark.methodtest
 def test_1():
     psi4.core.clean()
     psi4.core.clean_options()
@@ -34,6 +36,7 @@ def test_1():
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
+@pytest.mark.methodtest
 def test_2():
     psi4.core.clean()
     psi4.core.clean_options()
@@ -44,6 +47,7 @@ def test_2():
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
+@pytest.mark.methodtest
 def test_3():
     psi4.core.clean()
     psi4.core.clean_options()

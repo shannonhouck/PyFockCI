@@ -25,4 +25,5 @@ install:
 
 # command to run tests
 script:
-  - pytest
+  - pytest -m methodtest
+  - pytest -m blochtest

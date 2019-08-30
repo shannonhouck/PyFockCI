@@ -1,8 +1,6 @@
-import sys, os
 import psi4
 import sf_ip_ea
-from sf_ip_ea import fock_ci
-import time
+import pytest
 
 # threshold for value equality
 threshold = 1e-7
@@ -26,7 +24,8 @@ O 1 1.2
 symmetry c1
 """)
 
-# Test: 1SF-CAS
+# Test: 1SF-RAS(p)
+@pytest.mark.methodtest
 def test_1():
     psi4.core.clean()
     psi4.core.clean_options()
@@ -37,6 +36,7 @@ def test_1():
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
+@pytest.mark.methodtest
 def test_2():
     psi4.core.clean()
     psi4.core.clean_options()
@@ -47,6 +47,7 @@ def test_2():
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 
+@pytest.mark.methodtest
 def test_3():
     psi4.core.clean()
     psi4.core.clean_options()

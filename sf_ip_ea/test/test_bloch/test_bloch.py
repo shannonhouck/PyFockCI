@@ -3,6 +3,7 @@ import sf_ip_ea
 from sf_ip_ea import bloch
 import numpy as np
 import time
+import pytest
 
 # threshold for value equality
 threshold = 1e-7
@@ -23,7 +24,9 @@ O 4.0 0.0 0.0
 symmetry c1
 """)
 
-# Test: 1SF-CAS
+# Test Bloch
+
+@pytest.mark.blochtest
 def test_1():
     psi4.core.clean()
     psi4.core.clean_options()
@@ -38,6 +41,7 @@ def test_1():
     J = bloch.do_bloch(wfn, 4)
     assert np.allclose(J, J_ref)
 
+@pytest.mark.blochtest
 def test_2():
     psi4.core.clean()
     psi4.core.clean_options()
