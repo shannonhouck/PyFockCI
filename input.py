@@ -12,8 +12,8 @@ n2_7 = psi4.core.Molecule.create_molecule_from_string("""
 0 5
 H 0 0 0
 H 2 0 0
-H 0 2 0
-H 2 2 0
+H 4 0 0
+H 6 0 0
 symmetry c1
 """)
 """
