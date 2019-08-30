@@ -1,9 +1,27 @@
+
+<img src = "https://travis-ci.com/shannonhouck/sf-ip-ea.svg?token=yXoAYb1Qe6BWq8AUXzXG&branch=master">
+
 # sf-ip-ea
-Stand-alone SF-IP/EA code. In progress. Run on the command line using Python:
+Stand-alone SF-IP/EA code. In progress.
+
+### Installation ###
+Clone the program from the GitHub repository:
+```
+$ git clone https://github.com/shannonhouck/sf-ip-ea.git
+```
+Then navigate into the directory and use pip:
+```
+$ cd sf-ip-ea/
+$ pip install -e .
+```
+You can now import this package into any Python script using `import sf_ip_ea`.
+
+### Running SF/IP/EA ###
+Run on the command line using Python:
 ```
 $ python input.py
 ```
-Output is written to stdout. A sample input file can be found below.
+Output is written to stdout by default. A sample input file can be found below.
 ```
 import psi4
 import sf_ip_ea
