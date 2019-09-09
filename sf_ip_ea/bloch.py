@@ -5,20 +5,40 @@ import psi4
 import scipy.linalg as LIN
 
 def lowdin_orth(A):
+    """
+    Performs Lowdin orthonormalization on a given matrix A.
+
+    Orthonormalizes a given matrix A based on Lowdin's approach.
+
+    Parameters:
+        A (numpy.ndarray): NumPy array to orthogonalize.
+
+    Returns:
+        numpy.ndarray: An orthogonalized version of A.
+    """
     U, S, V = LIN.svd(A)
     return np.dot(U, V)
 
-def lowdin_orth_2(A):
-    sal, svec = np.linalg.eigh(np.dot(A.T, A))
-    idx = sal.argsort()[::-1]                         
-    sal = sal[idx]                                    
-    svec = svec[:, idx]                               
-    sal = sal**-0.5                                   
-    sal = np.diagflat(sal)                            
-    X = svec.dot(sal.dot(svec.T))   
-    return np.dot(A, X)
+def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden', 
+    skip_localization=False):
+    """
+    Bloch effective Hamiltonian solver.
 
-def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden', skip_localization=False):
+    Solves the Bloch effective Hamiltonian and returns a matrix of the J couplings.
+    It is totally dependent on Psi4 for localization right now.
+
+    Parameters:
+        wfn (wfn): SF-IP-EA wfn object containing info about the calculation.
+        n_sites (int): The number of sites (integer).
+        site_list (list): List of which atoms are "sites". If this is not given,
+            the program assumes one orbital per site.
+        molden_file (str): Name of the Molden file to write for localized orbitals.
+        skip_localization (bool): Whether to skip orbital localization. If you use
+            this, you should localize the orbitals in wfn.wfn yourself!
+    
+    Returns:
+        J (numpy.ndarray): NumPy matrix of J coupling values
+    """
 
     np.set_printoptions(suppress=True)
     print("Doing Bloch Hamiltonian analysis...")
@@ -40,7 +60,8 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden', skip_local
         ras1_C = C[:, :ras1]
         ras2_C = C[:, ras1:ras1+ras2]
         ras3_C = C[:, ras1+ras2:]
-        loc = psi4.core.Localizer.build('BOYS', psi4_wfn.basisset(), psi4.core.Matrix.from_array(ras2_C))
+        loc = psi4.core.Localizer.build('BOYS', psi4_wfn.basisset(), 
+                  psi4.core.Matrix.from_array(ras2_C))
         loc.localize()
         U = psi4.core.Matrix.to_array(loc.U, copy=True)
         # localize vects
@@ -48,7 +69,8 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden', skip_local
         v_b1 = np.einsum("ba,ibn->ian", U, v_b1)
         wfn.local_vecs = np.reshape(v_b1, (ras2*ras2, n_roots))
         # write localized orbitals to wfn and molden
-        C_full_loc = psi4.core.Matrix.from_array(np.column_stack((ras1_C, psi4.core.Matrix.to_array(loc.L), ras3_C)))
+        C_full_loc = psi4.core.Matrix.from_array(np.column_stack((ras1_C, 
+                         psi4.core.Matrix.to_array(loc.L), ras3_C)))
         psi4_wfn.Ca().copy(C_full_loc)
         psi4_wfn.Cb().copy(C_full_loc)
         psi4.molden(psi4_wfn, molden_file)
