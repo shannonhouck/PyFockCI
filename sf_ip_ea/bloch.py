@@ -52,6 +52,8 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden',
     n_roots = v_b1.shape[1]
     v_b1 = np.reshape(v_b1, (ras2,ras2,n_roots)) # v[i,a]
 
+    print(v_b1)
+
     # Obtain info for orbital localization and localize v
     psi4_wfn = wfn.wfn
     C = psi4.core.Matrix.to_array(psi4_wfn.Ca(), copy=True)
@@ -121,7 +123,12 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden',
     else:
         orbs_per_site = n_sites*[1]
 
+    #v_orth = v_n
     v_orth = lowdin_orth(v_n)
+
+    print("v_n")
+    print(v_n)
+
     S = np.dot(v_orth.T, v_orth)
     print("Orthogonalized Orbital Overlap:")
     print(S)
