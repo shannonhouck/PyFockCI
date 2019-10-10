@@ -20,7 +20,7 @@ def lowdin_orth(A):
     return np.dot(U, V)
 
 def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden', 
-    skip_localization=False):
+    skip_localization=False, neutral=False):
     """
     Bloch effective Hamiltonian solver.
 
@@ -48,7 +48,15 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden',
     ras1 = wfn.ras1
     ras2 = wfn.ras2
     e = wfn.e.copy()
-    v_b1 = wfn.vecs[:(ras2*ras2), :n_sites].copy()
+    vecs = wfn.vecs
+    if(neutral):
+        newvecs = np.zeros((ras2, ras2, n_sites))
+        for i in range(ras2):
+            for n in range(n_sites):
+                newvecs[i, i, n] = wfn.vecs[i, n]
+        newvecs = np.reshape(newvecs, (ras2*ras2, n_sites))
+        vecs = newvecs
+    v_b1 = vecs[:(ras2*ras2), :n_sites].copy()
     n_roots = v_b1.shape[1]
     v_b1 = np.reshape(v_b1, (ras2,ras2,n_roots)) # v[i,a]
 
