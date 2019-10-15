@@ -19,8 +19,8 @@ def lowdin_orth(A):
     U, S, V = LIN.svd(A)
     return np.dot(U, V)
 
-def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden', 
-    skip_localization=False, neutral=False):
+def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
+    molden_file='orbs.molden', skip_localization=False, neutral=False):
     """
     Bloch effective Hamiltonian solver.
 
@@ -124,6 +124,22 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden',
         tmp, orbs_per_site = np.unique(perm, return_counts=True)
         for i, site in enumerate(np.sort(perm)):
             R[i, site] = 1.0/math.sqrt(orbs_per_site[site])
+        # orthonormalize (SVD)
+        v_n = np.dot(R.T, v_n)
+
+    elif(type(site_list_orbs) != type(None)):
+        # Reorder v_n rows so they're grouped by site
+        perm = []
+        for site in site_list_orbs:
+            for orb in site:
+                perm.append(ras1 - orb)
+        print("Reordering RAS2 determinants as follows:")
+        print(perm)
+        v_n = v_n[np.argsort(perm), :] # permute!
+        # construct coeff matrix
+        R = np.zeros((ras2, len(site_list_orbs)))
+        for i, site in enumerate(np.sort(perm)):
+            R[i, site] = 1.0/math.sqrt(len(site_list_orbs[i]))
         # orthonormalize (SVD)
         v_n = np.dot(R.T, v_n)
 
