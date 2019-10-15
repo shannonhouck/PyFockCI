@@ -137,9 +137,13 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
         print(perm)
         v_n = v_n[np.argsort(perm), :] # permute!
         # construct coeff matrix
+        # construct coeff matrix
         R = np.zeros((ras2, len(site_list_orbs)))
-        for i, site in enumerate(np.sort(perm)):
-            R[i, site] = 1.0/math.sqrt(len(site_list_orbs[i]))
+        orbs_per_site = []
+        for s, site in enumerate(site_list_orbs):
+            orbs_per_site.append(len(site))
+            for i in range(len(site)):
+                R[i, s] = 1.0/math.sqrt(len(site))
         # orthonormalize (SVD)
         v_n = np.dot(R.T, v_n)
 
