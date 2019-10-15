@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import time
 import psi4
 
 """
@@ -40,6 +41,7 @@ class TEIFull(TEI):
            Return
                Initialized TEI object
         """
+        tei_start_time = time.time()
         if(not type(np_tei)==type(None)):
             print("Reading in two-electron integrals...")
             self.eri = np_tei
@@ -61,6 +63,7 @@ class TEIFull(TEI):
         # ind stores the indexing of ras1/ras2/ras3 for get_subblock method
         self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],
                     [ras1+ras2,ras1+ras2+ras3]]
+        print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
 
     def get_subblock(self, a, b, c, d):
         """Returns a given subblock of the two-electron integrals.
@@ -106,6 +109,7 @@ class TEIDF(TEI):
                Initialized TEI object
         """
         print("Inititalizing DF-TEI Object....")
+        tei_start_time = time.time()
         if(not type(np_tei)==type(None)):
             eri = np_tei
             J = np_J
@@ -160,6 +164,7 @@ class TEIDF(TEI):
             self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
             self.B31 = np.einsum('PAq,qJ->PAJ', B3m, C_ras1)
             self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
+        print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
 
     def get_subblock(self, a, b, c, d):
         """Returns a given subblock of the two-electron integrals (DF).

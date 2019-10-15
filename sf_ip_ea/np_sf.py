@@ -1,6 +1,7 @@
 # importing general python functionality
 from __future__ import print_function
 import math
+import time
 
 # importing numpy
 import numpy as np
@@ -151,6 +152,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     # DIAGONALIZATION
     # use built-in Lanczos method
     # TODO: Support other guess options
+    start_diag_time = time.time()
     if(opts['SF_DIAG_METHOD'] == "LANCZOS"):
         # do LANCZOS
         if(num_roots == n_dets):
@@ -209,6 +211,8 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
         print("Diag method not yet supported. \
                Please use DAVIDSON or LANCZOS.")
         exit()
+    print("Diagonalization completed in %i seconds." %(time.time() - start_diag_time) )
+
     # POST-HF ANALYSIS
     # set eigenvalues/vects
     wfn.e = vals
