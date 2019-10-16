@@ -9,15 +9,17 @@ from scipy.sparse.linalg import spsolve
 def davidson( A, vInit, e_conv=1e-8, r_conv=1e-4, vect_cutoff=1e-5,
               maxIter=200, collapse_per_root=20 ):
     """Solves for the eigenvalues and eigenvectors of a Hamiltonian.
-       Input
-           A -- Hamiltonian (LinOp object)
-           vInit -- Initial guess vector (numpy)
-           e_conv -- Cutoff for energy convergence
-           r_conv -- Cutoff for residual squared convergence
-           vect_cutoff -- Cutoff for adding vectors to Krylov space
-           maxIter -- Maximum number of iterations
-       Returns
-           Eigenvalues/eigenvectors for the Hamiltonian.
+
+    Uses the Davidson method to solve for the eigenvalues and eigenvectors
+    of a given Hermitian matrix A.
+       
+    :param A: Hamiltonian (LinOp object)
+    :param vInit: Initial guess vector (numpy)
+    :param e_conv: Cutoff for energy convergence
+    :param r_conv: Cutoff for residual squared convergence
+    :param vect_cutoff: Cutoff for adding vectors to Krylov space
+    :param maxIter: Maximum number of iterations
+    :return: Eigenvalues/eigenvectors for the Hamiltonian.
     """
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots

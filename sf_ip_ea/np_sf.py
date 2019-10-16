@@ -72,28 +72,26 @@ class wfn_sf:
 def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
              conf_space="", sf_opts={}, J_in=None, C_in=None):
     """Performs the 1SF-CAS calculation, given NumPy input arrays.
-       Input
-           delta_a -- Desired number of alpha electrons to remove (int)
-           delta_b -- Desired number of beta electrons to add (int)
-           ras1 -- RAS1 space (int)
-           ras2 -- RAS2 space (int)
-           ras3 -- RAS3 space (int)
-           Fa -- Alpha Fock matrix (NumPy array)
-           Fb -- Beta Fock matrix (NumPy array)
-           tei_int -- Two-electron integrals (NumPy array)
-           e -- ROHF energy (float)
-           conf_space -- Desired excitation scheme:
+
+       :param delta_a: Desired number of alpha electrons to remove (int)
+       :param delta_b: Desired number of beta electrons to add (int)
+       :param ras1: RAS1 space (int)
+       :param ras2: RAS2 space (int)
+       :param ras3: RAS3 space (int)
+       :param Fa: Alpha Fock matrix (NumPy array)
+       :param Fb: Beta Fock matrix (NumPy array)
+       :param tei_int: Two-electron integrals (NumPy array)
+       :param e: ROHF energy (float)
+       :param conf_space: Desired excitation scheme:
                          "" CAS-nSF-IP/EA (default)
                          "h" RAS(h)-nSF-IP/EA
                          "p" RAS(p)-nSF-IP/EA
                          "h,p" RAS(h,p)-nSF-IP/EA
-           sf_opts -- Additional options (dict)
+       :param sf_opts: Additional options (dict)
                       See __init__ for more information.
-           J_in -- J matrix (for DF calculations)
-           C_in -- MO coefficients matrix (for DF calculations)
-       Output
-           energy -- List of requested roots for the system
-           vects -- Eigenvectors for the system (optional)
+       :param J_in: J matrix (for DF calculations)
+       :param C_in: MO coefficients matrix (for DF calculations)
+       :return: A sf_wfn object with calculation result info
     """
     # OPTIONS HANDLING
     opts =  {'SF_DIAG_METHOD': 'DAVIDSON',

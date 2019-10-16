@@ -10,11 +10,8 @@ def lowdin_orth(A):
 
     Orthonormalizes a given matrix A based on Lowdin's approach.
 
-    Parameters:
-        A (numpy.ndarray): NumPy array to orthogonalize.
-
-    Returns:
-        numpy.ndarray: An orthogonalized version of A.
+    :param A: NumPy array to orthogonalize.
+    :return: An orthogonalized version of A.
     """
     U, S, V = LIN.svd(A)
     return np.dot(U, V)
@@ -27,17 +24,18 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
     Solves the Bloch effective Hamiltonian and returns a matrix of the J couplings.
     It is totally dependent on Psi4 for localization right now.
 
-    Parameters:
-        wfn (wfn): SF-IP-EA wfn object containing info about the calculation.
-        n_sites (int): The number of sites (integer).
-        site_list (list): List of which atoms are "sites". If this is not given,
-            the program assumes one orbital per site.
-        molden_file (str): Name of the Molden file to write for localized orbitals.
-        skip_localization (bool): Whether to skip orbital localization. If you use
+    :param wfn: SF-IP-EA wfn object containing info about the calculation.
+    :param n_sites: The number of sites (integer).
+    :param site_list: List of which atoms are "sites". If this is not given,
+            the program assumes one orbital per site. Atomic center ordering
+            starts at zero.
+    :param site_list_orbs: Site list using orbitals rather than atomic centers.
+            Note that orbital ordering follows the same notation as Psi4
+            (i.e. orbital ordering starts at 1, not zero).
+    :param molden_file: Name of the Molden file to write for localized orbitals.
+    :skip_localization: Whether to skip orbital localization. If you use
             this, you should localize the orbitals in wfn.wfn yourself!
-    
-    Returns:
-        J (numpy.ndarray): NumPy matrix of J coupling values
+    :return: NumPy matrix of J coupling values
     """
 
     np.set_printoptions(suppress=True)
@@ -59,8 +57,6 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
     v_b1 = vecs[:(ras2*ras2), :n_sites].copy()
     n_roots = v_b1.shape[1]
     v_b1 = np.reshape(v_b1, (ras2,ras2,n_roots)) # v[i,a]
-
-    print(v_b1)
 
     # Obtain info for orbital localization and localize v
     psi4_wfn = wfn.wfn

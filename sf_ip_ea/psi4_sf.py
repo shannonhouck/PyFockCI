@@ -15,16 +15,13 @@ from .np_sf import do_sf_np
 def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     """Runs SF-CAS using Psi4's integral packages
        Input
-           delta_a -- Number of alpha electrons to eliminate
-           delta_b -- Number of beta electrons to create
-           mol -- Psi4 Molecule object on which to run the calculation
-           conf_space -- Excitation scheme (Options: "", "h", "p", "h,p")
-           ref_opts -- Additional options for Psi4 (dictionary)
-           sf_opts -- Additional options for Fock CI (dictionary)
-       Returns
-           e -- List of SF-IP/EA roots (as many as requested)
-           vects (opt) -- List of eigenvectors corresponding to the roots in e
-           wfn (opt) -- The reference ROHF wavefunction object from Psi4
+       :param delta_a: Number of alpha electrons to eliminate
+       :param delta_b: Number of beta electrons to create
+       :param mol: Psi4 Molecule object on which to run the calculation
+       :param conf_space: Excitation scheme (Options: "", "h", "p", "h,p")
+       :param ref_opts: Additional options for Psi4 (dictionary)
+       :param sf_opts: Additional options for Fock CI (dictionary)
+       :return: A sf_wfn object containing calculation results
     """
     # cleanup in case of multiple calculations
     psi4.core.clean()

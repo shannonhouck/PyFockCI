@@ -29,17 +29,16 @@ class TEIFull(TEI):
     def __init__(self, C, basis, ras1, ras2, ras3, ref_method='PSI4',
                  np_tei=None):
         """Initialize TEI object.
-           Input
-               C -- MO coefficient matrix (NumPy array)
-               basis -- Basis set object (Psi4 BasisSet)
-               ras1 -- RAS1 orbitals (int)
-               ras2 -- RAS2 orbitals (int)
-               ras3 -- RAS3 orbitals (int)
-               ref_method -- Program to use to generate TEIs
-               np_tei -- NumPy array for previously-constructed integrals.
+
+           :param C: MO coefficient matrix (NumPy array)
+           :param basis: Basis set object (Psi4 BasisSet)
+           :param ras1: RAS1 orbitals (int)
+           :param ras2: RAS2 orbitals (int)
+           :param ras3: RAS3 orbitals (int)
+           :param ref_method: Program to use to generate TEIs
+           :param np_tei: NumPy array for previously-constructed integrals.
                          This allows us to avoid integral construction.
-           Return
-               Initialized TEI object
+           :return: Initialized TEI object
         """
         tei_start_time = time.time()
         if(not type(np_tei)==type(None)):
@@ -71,13 +70,11 @@ class TEIFull(TEI):
            the returned integral has the form <ab|cd>.
            So to get the block with a and c in RAS1 and b and d in RAS2,
            one would use get_subblock(1, 2, 1, 2).
-           Input
-               a -- RAS space of index 1
-               b -- RAS space of index 2
-               c -- RAS space of index 3
-               d -- RAS space of index 4
-           Returns
-               Desired subblock (NumPy array)
+           :param a: RAS space of index 1
+           :param b: RAS space of index 2
+           :param c: RAS space of index 3
+           :param d: RAS space of index 4
+           :return: Desired subblock (NumPy array)
         """
         return self.eri[self.ind[a][0]:self.ind[a][1],
                         self.ind[b][0]:self.ind[b][1],
@@ -95,18 +92,17 @@ class TEIDF(TEI):
     def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space,
                  ref_method='PSI4', np_tei=None, np_J=None):
         """Initialize density-fitted TEI object.
-           Input
-               C -- MO coefficient matrix (NumPy array)
-               basis -- Basis set object (Psi4 BasisSet)
-               ras1 -- RAS1 orbitals (int)
-               ras2 -- RAS2 orbitals (int)
-               ras3 -- RAS3 orbitals (int)
-               ref_method -- Program to use to generate TEIs
-               np_tei -- NumPy array for previously-constructed integrals.
-                         This allows us to avoid integral construction.
-               J_tei -- Previously-constructed J matrix (NumPy)
-           Return
-               Initialized TEI object
+
+           :param C: MO coefficient matrix (NumPy array)
+           :param basis: Basis set object (Psi4 BasisSet)
+           :param ras1: RAS1 orbitals (int)
+           :param ras2: RAS2 orbitals (int)
+           :param ras3: RAS3 orbitals (int)
+           :param ref_method: Program to use to generate TEIs
+           :param np_tei: NumPy array for previously-constructed integrals.
+                     This allows us to avoid integral construction.
+           :param J_tei: Previously-constructed J matrix (NumPy)
+           :return: Initialized TEI object
         """
         print("Inititalizing DF-TEI Object....")
         tei_start_time = time.time()
@@ -168,15 +164,16 @@ class TEIDF(TEI):
 
     def get_subblock(self, a, b, c, d):
         """Returns a given subblock of the two-electron integrals (DF).
+
+           Returns a given subblock of the DF two-electron integral object.
            The RAS space to return is given by a, b, c, and d, and 
            the returned integral has the form <ab|cd>.
-           Input
-               a -- RAS space of index 1
-               b -- RAS space of index 2
-               c -- RAS space of index 3
-               d -- RAS space of index 4
-           Returns
-               Desired subblock (NumPy array)
+
+           :param a: RAS space of index 1
+           :param b: RAS space of index 2
+           :param c: RAS space of index 3
+           :param d: RAS space of index 4
+           :return: Desired subblock (NumPy array)
         """
         # the B matrices are still in chemists' notation
         # don't switch b and c index until end
