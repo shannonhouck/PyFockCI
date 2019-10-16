@@ -94,6 +94,7 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
     # Obtain S
     # S should be I if states are orthonormal
 
+    orbs_per_site = []
     # Handle grouping orbitals if needed
     if(type(site_list) != type(None)):
         # Construct density N for sites
@@ -135,7 +136,6 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
         # construct coeff matrix
         # construct coeff matrix
         R = np.zeros((ras2, len(site_list_orbs)))
-        orbs_per_site = []
         for s, site in enumerate(site_list_orbs):
             orbs_per_site.append(len(site))
             for i in range(len(site)):
@@ -165,6 +165,8 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
     J = np.zeros(H.shape)
     print("Effective Hamiltonian")
     print(H)
+    print("Orbs Per Site")
+    print(orbs_per_site)
     print("J Couplings:")
     for i in range(n_sites):
         for j in range(i):
