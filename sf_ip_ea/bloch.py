@@ -130,7 +130,7 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
         perm = []
         for site in site_list_orbs:
             for orb in site:
-                perm.append(orb - ras1)
+                perm.append(orb - ras1 - 1)
         print("Reordering RAS2 determinants as follows:")
         print(perm)
         v_n = v_n[perm, :] # permute!
