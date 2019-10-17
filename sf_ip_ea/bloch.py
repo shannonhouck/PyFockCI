@@ -125,6 +125,7 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
         v_n = np.dot(R.T, v_n)
 
     elif(type(site_list_orbs) != type(None)):
+        print("WE HIT THE SITE LIST ORBS")
         # Reorder v_n rows so they're grouped by site
         perm = []
         for site in site_list_orbs:
@@ -132,15 +133,18 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
                 perm.append(orb - ras1)
         print("Reordering RAS2 determinants as follows:")
         print(perm)
-        v_n = v_n[np.argsort(perm), :] # permute!
+        v_n = v_n[perm, :] # permute!
         # construct coeff matrix
         # construct coeff matrix
         R = np.zeros((ras2, len(site_list_orbs)))
+        ind = 0
         for s, site in enumerate(site_list_orbs):
             orbs_per_site.append(len(site))
             for i in range(len(site)):
-                R[i, s] = 1.0/math.sqrt(len(site))
+                R[ind, s] = 1.0/math.sqrt(len(site))
+                ind = ind + 1
         # orthonormalize (SVD)
+        print(R)
         v_n = np.dot(R.T, v_n)
 
     # Else, assume 1 orbital per site
