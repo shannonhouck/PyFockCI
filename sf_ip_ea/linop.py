@@ -180,7 +180,7 @@ class LinOpH (LinearOperator):
                             sig_1_out[index, n] = sig_1[i, j, a, b, n]
                             index = index + 1
 
-        return sig_1_out #+ offset_v
+        return sig_1_out + offset_v
 
     def do_h_1sf(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
         """Do RAS(h)-1SF.
