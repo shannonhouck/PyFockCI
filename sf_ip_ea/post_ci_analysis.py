@@ -158,6 +158,20 @@ def calc_s2(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
                     s2 = s2 + 0.5*vect[p,p]*vect[q,q]
         return s2
 
+    # CAS-1SF
+    if(n_SF==1 and delta_ec==0 and conf_space=="neutral"):
+        # S+S-
+        for p in range(socc):
+            for q in range(socc):
+                if(p != q):
+                    s2 = s2 + 0.5*vect[p]*vect[q]
+        # S-S+
+        for p in range(socc):
+            for q in range(socc):
+                if(p != q):
+                    s2 = s2 + 0.5*vect[p]*vect[q]
+        return s2
+
     # CAS-2SF
     if(n_SF==2 and delta_ec==0 and conf_space==""):
         v_ref1 = np.zeros((socc, socc, socc, socc))
@@ -579,6 +593,13 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
         for i in range(ras1,ras1+ras2):
             for a in range(ras1,ras1+ras2):
                 dets_list.append([[[i],[]], [[],[a]]])
+        return dets_list
+
+    # CAS-1SF (neutral)
+    if(n_SF==1 and delta_ec==0 and conf_space=="neutral"):
+        # make array with determinant data (i->i)
+        for i in range(ras1,ras1+ras2):
+            dets_list.append([[[i],[]], [[],[i]]])
         return dets_list
 
     # RAS(h)-1SF

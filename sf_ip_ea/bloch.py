@@ -10,34 +10,32 @@ def lowdin_orth(A):
 
     Orthonormalizes a given matrix A based on Lowdin's approach.
 
-    Parameters:
-        A (numpy.ndarray): NumPy array to orthogonalize.
-
-    Returns:
-        numpy.ndarray: An orthogonalized version of A.
+    :param A: NumPy array to orthogonalize.
+    :return: An orthogonalized version of A.
     """
     U, S, V = LIN.svd(A)
     return np.dot(U, V)
 
-def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden', 
-    skip_localization=False):
+def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
+    molden_file='orbs.molden', skip_localization=False, neutral=False):
     """
     Bloch effective Hamiltonian solver.
 
     Solves the Bloch effective Hamiltonian and returns a matrix of the J couplings.
     It is totally dependent on Psi4 for localization right now.
 
-    Parameters:
-        wfn (wfn): SF-IP-EA wfn object containing info about the calculation.
-        n_sites (int): The number of sites (integer).
-        site_list (list): List of which atoms are "sites". If this is not given,
-            the program assumes one orbital per site.
-        molden_file (str): Name of the Molden file to write for localized orbitals.
-        skip_localization (bool): Whether to skip orbital localization. If you use
+    :param wfn: SF-IP-EA wfn object containing info about the calculation.
+    :param n_sites: The number of sites (integer).
+    :param site_list: List of which atoms are "sites". If this is not given,
+            the program assumes one orbital per site. Atomic center ordering
+            starts at zero.
+    :param site_list_orbs: Site list using orbitals rather than atomic centers.
+            Note that orbital ordering follows the same notation as Psi4
+            (i.e. orbital ordering starts at 1, not zero).
+    :param molden_file: Name of the Molden file to write for localized orbitals.
+    :skip_localization: Whether to skip orbital localization. If you use
             this, you should localize the orbitals in wfn.wfn yourself!
-    
-    Returns:
-        J (numpy.ndarray): NumPy matrix of J coupling values
+    :return: NumPy matrix of J coupling values
     """
 
     np.set_printoptions(suppress=True)
@@ -48,7 +46,15 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden',
     ras1 = wfn.ras1
     ras2 = wfn.ras2
     e = wfn.e.copy()
-    v_b1 = wfn.vecs[:(ras2*ras2), :n_sites].copy()
+    vecs = wfn.vecs
+    if(neutral):
+        newvecs = np.zeros((ras2, ras2, n_sites))
+        for i in range(ras2):
+            for n in range(n_sites):
+                newvecs[i, i, n] = wfn.vecs[i, n]
+        newvecs = np.reshape(newvecs, (ras2*ras2, n_sites))
+        vecs = newvecs
+    v_b1 = vecs[:(ras2*ras2), :n_sites].copy()
     n_roots = v_b1.shape[1]
     v_b1 = np.reshape(v_b1, (ras2,ras2,n_roots)) # v[i,a]
 
@@ -88,6 +94,7 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden',
     # Obtain S
     # S should be I if states are orthonormal
 
+    orbs_per_site = []
     # Handle grouping orbitals if needed
     if(type(site_list) != type(None)):
         # Construct density N for sites
@@ -117,11 +124,39 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden',
         # orthonormalize (SVD)
         v_n = np.dot(R.T, v_n)
 
+    elif(type(site_list_orbs) != type(None)):
+        print("WE HIT THE SITE LIST ORBS")
+        # Reorder v_n rows so they're grouped by site
+        perm = []
+        for site in site_list_orbs:
+            for orb in site:
+                perm.append(orb - ras1 - 1)
+        print("Reordering RAS2 determinants as follows:")
+        print(perm)
+        v_n = v_n[perm, :] # permute!
+        # construct coeff matrix
+        # construct coeff matrix
+        R = np.zeros((ras2, len(site_list_orbs)))
+        ind = 0
+        for s, site in enumerate(site_list_orbs):
+            orbs_per_site.append(len(site))
+            for i in range(len(site)):
+                R[ind, s] = 1.0/math.sqrt(len(site))
+                ind = ind + 1
+        # orthonormalize (SVD)
+        print(R)
+        v_n = np.dot(R.T, v_n)
+
     # Else, assume 1 orbital per site
     else:
         orbs_per_site = n_sites*[1]
 
+    #v_orth = v_n
     v_orth = lowdin_orth(v_n)
+
+    print("v_n")
+    print(v_n)
+
     S = np.dot(v_orth.T, v_orth)
     print("Orthogonalized Orbital Overlap:")
     print(S)
@@ -134,6 +169,8 @@ def do_bloch(wfn, n_sites, site_list=None, molden_file='orbs.molden',
     J = np.zeros(H.shape)
     print("Effective Hamiltonian")
     print(H)
+    print("Orbs Per Site")
+    print(orbs_per_site)
     print("J Couplings:")
     for i in range(n_sites):
         for j in range(i):

@@ -92,6 +92,34 @@ class LinOpH (LinearOperator):
         sig_1 = np.reshape(sig_1, (v.shape[0], v.shape[1]))
         return sig_1 + offset_v
 
+    def do_cas_1sf_neutral(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
+        """Do CAS-1SF.
+
+           Evaluate the following matrix vector multiply:
+                | H(1,1) | * v(1) = sig(1)
+           
+        """
+        ################################################ 
+        # Put guess vector into block form
+        ################################################ 
+        v_b1 = v # v for block 1
+
+        ################################################ 
+        #       H(1,1) v(1) = sig(1)
+        ################################################ 
+        #   sig(ia:ba) += -v(ia:ba) (eps(a:b)-eps(i:a))
+        Fi_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
+        Fa_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
+        sig_1 = np.einsum("in,ii->in", v_b1, Fa_tmp)
+        sig_1 = sig_1 - np.einsum("in,ii->in", v_b1, Fi_tmp)
+        #   sig(ai:ba) += -v(bj:ba) I(ajbi:baba)
+        tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
+        sig_1 = sig_1 - np.einsum("jn,ijji->in", v_b1, tei_tmp)
+        # using reshape because non-contiguous in memory
+        # look into this while doing speedup
+        #sig_1 = np.reshape(sig_1, (v.shape[0], v.shape[1]))
+        return sig_1 + offset_v
+
     def do_cas_2sf(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
         """Do CAS-2SF.
 
@@ -2399,6 +2427,9 @@ class LinOpH (LinearOperator):
         # CAS-1SF
         if(n_SF==1 and delta_ec==0 and conf_space==""):
             return self.do_cas_1sf(v, Fa, Fb, tei, offset_v, ras1, ras2, ras3)
+        # CAS-1SF (neutral determinants only!!)
+        if(n_SF==1 and delta_ec==0 and conf_space=="neutral"):
+            return self.do_cas_1sf_neutral(v, Fa, Fb, tei, offset_v, ras1, ras2, ras3)
         # CAS-2SF
         if(n_SF==2 and delta_ec==0 and conf_space==""):
             return self.do_cas_2sf(v, Fa, Fb, tei, offset_v, ras1, ras2, ras3)
