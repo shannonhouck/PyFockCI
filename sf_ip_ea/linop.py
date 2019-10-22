@@ -1242,7 +1242,6 @@ class LinOpH (LinearOperator):
         F_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = -1.0*np.einsum("jn,ji->in", v_ref1, F_tmp)
 
-        '''
         ################################################ 
         # Do the following term:
         #       H(1,2) v(2) = sig(1)
@@ -1258,35 +1257,28 @@ class LinOpH (LinearOperator):
         sig_1 = sig_1 + np.einsum("Iian,Ia->in", v_ref3, F_tmp)
         tei_tmp = self.tei.get_subblock(1, 2, 2, 2)
         sig_1 = sig_1 - np.einsum("Ijan,Ijai->in", v_ref3, tei_tmp)
-        '''
 
-        '''
         ################################################ 
         # Do the following term:
         #       H(2,1) v(1) = sig(2)
         ################################################ 
         F_tmp = Fa[ras1:ras1+ras2, 0:ras1]
         sig_2 = -1.0*np.einsum("in,iI->In", v_ref1, F_tmp)
-        '''
 
         ################################################ 
         # Do the following term:
         #       H(2,2) v(2) = sig(2)
         ################################################ 
         F_tmp = Fa[0:ras1, 0:ras1]
-        sig_2 = -1.0*np.einsum("Jn,JI->In", v_ref2, F_tmp)
-        #sig_2 = sig_2 - np.einsum("Jn,JI->In", v_ref2, F_tmp)
+        sig_2 = sig_2 - np.einsum("Jn,JI->In", v_ref2, F_tmp)
 
-        '''
         ################################################ 
         # Do the following term:
         #       H(2,3) v(3) = sig(2)
         ################################################ 
         tei_tmp = self.tei.get_subblock(1, 2, 2, 1)
         sig_2 = sig_2 - np.einsum("Jian,JiaI->In", v_ref3, tei_tmp)
-        '''
 
-        '''
         ################################################ 
         # Do the following term:
         #       H(3,1) v(1) = sig(3)
@@ -1302,15 +1294,13 @@ class LinOpH (LinearOperator):
         ################################################
         tei_tmp = self.tei.get_subblock(2, 1, 1, 2)
         sig_3 = sig_3 - np.einsum("Jn,aJIi->Iian", v_ref2, tei_tmp)
-        '''
 
         ################################################ 
         # Do the following term:
         #       H(3,3) v(3) = sig(3)
         ################################################
         F_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_3 = -1.0*np.einsum("Ijan,ji->Iian", v_ref3, F_tmp)
-        #sig_3 = sig_3 - np.einsum("Ijan,ji->Iian", v_ref3, F_tmp)
+        sig_3 = sig_3 - np.einsum("Ijan,ji->Iian", v_ref3, F_tmp)
         F_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_3 = sig_3 + np.einsum("Iibn,ab->Iian", v_ref3, F_tmp)
         F_tmp = Fb[0:ras1, 0:ras1]
