@@ -144,14 +144,20 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
           %(n_SF, delta_ec))
     print("\tRAS1: %i\n\tRAS2: %i\n\tRAS3: %i" %(ras1, ras2, ras3) )
     if(n_dets < 250):
-        opts['SF_DIAG_METHOD'] = "LANCZOS"
+        if(opts['SF_DIAG_METHOD'] == "DAVIDSON"):
+            opts['SF_DIAG_METHOD'] = "LANCZOS"
     print("\tDiagonalization: %s\n\tGuess: %s" %(opts['SF_DIAG_METHOD'],
                                                  opts['GUESS_TYPE']))
     # DIAGONALIZATION
     # use built-in Lanczos method
     # TODO: Support other guess options
     start_diag_time = time.time()
-    if(opts['SF_DIAG_METHOD'] == "LANCZOS"):
+    if(opts['SF_DIAG_METHOD'] == "PRINT_MATRIX"):
+        print("Hamiltonian Matrix:")
+        print(A.matmat(np.eye(n_dets)))
+        print("Hamiltonian printing done. Exiting...")
+        exit()
+    elif(opts['SF_DIAG_METHOD'] == "LANCZOS"):
         # do LANCZOS
         if(num_roots == n_dets):
             H_full = A.matmat(np.eye(n_dets))

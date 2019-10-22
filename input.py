@@ -16,7 +16,7 @@ symmetry c1
 """)
 
 options = {"basis": "cc-pvtz", "BASIS_GUESS": "sto-3g", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}
-sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 2}
+sf_options = {'SF_DIAG_METHOD': 'PRINT_MATRIX', 'NUM_ROOTS': 2}
 
 psi4.set_options(options)
 e, psi4_wfn = psi4.energy('scf', molecule=n2_7, return_wfn=True)
