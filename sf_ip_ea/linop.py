@@ -155,7 +155,6 @@ class LinOpH (LinearOperator):
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = sig_1 + np.einsum("ijcbn,ac->ijabn", v_ref1, Fb_tmp)
         sig_1 = sig_1 - np.einsum("ijcan,bc->ijabn", v_ref1, Fb_tmp) #P(ab)
-        '''
         #   sig(ijab:aabb) += 0.5*v(ijcd:aabb) I(abcd:bbbb)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
         sig_1 = sig_1 + 0.5*(np.einsum("ijcdn,abcd->ijabn", v_ref1, tei_tmp)
@@ -168,7 +167,6 @@ class LinOpH (LinearOperator):
         sig_1 = sig_1 + (np.einsum("jkcbn,akci->ijabn", v_ref1, tei_tmp)) #P(ij)
         sig_1 = sig_1 + (np.einsum("ikcan,bkcj->ijabn", v_ref1, tei_tmp)) #P(ab)
         sig_1 = sig_1 - (np.einsum("jkcan,bkci->ijabn", v_ref1, tei_tmp)) #P(ij)P(ab)
-        '''
 
         sig_1_out = np.zeros((v.shape[0], v.shape[1]))
         for n in range(v.shape[1]):
