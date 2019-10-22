@@ -127,6 +127,7 @@ class LinOpH (LinearOperator):
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = sig_1 + np.einsum("ijcbn,ac->ijabn", v_ref1, Fb_tmp)
         sig_1 = sig_1 - np.einsum("ijcan,bc->ijabn", v_ref1, Fb_tmp) #P(ab)
+        '''
         #   sig(ijab:aabb) += 0.5*v(ijcd:aabb) I(abcd:bbbb)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
         sig_1 = sig_1 + 0.5*(np.einsum("ijcdn,abcd->ijabn", v_ref1, tei_tmp)
@@ -139,6 +140,7 @@ class LinOpH (LinearOperator):
         sig_1 = sig_1 + (np.einsum("jkcbn,akci->ijabn", v_ref1, tei_tmp)) #P(ij)
         sig_1 = sig_1 + (np.einsum("ikcan,bkcj->ijabn", v_ref1, tei_tmp)) #P(ab)
         sig_1 = sig_1 - (np.einsum("jkcan,bkci->ijabn", v_ref1, tei_tmp)) #P(ij)P(ab)
+        '''
 
         sig_1_out = np.zeros((v.shape[0], v.shape[1]))
         for n in range(v.shape[1]):
@@ -150,7 +152,7 @@ class LinOpH (LinearOperator):
                             sig_1_out[index, n] = sig_1[i, j, a, b, n]
                             index = index + 1
 
-        return sig_1_out + offset_v
+        return sig_1_out #+ offset_v
 
     def do_h_1sf(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
         """Do RAS(h)-1SF.
@@ -1212,6 +1214,7 @@ class LinOpH (LinearOperator):
         F_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = -1.0*np.einsum("jn,ji->in", v_ref1, F_tmp)
 
+        '''
         ################################################ 
         # Do the following term:
         #       H(1,2) v(2) = sig(1)
@@ -1227,28 +1230,35 @@ class LinOpH (LinearOperator):
         sig_1 = sig_1 + np.einsum("Iian,Ia->in", v_ref3, F_tmp)
         tei_tmp = self.tei.get_subblock(1, 2, 2, 2)
         sig_1 = sig_1 - np.einsum("Ijan,Ijai->in", v_ref3, tei_tmp)
+        '''
 
+        '''
         ################################################ 
         # Do the following term:
         #       H(2,1) v(1) = sig(2)
         ################################################ 
         F_tmp = Fa[ras1:ras1+ras2, 0:ras1]
         sig_2 = -1.0*np.einsum("in,iI->In", v_ref1, F_tmp)
+        '''
 
         ################################################ 
         # Do the following term:
         #       H(2,2) v(2) = sig(2)
         ################################################ 
         F_tmp = Fa[0:ras1, 0:ras1]
-        sig_2 = sig_2 - np.einsum("Jn,JI->In", v_ref2, F_tmp)
+        sig_2 = -1.0*np.einsum("Jn,JI->In", v_ref2, F_tmp)
+        #sig_2 = sig_2 - np.einsum("Jn,JI->In", v_ref2, F_tmp)
 
+        '''
         ################################################ 
         # Do the following term:
         #       H(2,3) v(3) = sig(2)
         ################################################ 
         tei_tmp = self.tei.get_subblock(1, 2, 2, 1)
         sig_2 = sig_2 - np.einsum("Jian,JiaI->In", v_ref3, tei_tmp)
+        '''
 
+        '''
         ################################################ 
         # Do the following term:
         #       H(3,1) v(1) = sig(3)
@@ -1264,13 +1274,15 @@ class LinOpH (LinearOperator):
         ################################################
         tei_tmp = self.tei.get_subblock(2, 1, 1, 2)
         sig_3 = sig_3 - np.einsum("Jn,aJIi->Iian", v_ref2, tei_tmp)
+        '''
 
         ################################################ 
         # Do the following term:
         #       H(3,3) v(3) = sig(3)
         ################################################
         F_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_3 = sig_3 - np.einsum("Ijan,ji->Iian", v_ref3, F_tmp)
+        sig_3 = -1.0*np.einsum("Ijan,ji->Iian", v_ref3, F_tmp)
+        #sig_3 = sig_3 - np.einsum("Ijan,ji->Iian", v_ref3, F_tmp)
         F_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_3 = sig_3 + np.einsum("Iibn,ab->Iian", v_ref3, F_tmp)
         F_tmp = Fb[0:ras1, 0:ras1]
