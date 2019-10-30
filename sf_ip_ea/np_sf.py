@@ -46,6 +46,7 @@ class wfn_sf:
         self.sz = np.zeros((n_roots))
         self.s2 = np.zeros((n_roots))
         # Psi4-specific (unset otherwise)
+        self.H = None
         self.wfn = None
 
     def print_roots(self):
@@ -152,11 +153,12 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     # use built-in Lanczos method
     # TODO: Support other guess options
     start_diag_time = time.time()
-    if(opts['SF_DIAG_METHOD'] == "PRINT_MATRIX"):
+    if(opts['SF_DIAG_METHOD'] == "DO_MATRIX"):
         print("Hamiltonian Matrix:")
-        print(A.matmat(np.eye(n_dets)))
-        print("Hamiltonian printing done. Exiting...")
-        exit()
+        wfn.H = A.matmat(np.eye(n_dets))
+        print(wfn.H)
+        vects = LIN.orth(np.random.rand(n_dets, num_roots))
+        vals = np.zeros(num_roots)
     elif(opts['SF_DIAG_METHOD'] == "LANCZOS"):
         # do LANCZOS
         if(num_roots == n_dets):

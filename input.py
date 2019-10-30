@@ -16,7 +16,7 @@ symmetry c1
 """)
 
 options = {"basis": "cc-pvtz", "BASIS_GUESS": "sto-3g", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}
-sf_options = {'SF_DIAG_METHOD': 'PRINT_MATRIX', 'NUM_ROOTS': 2}
+sf_options = {'SF_DIAG_METHOD': 'DO_MATRIX', 'NUM_ROOTS': 2}
 
 psi4.set_options(options)
 e, psi4_wfn = psi4.energy('scf', molecule=n2_7, return_wfn=True)
@@ -42,9 +42,12 @@ psi4_wfn.Cb().copy(C_full_loc)
 psi4.molden(psi4_wfn, 'localized')
 '''
 
-sf_options.update({'READ_PSI4_WFN': True, 'PSI4_WFN': psi4_wfn})
+sf_options.update({'READ_PSI4_WFN': True, 'PSI4_WFN': psi4_wfn, 'SF_DIAG_OPTS': 'DO_MATRIX'})
 wfn = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
 
+print(wfn.H)
+
+'''
 np.set_printoptions(threshold=np.inf, linewidth=100000)
 #J = bloch.do_bloch(wfn, 2, site_list_orbs=[[5,6,9], [7,8,10]], skip_localization=True)
 #J = bloch.do_bloch(wfn, 2, site_list_orbs=[[4,5,8], [6,7,9]], skip_localization=True)
@@ -61,3 +64,4 @@ print(219474.63 *J)
 #heis.print_roots()
 
 
+'''
