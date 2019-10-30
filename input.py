@@ -8,12 +8,29 @@ import numpy as np
 import numpy.linalg as LIN
 import pickle
 
-n2_7 = psi4.core.Molecule.from_string("""
+n2_7 = psi4.core.Molecule.create_molecule_from_string("""
 0 7
 N 0 0 0
 N 0 0 2.0
 symmetry c1
 """)
+"""
+# 1.278
+0 7
+O 0.0 0.0 0.0
+O 2.0 0.0 0.0
+O 4.0 0.0 0.0
+H 0 0 0
+H 2 0 0
+H 0 2 0
+H 2 2 0
+"""
+
+options = {"BASIS": "cc-pvtz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}
+sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 4}
+
+print("***** TEST: NO READ PSI WFN")
+wfn = fock_ci( 2, 2, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
 
 options = {"basis": "cc-pvtz", "BASIS_GUESS": "sto-3g", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}
 sf_options = {'SF_DIAG_METHOD': 'DO_MATRIX', 'NUM_ROOTS': 2}
@@ -63,5 +80,6 @@ print(219474.63 *J)
 #heis.do_heisenberg([1,1,1], J)
 #heis.print_roots()
 
+"""
 
 '''
