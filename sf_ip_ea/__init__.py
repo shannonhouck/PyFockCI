@@ -24,20 +24,19 @@ Psi4NumPy Tutorials
 def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
             program='PSI4'):
     """Performs Fock-space CI (SF-IP/EA)
-       Input
-           delta_a -- Desired number of alpha electrons to remove (int)
-           delta_b -- Desired number of beta electrons to add (int)
-           mol -- Molecule object. This should be built in whichever
+       :param delta_a: Desired number of alpha electrons to remove (int)
+       :param delta_b: Desired number of beta electrons to add (int)
+       :param mol: Molecule object. This should be built in whichever
                   program you'll use to run the reference, and should be
                   handled properly by the reference program.
-           conf_space -- Desired configuration space.
+       :param conf_space: Desired configuration space.
                   "" CAS
                   "h" 1 hole excitation
                   "p" 1 particle excitation
                   "h,p" 1 hole + 1 particle excitation
-           ref_opts -- Options for the reference program (dict)
-                       See relevant ref code (ex. do_sf_psi4) for details
-           sf_opts -- Additional options for stand-alone SF code (dict)
+       :param ref_opts: Options for the reference program (dict)
+                        See relevant ref code (ex. do_sf_psi4) for details
+       :param sf_opts: Additional options for stand-alone SF code (dict)
                       sf_diag_method -- Diagonalization method to use.
                           "RSP" Direct (deprecated)
                           "LANCZOS" Use NumPy's Lanczos
@@ -51,10 +50,7 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
                            "FULL" Use full integrals (no density fitting)
                            "DF" Use density fit integrals
                       return_vects -- Whether to return eigenvectors
-        Returns
-            energy -- List of requested roots for the system
-            vects -- Eigenvectors for the system (optional)
-            wfn -- Psi4 reference wavefunction (Psi4 only, optional)
+       :return: SF wavefunction object containing calculation data and results
     """
 
     # update options to pass into SF code

@@ -27,7 +27,46 @@ Performs Fock-space CI using NumPy arrays as input for integrals.
 """
 
 class wfn_sf:
+    """Contains information about the RAS-SF-IP/EA calculation.
+
+       The wfn_sf class stores important information about the calculation, 
+       including RAS spaces, eigenvectors, energies, S**2 values, and so on. 
+
+       :ivar n_SF: Number of spin-flips to perform (SF)
+       :ivar delta_ec: Change in electron count (IP/EA)
+       :ivar conf_space: Configuration space
+       :ivar ras1: RAS1 orbital count
+       :ivar ras2: RAS2 orbital count
+       :ivar ras3: RAS3 orbital count
+       :ivar n_roots: Number of roots calculated
+       :ivar n_dets: Number of determinants
+       :ivar e: Calculated energy values
+       :ivar vecs: Calculated eigenvectors
+       :ivar local_vecs: Localized eigenvectors
+       :ivar s: Array of S values (per root)
+       :ivar sz: Array of Sz values (per root)
+       :ivar s2: Array of S**2 values (per root)
+       :ivar H: Calculated Hamiltonian (only if requested)
+       :ivar wfn: ROHF wavefunction object (Psi4 Wavefunction)
+    """
+
     def __init__(self, n_SF, delta_ec, conf_space, ras1, ras2, ras3, n_roots, n_dets):
+        """Creates and initializes a wfn_sf object.
+
+          This initializes the wfn_sf object, which holds information about the
+          calculation performed. Sets things that are known at the beginning of 
+          the calculation; other things are initialized but not set until 
+          the calculation is complete.
+
+          :param n_SF: Number of spin-flips to perform (SF)
+          :param delta_ec: Change in electron count (IP/EA)
+          :param conf_space: Configuration space
+          :param ras1: RAS1 orbital count
+          :param ras2: RAS2 orbital count
+          :param ras3: RAS3 orbital count
+          :param n_roots: Number of roots calculated
+          :param n_dets: Number of determinants
+        """
         # active space info
         self.n_SF = n_SF
         self.delta_ec = delta_ec
@@ -50,6 +89,8 @@ class wfn_sf:
         self.wfn = None
 
     def print_roots(self):
+        """Prints the calculated energies, with S**2 and Sz values.
+        """
         print("\nROOT No.\tEnergy\t\t\tSz\tS**2")
         print("----------------------------------------------------------")
         for i in range(self.n_roots):
@@ -57,6 +98,8 @@ class wfn_sf:
         print("----------------------------------------------------------\n")
 
     def print_important_dets(self):
+        """Prints the most important determinants for each root.
+        """
         print("Most Important Determinants Data:")
         for i, corr in enumerate(self.e):
             print("\nROOT %i: %12.12f" %(i, corr))
@@ -64,6 +107,8 @@ class wfn_sf:
                        self.ras2, self.ras3)
 
     def print_local_dets(self):
+        """Prints the most important determinants for each root (localized).
+        """
         print("Most Important Determinants Data (Localized):")
         for i, corr in enumerate(self.e):
             print("\nROOT %i: %12.12f" %(i, corr))
@@ -72,7 +117,14 @@ class wfn_sf:
 
 def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
              conf_space="", sf_opts={}, J_in=None, C_in=None):
-    """Performs the 1SF-CAS calculation, given NumPy input arrays.
+    """Performs the RAS-SF-IP/EA calculation.
+
+       Performs a RAS-SF-IP/EA calculation. The number of spin flips 
+       and IP/EA is determined by the given parameters delta_a (number 
+       of alpha electrons removed) and delta_b (number of beta electrons 
+       added). One- and two-electron integrals are passed in as NumPy 
+       arrays. Whether to perform hole and/or particle excitations is 
+       specified using conf_space.
 
        :param delta_a: Desired number of alpha electrons to remove (int)
        :param delta_b: Desired number of beta electrons to add (int)
@@ -83,11 +135,8 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
        :param Fb: Beta Fock matrix (NumPy array)
        :param tei_int: Two-electron integrals (NumPy array)
        :param e: ROHF energy (float)
-       :param conf_space: Desired excitation scheme:
-                         "" CAS-nSF-IP/EA (default)
-                         "h" RAS(h)-nSF-IP/EA
-                         "p" RAS(p)-nSF-IP/EA
-                         "h,p" RAS(h,p)-nSF-IP/EA
+       :param conf_space: Desired excitation scheme.
+                      See __init__ for more information.
        :param sf_opts: Additional options (dict)
                       See __init__ for more information.
        :param J_in: J matrix (for DF calculations)

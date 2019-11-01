@@ -14,7 +14,7 @@ from .np_sf import do_sf_np
 
 def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     """Runs SF-CAS using Psi4's integral packages
-       Input
+
        :param delta_a: Number of alpha electrons to eliminate
        :param delta_b: Number of beta electrons to create
        :param mol: Psi4 Molecule object on which to run the calculation
