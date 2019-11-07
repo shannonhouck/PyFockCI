@@ -53,7 +53,7 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     # get two-electron integrals
     if(sf_opts['INTEGRAL_TYPE']=="FULL"):
         tei_int = TEIFull(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3,
-                          ref_method='PSI4')
+                          conf_space, ref_method='PSI4')
     if(sf_opts['INTEGRAL_TYPE']=="DF"):
         # if user hasn't defined which aux basis to use, default behavior
         # is to use the one from Psi4 wfn

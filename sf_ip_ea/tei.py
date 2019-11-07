@@ -26,8 +26,8 @@ class TEI:
 # Class for full TEI integrals.
 #   np_tei         Allows for importing a previously-computed TEI integral (in NumPy martrix form)
 class TEIFull(TEI):
-    def __init__(self, C, basis, ras1, ras2, ras3, ref_method='PSI4',
-                 np_tei=None):
+    def __init__(self, C, basis, ras1, ras2, ras3, conf_space,
+                 ref_method='PSI4', np_tei=None):
         """Initialize TEI object.
 
            :param C: MO coefficient matrix (NumPy array)
@@ -51,17 +51,37 @@ class TEIFull(TEI):
                 self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
                 # put in physicists' notation
                 self.eri = self.eri.transpose(0, 2, 1, 3)
+                # truncate C as needed
+                C_np = psi4.core.Matrix.to_array(C, copy=True)
+                ras1_C = C_np[:, :ras1]
+                ras2_C = C_np[:, ras1:ras1+ras2]
+                ras3_C = C_np[:, ras1+ras2:]
+                if(conf_space == ""):
+                    C_act = ras2_C
+                elif(conf_space == "h"):
+                    C_act = np.column_stack((ras1_C, ras2_C))
+                elif(conf_space == "p"):
+                    C_act = np.column_stack((ras2_C, ras3_C))
+                elif(conf_space == "h,p"):
+                    C_act = np.column_stack((ras1_C, ras2_C, ras3_C))
                 # move to MO basis
-                self.eri = np.einsum('pqrs,pa',self.eri,C)
-                self.eri = np.einsum('aqrs,qb',self.eri,C)
-                self.eri = np.einsum('abrs,rc',self.eri,C)
-                self.eri = np.einsum('abcs,sd',self.eri,C)
+                self.eri = np.einsum('pqrs,pa',self.eri,C_act)
+                self.eri = np.einsum('aqrs,qb',self.eri,C_act)
+                self.eri = np.einsum('abrs,rc',self.eri,C_act)
+                self.eri = np.einsum('abcs,sd',self.eri,C_act)
             else:
                 print("ERROR: Method not yet supported. Exiting...")
                 exit()
         # ind stores the indexing of ras1/ras2/ras3 for get_subblock method
-        self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],
-                    [ras1+ras2,ras1+ras2+ras3]]
+        if(conf_space == ""):
+            self.ind = [[0,0],[0,0],[0,ras2],[0,0]] # only worry about RAS2 block
+        if(conf_space == "h"):
+            self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[0,0]] # only worry about RAS1+2
+        if(conf_space == "p"):
+            self.ind = [[0,0],[0,0],[0,ras2],[ras2, ras2+ras3]] # only worry about RAS2+3
+        if(conf_space == "h,p"):
+            self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],
+                        [ras1+ras2,ras1+ras2+ras3]]
         print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
 
     def get_subblock(self, a, b, c, d):
