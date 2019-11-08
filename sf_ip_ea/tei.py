@@ -46,11 +46,6 @@ class TEIFull(TEI):
             self.eri = np_tei
         else:
             if(ref_method=='PSI4'):
-                # get necessary integrals/matrices from Psi4 (AO basis)
-                mints = psi4.core.MintsHelper(basis)
-                self.eri = psi4.core.Matrix.to_array(mints.ao_eri())
-                # put in physicists' notation
-                self.eri = self.eri.transpose(0, 2, 1, 3)
                 # truncate C as needed
                 C_np = psi4.core.Matrix.to_array(C, copy=True)
                 ras1_C = C_np[:, :ras1]
@@ -64,11 +59,12 @@ class TEIFull(TEI):
                     C_act = np.column_stack((ras2_C, ras3_C))
                 elif(conf_space == "h,p"):
                     C_act = np.column_stack((ras1_C, ras2_C, ras3_C))
-                # move to MO basis
-                self.eri = np.einsum('pqrs,pa',self.eri,C_act)
-                self.eri = np.einsum('aqrs,qb',self.eri,C_act)
-                self.eri = np.einsum('abrs,rc',self.eri,C_act)
-                self.eri = np.einsum('abcs,sd',self.eri,C_act)
+                # get necessary integrals/matrices from Psi4 (AO basis)
+                mints = psi4.core.MintsHelper(basis)
+                C_act = psi4.core.Matrix.from_array(C_act)
+                self.eri = psi4.core.Matrix.to_array(mints.mo_eri(C_act,C_act,C_act,C_act))
+                # put in physicists' notation
+                self.eri = self.eri.transpose(0, 2, 1, 3)
             else:
                 print("ERROR: Method not yet supported. Exiting...")
                 exit()
