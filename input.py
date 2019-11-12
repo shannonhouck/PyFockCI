@@ -9,9 +9,9 @@ import numpy.linalg as LIN
 import pickle
 
 n2_7 = psi4.core.Molecule.from_string("""
-0 3
-H
-H 1 0.75
+0 7
+N
+N 1 2.0
 symmetry c1
 """)
 """
@@ -29,8 +29,6 @@ H 2 2 0
 options = {"BASIS": "vdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}
 sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 900}
 
-print("***** TEST: NO READ PSI WFN")
-psi4.set_options(options)
 wfn = fock_ci( 2, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
 
 '''
@@ -60,14 +58,12 @@ psi4_wfn.Ca().copy(C_full_loc)
 psi4_wfn.Cb().copy(C_full_loc)
 
 psi4.molden(psi4_wfn, 'localized')
-'''
 
 sf_options.update({'READ_PSI4_WFN': True, 'PSI4_WFN': psi4_wfn, 'SF_DIAG_OPTS': 'DO_MATRIX'})
 wfn = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
 
 print(wfn.H)
 
-'''
 np.set_printoptions(threshold=np.inf, linewidth=100000)
 #J = bloch.do_bloch(wfn, 2, site_list_orbs=[[5,6,9], [7,8,10]], skip_localization=True)
 #J = bloch.do_bloch(wfn, 2, site_list_orbs=[[4,5,8], [6,7,9]], skip_localization=True)

@@ -1,13 +1,16 @@
 """
-FOCK SPACE CI PROGRAM
+A program for running RAS-SF-IP/EA calculations.
 
-Runs RAS-SF-IP/EA calculations.
+This program runs RAS-SF-IP/EA calculations using an efficient 
+tensor-contraction-based scheme. The contractions have been hand-derived and 
+use NumPy's einsum for efficiency. The program is run primarily through 
+the main ``fock_ci`` function.
 
 References:
-Crawford Tutorials (http://sirius.chem.vt.edu/wiki/doku.php?id=crawdad:programming:project12)
-DePrince Tutorials (https://www.chem.fsu.edu/~deprince/programming_projects/cis/)
-Sherrill Notes (http://vergil.chemistry.gatech.edu/notes/cis/cis.html)
-Psi4NumPy Tutorials
+* Crawford Tutorials (http://sirius.chem.vt.edu/wiki/doku.php)
+* DePrince Tutorials (https://www.chem.fsu.edu/~deprince/programming_projects/cis/)
+* Sherrill Notes (http://vergil.chemistry.gatech.edu/notes/cis/cis.html)
+* Psi4NumPy Tutorials
 """
 
 # importing general python functionality
@@ -26,7 +29,8 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
             program='PSI4'):
     """Performs Fock-space CI (SF-IP/EA).
 
-    This is the main function call for the program.
+    This is the main function call for the program. Given the changes in 
+    alpha and beta electrons, it performs a
 
     Parameters
     ----------
@@ -34,15 +38,16 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
     delta_b (int) : Desired number of beta electrons to add.
     mol (Molecule) : The molecule object to run the calculation on. 
           This should be built in whichever program you'll use 
-          to run the reference, and should be handled properly by the reference program.
+          to run the reference, and should be handled properly by the 
+          reference program.
     conf_space (string) : Desired configuration space/additional excitations.
                      * "" CAS
                      * "h" 1 hole excitation
                      * "p" 1 particle excitation
                      * "h,p" 1 hole + 1 particle excitation
-    ref_opts : Options for the reference program.
+    ref_opts (dict): Options for the reference program.
                See relevant ref code (ex. do_sf_psi4) for details
-    sf_opts : Additional options for stand-alone SF code. 
+    sf_opts (dict): Additional options for stand-alone SF code. 
               * sf_diag_method -- Diagonalization method to use.
                   * "RSP" Direct (deprecated)
                   * "LANCZOS" Use NumPy's Lanczos

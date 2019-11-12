@@ -52,8 +52,8 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     Fa, Fb = get_F(wfn)
     # get two-electron integrals
     if(sf_opts['INTEGRAL_TYPE']=="FULL"):
-        tei_int = TEIFull(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3,
-                          conf_space, ref_method='PSI4')
+        tei_int = TEIFullPsi4(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3,
+                          conf_space)
     if(sf_opts['INTEGRAL_TYPE']=="DF"):
         # if user hasn't defined which aux basis to use, default behavior
         # is to use the one from Psi4 wfn
@@ -63,8 +63,8 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
             aux_basis_name = sf_opts['AUX_BASIS_NAME']
         aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", 
                                              "JKFIT", aux_basis_name)
-        tei_int = TEIDF(wfn.Ca(), wfn.basisset(), aux_basis, ras1, ras2,
-                        ras3, conf_space, ref_method='PSI4')
+        tei_int = TEIDFPsi4(wfn.Ca(), wfn.basisset(), aux_basis, ras1, ras2,
+                        ras3, conf_space)
     out = do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
                    conf_space=conf_space, sf_opts=sf_opts)
     # write Psi4 wavefunction to output object

@@ -52,7 +52,8 @@ circumstance, the user may use the ``READ_PSI4_WFN`` keyword and the
 Diagonalization Methods
 -----------------------
 
-Multiple options are available for diagonalization. To select one, :
+Multiple options are available for diagonalization. To select one, choose from the 
+following keywords:
 
     * ``RSP``: Full diagonalization (deprecated)
     * ``LANCZOS``: Use NumPy's built-in Lanczos solver (default)
