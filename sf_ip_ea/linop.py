@@ -1627,8 +1627,7 @@ class LinOpH (LinearOperator):
         ################################################ 
         #   sig(Iia:aab) += -1.0*v(Jia:aab)*F(JI:aa)
         Fa_tmp = Fa[0:ras1, 0:ras1]
-        #sig_2 = sig_2 - np.einsum("Jian,JI->Iian", v_ref2, Fa_tmp)
-        sig_2 = -1.0*np.einsum("Jian,JI->Iian", v_ref2, Fa_tmp)
+        sig_2 = sig_2 - np.einsum("Jian,JI->Iian", v_ref2, Fa_tmp)
         #   sig(Iia:aab) += -1.0*v(Jia:aab)*F(ji:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_2 = sig_2 - np.einsum("Ijan,ji->Iian", v_ref2, Fa_tmp)
@@ -1692,8 +1691,7 @@ class LinOpH (LinearOperator):
         ################################################ 
         #   sig(Iijab:baabb) += P(ab)*v(Iijcb:baabb)*F(ac:bb)
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        #sig_3 = sig_3 + np.einsum("Iijcbn,ac->Iijabn", v_ref3, Fb_tmp)
-        sig_3 = np.einsum("Iijcbn,ac->Iijabn", v_ref3, Fb_tmp)
+        sig_3 = sig_3 + np.einsum("Iijcbn,ac->Iijabn", v_ref3, Fb_tmp)
         sig_3 = sig_3 - np.einsum("Iijcan,bc->Iijabn", v_ref3, Fb_tmp) #P(ab)
         #   sig(Iijab:baabb) += -1.0*v(Jijab:baabb)*F(JI:bb)
         Fb_tmp = Fb[0:ras1, 0:ras1]
