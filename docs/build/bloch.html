@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Bloch Effective Hamiltonian Analysis &#8212; CAS-nSF-IP/EA  documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bloch-effective-hamiltonian-analysis">
+<h1>Bloch Effective Hamiltonian Analysis<a class="headerlink" href="#bloch-effective-hamiltonian-analysis" title="Permalink to this headline">¶</a></h1>
+<p>A Bloch effective Hamiltonian can be built in order to extract information
+about coupling in complexes with more than two centers (for example in some
+mixed-valent complexes, or lanthanide dimers in fullerene cages). A
+sample input file for such a situation is shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psi4</span>
+<span class="kn">import</span> <span class="nn">sf_ip_ea</span>
+<span class="kn">from</span> <span class="nn">sf_ip_ea</span> <span class="k">import</span> <span class="n">bloch</span>
+
+<span class="n">mol</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">0 7</span>
+<span class="s2">O 0 0 0</span>
+<span class="s2">O 2 0 0</span>
+<span class="s2">O 4 0 0</span>
+<span class="s2">symmetry c1</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;BASIS&quot;</span><span class="p">:</span> <span class="s2">&quot;sto-3g&quot;</span><span class="p">}</span>
+<span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NUM_ROOTS&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">sf_ip_ea</span><span class="o">.</span><span class="n">fock_ci</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+<span class="n">n_sites</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">bloch</span><span class="o">.</span><span class="n">do_bloch</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that Bloch is only supported for the Psi4 interface right now, and that
+the program only supports 1SF calculations at the moment.</p>
+<div class="section" id="defining-sites">
+<h2>Defining Sites<a class="headerlink" href="#defining-sites" title="Permalink to this headline">¶</a></h2>
+<p>By default, each orbital in the CAS space is treated as its own site.
+This behavior can be overridden by specifying either of the following
+keywords:</p>
+<blockquote>
+<div><ul>
+<li><p>site_list: A list of atom indexes, where each atom corresponds to
+one site. The numbering here follows the ordering of atoms in the Psi4
+Molecule object and starts at 0. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">H</span> <span class="o">=</span> <span class="n">bloch</span><span class="o">.</span><span class="n">do_bloch</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">site_list</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</li>
+<li><p>site_list_orbs: A list of lists of orbital indexes, with each sub-list
+counted as its own site. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">H</span> <span class="o">=</span> <span class="n">bloch</span><span class="o">.</span><span class="n">do_bloch</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span>
+                   <span class="n">site_list_orbs</span><span class="o">=</span><span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">13</span><span class="p">],[</span><span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">]],</span>
+                   <span class="n">skip_localization</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Ordering follows Psi4 ordering, and orbital indexing starts at 1.
+In this case, the user should localize the orbitals themselves,
+make the assignments by hand, and set <code class="docutils literal notranslate"><span class="pre">skip_localization=True</span></code>
+in the function call.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Bloch Effective Hamiltonian Analysis</a><ul>
+<li><a class="reference internal" href="#defining-sites">Defining Sites</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bloch.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Shannon E. Houck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

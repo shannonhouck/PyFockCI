@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>CAS-nSF-IP/EA Package &#8212; CAS-nSF-IP/EA  documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="cas-nsf-ip-ea-package">
+<h1>CAS-nSF-IP/EA Package<a class="headerlink" href="#cas-nsf-ip-ea-package" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>Clone the program from the GitHub repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/shannonhouck/sf-ip-ea.git
+</pre></div>
+</div>
+<p>Then naviate into the directory and use pip to install:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd sf-ip-ea/
+$ pip install -e .
+</pre></div>
+</div>
+<p>You can now import this package into Python. Note that some dependencies
+may be required (ex. numpy, scipy, Psi4).</p>
+</div>
+<div class="section" id="running-cas-sf-ip-ea">
+<h1>Running CAS-SF/IP/EA<a class="headerlink" href="#running-cas-sf-ip-ea" title="Permalink to this headline">¶</a></h1>
+<p>The RAS-SF-IP/EA code is run by calling the <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> function. A sample
+input file (using the Psi4 interface) can be found below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psi4</span>
+<span class="kn">import</span> <span class="nn">sf_ip_ea</span>
+
+<span class="c1"># Psi4 Molecule object</span>
+<span class="n">n2_7</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">0 7</span>
+<span class="s2">N 0 0 0</span>
+<span class="s2">N 0 0 2.5</span>
+<span class="s2">symmetry c1</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="c1"># Psi4 options</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;BASIS&quot;</span><span class="p">:</span> <span class="s2">&quot;cc-pvdz&quot;</span><span class="p">}</span>
+<span class="c1"># Fock CI options</span>
+<span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NUM_ROOTS&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+
+<span class="c1"># do RAS(p)-1SF</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">sf_ip_ea</span><span class="o">.</span><span class="n">fock_ci</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n2_7</span><span class="p">,</span> <span class="n">conf_space</span><span class="o">=</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+                        <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>A few important things to note:</dt><dd><ul class="simple">
+<li><p>The number of spin-flips and IP/EA is determined by the first two
+numbers passed into <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code>. The first integer is the number of
+alpha electrons to remove, relative to the reference wavefunction;
+the second is the number of beta electrons to add. For more information
+about method selection, see [TODO: add table link].</p></li>
+<li><p>The object returned is a wfn_sf object. Any additional information
+needed can then be extracted from this object (ex. Sz values,
+information about RAS spaces, or eigenvectors). For example, you could
+get an array of the eigenvalues using <code class="docutils literal notranslate"><span class="pre">wfn.e</span></code>. For more information
+about the wfn_sf object, see [TODO: link to wfn_sf page].</p></li>
+</ul>
+</dd>
+</dl>
+<p>This input file can then be run from the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python input.py
+</pre></div>
+</div>
+<p>For additional information about <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code>, see [TODO: add link].</p>
+<div class="section" id="selecting-nsf-ip-ea-method">
+<h2>Selecting nSF-IP/EA Method<a class="headerlink" href="#selecting-nsf-ip-ea-method" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned previously, the number of spin-flips and IP/EA is determined
+exclusively by the number of alpha electrons removed and beta electrons added.
+A table of currently-supported options is shown below.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 30%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Scheme</p></th>
+<th class="head"><p>n_alpha</p></th>
+<th class="head"><p>n_beta</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1SF</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>2SF</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>IP</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>EA</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>1SF-IP</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1SF-EA</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+</tr>
+</tbody>
+</table>
+<p>Note that if you do not see your desired scheme here, you can use our
+slower but more general Psi4 version run using DETCI [TODO: add link].</p>
+</div>
+<div class="section" id="adding-hole-and-particle-excitations">
+<h2>Adding Hole and Particle Excitations<a class="headerlink" href="#adding-hole-and-particle-excitations" title="Permalink to this headline">¶</a></h2>
+<p>Hole and particle excitations are often needed to provide orbital relaxation,
+particularly in the SF-IP/EA schemes (see [TODO: ref]). The following
+excitation schemes are currently implemented in our code:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 17%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 24%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td></td>
+<td><p>CAS</p></td>
+<td><p>RAS(h)</p></td>
+<td><p>RAS(p)</p></td>
+<td><p>RAS(h,p)</p></td>
+</tr>
+<tr class="row-even"><td><p>1SF</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>2SF</p></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>IP</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>EA</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>1SF-IP</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>1SF-EA</p></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>In order to perform hole and particle excitations, use the <code class="docutils literal notranslate"><span class="pre">conf_space</span></code>
+keyword passed into <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code>. Schemes are called as follows:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Scheme</p></td>
+<td><p>conf_space</p></td>
+</tr>
+<tr class="row-even"><td><p>CAS</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>RAS(h)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;h&quot;</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>RAS(p)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;p&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>RAS(h,p)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;h,p&quot;</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>So, for example, to do RAS(h)-1SF-IP, one would do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conf_space</span><span class="o">=</span><span class="s2">&quot;h&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you do not see your desired scheme here, please revert to the Psi4 plugin
+version using DETCI [TODO: add link].</p>
+</div>
+</div>
+<div class="section" id="reference-options-ref-opts">
+<h1>Reference Options: REF_OPTS<a class="headerlink" href="#reference-options-ref-opts" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">ref_opts</span></code> keyword allows the user to pass in additional options for
+the program running the reference SCF portion of the calculation. These are
+set uniquely for each program (Psi4, PySCF, etc). It is passed like follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">psi4_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;basis&quot;</span><span class="p">:</span> <span class="s2">&quot;cc-pvtz&quot;</span><span class="p">,</span> <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;rohf&quot;</span><span class="p">,</span> <span class="s2">&quot;guess&quot;</span><span class="p">:</span> <span class="s2">&quot;gwh&quot;</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">psi4_options</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See the documentation for each package for details.</p>
+</div>
+<div class="section" id="additional-options-sf-opts">
+<h1>Additional Options: SF_OPTS<a class="headerlink" href="#additional-options-sf-opts" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">sf_opts</span></code> keyword holds a dictionary that defines all other options for
+the <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> method. It can be used to select the diagonalization method,
+the CI guess type, which types of integrals to use, and more. These options
+are passed as an optional argument to <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sf_diag_method&#39;</span><span class="p">:</span> <span class="s1">&#39;lanczos&#39;</span><span class="p">,</span> <span class="s1">&#39;num_roots&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="number-of-roots">
+<h2>Number of Roots<a class="headerlink" href="#number-of-roots" title="Permalink to this headline">¶</a></h2>
+<p>By default, the program solves for only one root. To solve for multiple
+roots, use the <code class="docutils literal notranslate"><span class="pre">NUM_ROOTS</span></code> keyword:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;num_roots&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="passing-in-a-reference">
+<h2>Passing In A Reference<a class="headerlink" href="#passing-in-a-reference" title="Permalink to this headline">¶</a></h2>
+<p>At times, the user may want to use their own pre-converged ROHF reference
+wavefunction, rather than allowing <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> to do the SCF steps itself.
+(This is helpful in cases where orbitals need to be localized, for example, or
+when one ROHF solution can be used for multiple calculations.) In such a
+circumstance, the user may use the <code class="docutils literal notranslate"><span class="pre">READ_PSI4_WFN</span></code> keyword and the
+<code class="docutils literal notranslate"><span class="pre">PSI4_WFN</span></code> keyword like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># converge Psi4 ROHF wfn</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;basis&quot;</span><span class="p">:</span> <span class="s2">&quot;cc-pvtz&quot;</span><span class="p">,</span> <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;rohf&quot;</span><span class="p">}</span>
+<span class="n">psi4</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+<span class="n">e</span><span class="p">,</span> <span class="n">psi4_wfn</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="s1">&#39;scf&#39;</span><span class="p">,</span> <span class="n">molecule</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span> <span class="n">return_wfn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># do SF portion</span>
+<span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;READ_PSI4_WFN&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;PSI4_WFN&#39;</span><span class="p">:</span> <span class="n">psi4_wfn</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="diagonalization-methods">
+<h2>Diagonalization Methods<a class="headerlink" href="#diagonalization-methods" title="Permalink to this headline">¶</a></h2>
+<p>Multiple options are available for diagonalization. To select one, :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RSP</span></code>: Full diagonalization (deprecated)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LANCZOS</span></code>: Use NumPy’s built-in Lanczos solver (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DAVIDSON</span></code>: Use our Davidson (needs testing)</p></li>
+</ul>
+</div></blockquote>
+<p>Currently, <code class="docutils literal notranslate"><span class="pre">LANCZOS</span></code> is the default, due to a lack of rigorous testing in
+the Davidson implementation. In the future, Davidson will be the default.</p>
+<p>In addition, one can pass in <code class="docutils literal notranslate"><span class="pre">DO_MATRIX</span></code> to obtain the full Hamiltonian
+without diagonalization steps. This is stored in <code class="docutils literal notranslate"><span class="pre">sf_wfn.H</span></code> and can be
+accessed after a <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;SF_DIAG_METHOD&#39;</span><span class="p">:</span> <span class="s1">&#39;DO_MATRIX&#39;</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n2_7</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The guess for the diagonalization is set using <code class="docutils literal notranslate"><span class="pre">GUESS_TYPE</span></code>. Currently, a
+random orthonormal basis is the default. In the future we will implement a
+rigorous CAS guess and an option to read guess vectors from a NumPy file.</p>
+</div>
+<div class="section" id="integral-type">
+<h2>Integral Type<a class="headerlink" href="#integral-type" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">INTEGRAL_TYPE</span></code> keyword allows the user to choose whether to use
+density-fitted or full integrals:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DF</span></code>: Use density-fitted integrals</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FULL</span></code>: Use full integrals</p></li>
+</ul>
+</div></blockquote>
+<p>Note that the auxiliary basis is chosen based on the Psi4 settings.</p>
+</div>
+</div>
+<div class="section" id="bloch-effective-hamiltonian-analysis">
+<h1>Bloch Effective Hamiltonian Analysis<a class="headerlink" href="#bloch-effective-hamiltonian-analysis" title="Permalink to this headline">¶</a></h1>
+<p>A Bloch effective Hamiltonian can be built in order to extract information
+about coupling in complexes with more than two centers (for example in some
+mixed-valent complexes, or lanthanide dimers in fullerene cages). A
+sample input file for such a situation is shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psi4</span>
+<span class="kn">import</span> <span class="nn">sf_ip_ea</span>
+<span class="kn">from</span> <span class="nn">sf_ip_ea</span> <span class="k">import</span> <span class="n">bloch</span>
+
+<span class="n">mol</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">0 7</span>
+<span class="s2">O 0 0 0</span>
+<span class="s2">O 2 0 0</span>
+<span class="s2">O 4 0 0</span>
+<span class="s2">symmetry c1</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;BASIS&quot;</span><span class="p">:</span> <span class="s2">&quot;sto-3g&quot;</span><span class="p">}</span>
+<span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NUM_ROOTS&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">sf_ip_ea</span><span class="o">.</span><span class="n">fock_ci</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+<span class="n">n_sites</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">bloch</span><span class="o">.</span><span class="n">do_bloch</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that Bloch is only supported for the Psi4 interface right now, and that
+the program only supports 1SF calculations at the moment.</p>
+<div class="section" id="defining-sites">
+<h2>Defining Sites<a class="headerlink" href="#defining-sites" title="Permalink to this headline">¶</a></h2>
+<p>By default, each orbital in the CAS space is treated as its own site.
+This behavior can be overridden by specifying either of the following
+keywords:</p>
+<blockquote>
+<div><ul>
+<li><p>site_list: A list of atom indexes, where each atom corresponds to
+one site. The numbering here follows the ordering of atoms in the Psi4
+Molecule object and starts at 0. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">H</span> <span class="o">=</span> <span class="n">bloch</span><span class="o">.</span><span class="n">do_bloch</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">site_list</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</li>
+<li><p>site_list_orbs: A list of lists of orbital indexes, with each sub-list
+counted as its own site. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">H</span> <span class="o">=</span> <span class="n">bloch</span><span class="o">.</span><span class="n">do_bloch</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span>
+                   <span class="n">site_list_orbs</span><span class="o">=</span><span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">13</span><span class="p">],[</span><span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">]],</span>
+                   <span class="n">skip_localization</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Ordering follows Psi4 ordering, and orbital indexing starts at 1.
+In this case, the user should localize the orbitals themselves,
+make the assignments by hand, and set <code class="docutils literal notranslate"><span class="pre">skip_localization=True</span></code>
+in the function call.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="modules">
+<h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
+<p>For more information on modules, see below.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea" title="sf_ip_ea"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sf_ip_ea</span></code></a></p></td>
+<td><p>FOCK SPACE CI PROGRAM</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea.bloch" title="sf_ip_ea.bloch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bloch</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea.f" title="sf_ip_ea.f"><code class="xref py py-obj docutils literal notranslate"><span class="pre">f</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea.linop" title="sf_ip_ea.linop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linop</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea.np_sf" title="sf_ip_ea.np_sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">np_sf</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea.post_ci_analysis" title="sf_ip_ea.post_ci_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_ci_analysis</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea.psi4_sf" title="sf_ip_ea.psi4_sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi4_sf</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea.solvers" title="sf_ip_ea.solvers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solvers</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="sf_ip_ea.html#module-sf_ip_ea.tei" title="sf_ip_ea.tei"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tei</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CAS-nSF-IP/EA Package</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#running-cas-sf-ip-ea">Running CAS-SF/IP/EA</a><ul>
+<li><a class="reference internal" href="#selecting-nsf-ip-ea-method">Selecting nSF-IP/EA Method</a></li>
+<li><a class="reference internal" href="#adding-hole-and-particle-excitations">Adding Hole and Particle Excitations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reference-options-ref-opts">Reference Options: REF_OPTS</a></li>
+<li><a class="reference internal" href="#additional-options-sf-opts">Additional Options: SF_OPTS</a><ul>
+<li><a class="reference internal" href="#number-of-roots">Number of Roots</a></li>
+<li><a class="reference internal" href="#passing-in-a-reference">Passing In A Reference</a></li>
+<li><a class="reference internal" href="#diagonalization-methods">Diagonalization Methods</a></li>
+<li><a class="reference internal" href="#integral-type">Integral Type</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bloch-effective-hamiltonian-analysis">Bloch Effective Hamiltonian Analysis</a><ul>
+<li><a class="reference internal" href="#defining-sites">Defining Sites</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#modules">Modules</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Shannon E. Houck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+Running Sphinx v2.2.1
+loading pickled environment... done
+building [mo]: targets for 0 po files that are out of date
+building [html]: targets for 0 source files that are out of date
+updating environment: [config changed ('numpydoc_xref_aliases')] 4 added, 0 changed, 0 removed
+reading sources... [ 25%] index
+reading sources... [ 50%] modules
+reading sources... [ 75%] readme_link
+reading sources... [100%] sf_ip_ea
+
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+writing output... [ 25%] index
+writing output... [ 50%] modules
+writing output... [ 75%] readme_link
+writing output... [100%] sf_ip_ea
+
+generating indices...  genindex py-modindexdone
+writing additional pages...  searchdone
+copying static files... ... done
+copying extra files... done
+dumping search index in English (code: en)... done
+dumping object inventory... done
+build succeeded, 44 warnings.
+
+The HTML pages are in build.

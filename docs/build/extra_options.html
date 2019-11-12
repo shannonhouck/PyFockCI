@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Reference Options: REF_OPTS &#8212; CAS-nSF-IP/EA  documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="reference-options-ref-opts">
+<h1>Reference Options: REF_OPTS<a class="headerlink" href="#reference-options-ref-opts" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">ref_opts</span></code> keyword allows the user to pass in additional options for
+the program running the reference SCF portion of the calculation. These are
+set uniquely for each program (Psi4, PySCF, etc). It is passed like follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">psi4_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;basis&quot;</span><span class="p">:</span> <span class="s2">&quot;cc-pvtz&quot;</span><span class="p">,</span> <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;rohf&quot;</span><span class="p">,</span> <span class="s2">&quot;guess&quot;</span><span class="p">:</span> <span class="s2">&quot;gwh&quot;</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">psi4_options</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See the documentation for each package for details.</p>
+</div>
+<div class="section" id="additional-options-sf-opts">
+<h1>Additional Options: SF_OPTS<a class="headerlink" href="#additional-options-sf-opts" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">sf_opts</span></code> keyword holds a dictionary that defines all other options for
+the <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> method. It can be used to select the diagonalization method,
+the CI guess type, which types of integrals to use, and more. These options
+are passed as an optional argument to <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sf_diag_method&#39;</span><span class="p">:</span> <span class="s1">&#39;lanczos&#39;</span><span class="p">,</span> <span class="s1">&#39;num_roots&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="number-of-roots">
+<h2>Number of Roots<a class="headerlink" href="#number-of-roots" title="Permalink to this headline">¶</a></h2>
+<p>By default, the program solves for only one root. To solve for multiple
+roots, use the <code class="docutils literal notranslate"><span class="pre">NUM_ROOTS</span></code> keyword:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;num_roots&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="passing-in-a-reference">
+<h2>Passing In A Reference<a class="headerlink" href="#passing-in-a-reference" title="Permalink to this headline">¶</a></h2>
+<p>At times, the user may want to use their own pre-converged ROHF reference
+wavefunction, rather than allowing <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> to do the SCF steps itself.
+(This is helpful in cases where orbitals need to be localized, for example, or
+when one ROHF solution can be used for multiple calculations.) In such a
+circumstance, the user may use the <code class="docutils literal notranslate"><span class="pre">READ_PSI4_WFN</span></code> keyword and the
+<code class="docutils literal notranslate"><span class="pre">PSI4_WFN</span></code> keyword like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># converge Psi4 ROHF wfn</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;basis&quot;</span><span class="p">:</span> <span class="s2">&quot;cc-pvtz&quot;</span><span class="p">,</span> <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;rohf&quot;</span><span class="p">}</span>
+<span class="n">psi4</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+<span class="n">e</span><span class="p">,</span> <span class="n">psi4_wfn</span> <span class="o">=</span> <span class="n">psi4</span><span class="o">.</span><span class="n">energy</span><span class="p">(</span><span class="s1">&#39;scf&#39;</span><span class="p">,</span> <span class="n">molecule</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span> <span class="n">return_wfn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># do SF portion</span>
+<span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;READ_PSI4_WFN&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;PSI4_WFN&#39;</span><span class="p">:</span> <span class="n">psi4_wfn</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="diagonalization-methods">
+<h2>Diagonalization Methods<a class="headerlink" href="#diagonalization-methods" title="Permalink to this headline">¶</a></h2>
+<p>Multiple options are available for diagonalization. To select one, :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RSP</span></code>: Full diagonalization (deprecated)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LANCZOS</span></code>: Use NumPy’s built-in Lanczos solver (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DAVIDSON</span></code>: Use our Davidson (needs testing)</p></li>
+</ul>
+</div></blockquote>
+<p>Currently, <code class="docutils literal notranslate"><span class="pre">LANCZOS</span></code> is the default, due to a lack of rigorous testing in
+the Davidson implementation. In the future, Davidson will be the default.</p>
+<p>In addition, one can pass in <code class="docutils literal notranslate"><span class="pre">DO_MATRIX</span></code> to obtain the full Hamiltonian
+without diagonalization steps. This is stored in <code class="docutils literal notranslate"><span class="pre">sf_wfn.H</span></code> and can be
+accessed after a <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sf_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;SF_DIAG_METHOD&#39;</span><span class="p">:</span> <span class="s1">&#39;DO_MATRIX&#39;</span><span class="p">}</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n2_7</span><span class="p">,</span> <span class="n">ref_opts</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">sf_opts</span><span class="o">=</span><span class="n">sf_options</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The guess for the diagonalization is set using <code class="docutils literal notranslate"><span class="pre">GUESS_TYPE</span></code>. Currently, a
+random orthonormal basis is the default. In the future we will implement a
+rigorous CAS guess and an option to read guess vectors from a NumPy file.</p>
+</div>
+<div class="section" id="integral-type">
+<h2>Integral Type<a class="headerlink" href="#integral-type" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">INTEGRAL_TYPE</span></code> keyword allows the user to choose whether to use
+density-fitted or full integrals:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DF</span></code>: Use density-fitted integrals</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FULL</span></code>: Use full integrals</p></li>
+</ul>
+</div></blockquote>
+<p>Note that the auxiliary basis is chosen based on the Psi4 settings.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Reference Options: REF_OPTS</a></li>
+<li><a class="reference internal" href="#additional-options-sf-opts">Additional Options: SF_OPTS</a><ul>
+<li><a class="reference internal" href="#number-of-roots">Number of Roots</a></li>
+<li><a class="reference internal" href="#passing-in-a-reference">Passing In A Reference</a></li>
+<li><a class="reference internal" href="#diagonalization-methods">Diagonalization Methods</a></li>
+<li><a class="reference internal" href="#integral-type">Integral Type</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/extra_options.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Shannon E. Houck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

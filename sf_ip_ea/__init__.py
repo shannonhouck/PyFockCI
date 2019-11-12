@@ -1,14 +1,3 @@
-# importing general python functionality
-from __future__ import print_function
-import math
-
-# importing numpy
-import numpy as np
-
-# importing our packages
-from .psi4_sf import do_sf_psi4
-from .np_sf import do_sf_np
-
 """
 FOCK SPACE CI PROGRAM
 
@@ -21,36 +10,57 @@ Sherrill Notes (http://vergil.chemistry.gatech.edu/notes/cis/cis.html)
 Psi4NumPy Tutorials
 """
 
+# importing general python functionality
+from __future__ import print_function
+import math
+
+# importing numpy
+import numpy as np
+
+# importing our packages
+from .bloch import do_bloch
+from .psi4_sf import do_sf_psi4
+from .np_sf import do_sf_np
+
 def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
             program='PSI4'):
-    """Performs Fock-space CI (SF-IP/EA)
-       :param delta_a: Desired number of alpha electrons to remove (int)
-       :param delta_b: Desired number of beta electrons to add (int)
-       :param mol: Molecule object. This should be built in whichever
-                  program you'll use to run the reference, and should be
-                  handled properly by the reference program.
-       :param conf_space: Desired configuration space.
-                  "" CAS
-                  "h" 1 hole excitation
-                  "p" 1 particle excitation
-                  "h,p" 1 hole + 1 particle excitation
-       :param ref_opts: Options for the reference program (dict)
-                        See relevant ref code (ex. do_sf_psi4) for details
-       :param sf_opts: Additional options for stand-alone SF code (dict)
-                      sf_diag_method -- Diagonalization method to use.
-                          "RSP" Direct (deprecated)
-                          "LANCZOS" Use NumPy's Lanczos
-                          "DAVIDSON" Use our Davidson
-                      num_roots -- Number of roots to solve for.
-                      guess_type -- Type of guess vector to use
-                          "CAS" Do CAS first and use that as an initial guess.
-                          "RANDOM" Random orthonormal basis
-                          "READ" Read guess from a NumPy file (TODO)
-                      integral_type  Which integrals to use (DF or FULL)
-                           "FULL" Use full integrals (no density fitting)
-                           "DF" Use density fit integrals
-                      return_vects -- Whether to return eigenvectors
-       :return: SF wavefunction object containing calculation data and results
+    """Performs Fock-space CI (SF-IP/EA).
+
+    This is the main function call for the program.
+
+    Parameters
+    ----------
+    delta_a (int) : Desired number of alpha electrons to remove.
+    delta_b (int) : Desired number of beta electrons to add.
+    mol (Molecule) : The molecule object to run the calculation on. 
+          This should be built in whichever program you'll use 
+          to run the reference, and should be handled properly by the reference program.
+    conf_space (string) : Desired configuration space/additional excitations.
+                     * "" CAS
+                     * "h" 1 hole excitation
+                     * "p" 1 particle excitation
+                     * "h,p" 1 hole + 1 particle excitation
+    ref_opts : Options for the reference program.
+               See relevant ref code (ex. do_sf_psi4) for details
+    sf_opts : Additional options for stand-alone SF code. 
+              * sf_diag_method -- Diagonalization method to use.
+                  * "RSP" Direct (deprecated)
+                  * "LANCZOS" Use NumPy's Lanczos
+                  * "DAVIDSON" Use our Davidson
+              * num_roots -- Number of roots to solve for.
+              * guess_type -- Type of guess vector to use
+                  * "CAS" Do CAS first and use that as an initial guess.
+                  * "RANDOM" Random orthonormal basis
+                  * "READ" Read guess from a NumPy file (TODO)
+              * integral_type  Which integrals to use (DF or FULL)
+                  * "FULL" Use full integrals (no density fitting)
+                  * "DF" Use density fit integrals
+              * return_vects -- Whether to return eigenvectors
+
+    Returns
+    -------
+    SF wavefunction object containing calculation data and results
+
     """
 
     # update options to pass into SF code

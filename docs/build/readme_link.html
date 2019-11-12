@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Readme File &#8212; CAS-nSF-IP/EA  documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="readme-file">
+<h1>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this headline">¶</a></h1>
+<p><span class="raw-html-m2r"><img src = "https://travis-ci.com/shannonhouck/sf-ip-ea.svg?token=yXoAYb1Qe6BWq8AUXzXG&branch=master"></span></p>
+<div class="section" id="sf-ip-ea">
+<h2>sf-ip-ea<a class="headerlink" href="#sf-ip-ea" title="Permalink to this headline">¶</a></h2>
+<p>Stand-alone SF-IP/EA code. In progress.</p>
+<div class="section" id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<p>Clone the program from the GitHub repository:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/shannonhouck/sf-ip-ea.git
+</pre></div>
+</div>
+<p>Then navigate into the directory and use pip:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ cd sf-ip-ea/
+$ pip install -e .
+</pre></div>
+</div>
+<p>You can now import this package into any Python script using <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">sf_ip_ea</span></code>.</p>
+</div>
+<div class="section" id="running-sf-ip-ea">
+<h3>Running SF/IP/EA<a class="headerlink" href="#running-sf-ip-ea" title="Permalink to this headline">¶</a></h3>
+<p>Run on the command line using Python:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ python input.py
+</pre></div>
+</div>
+<p>Output is written to stdout by default. A sample input file can be found below.</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>import psi4
+import sf_ip_ea
+
+# Psi4 Molecule object
+n2_7 = psi4.core.Molecule.from_string(&quot;&quot;&quot;
+0 7
+N 0 0 0
+N 0 0 2.5
+symmetry c1
+&quot;&quot;&quot;)
+
+# Psi4 options
+options = {&quot;BASIS&quot;: &quot;cc-pvdz&quot;}
+# Fock CI options
+sf_options = {&#39;NUM_ROOTS&#39;: 2}
+
+# do a 1SF
+wfn = sf_ip_ea.fock_ci( 1, 1, n2_7, conf_space=&quot;p&quot;, ref_opts=options, sf_opts=sf_options)
+</pre></div>
+</div>
+<p>The object returned is a wfn_sf object. Any additional information needed can then be extracted from this object (ex. Sz values, information about RAS spaces, or eigenvectors). For example, you could get an array of the eigenvalues using <code class="docutils literal notranslate"><span class="pre">wfn.e</span></code>.
+The primary function call is <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code>, which is defined as follows:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>fock_ci(delta_a, delta_b, mol, conf_space=&quot;&quot;, ref_opts=&quot;&quot;, sf_opts=&quot;&quot;)
+delta_a -- Desired number of alpha electrons to remove (int)
+delta_b -- Desired number of beta electrons to add (int)
+mol -- Molecule object.
+conf_space -- Desired configuration space.
+                  &quot;&quot; CAS
+                  &quot;h&quot; 1 hole excitation
+                  &quot;p&quot; 1 particle excitation
+                  &quot;h,p&quot; 1 hole + 1 particle excitation
+ref_opts -- Options for the reference program (dict)
+                      See relevant ref code (ex. do_sf_psi4) for details
+sf_opts -- Additional options for stand-alone SF code (dict)
+                      sf_diag_method -- Diagonalization method to use.
+                          &quot;RSP&quot; Direct (deprecated)
+                          &quot;LANCZOS&quot; Use NumPy&#39;s Lanczos
+                          &quot;DAVIDSON&quot; Use our Davidson (UNDER CONSTRUCTION)
+                      num_roots -- Number of roots to solve for.
+                      guess_type -- Type of guess vector to use
+                          &quot;CAS&quot; Do CAS first and use that as an initial guess. (UNDER CONSTRUCTION)
+                          &quot;RANDOM&quot; Random orthonormal basis
+                          &quot;READ&quot; Read guess from a NumPy file (TODO)
+                      integral_type  Which integrals to use (DF or FULL)
+                           &quot;FULL&quot; Use full integrals (no density fitting)
+                           &quot;DF&quot; Use density fit integrals
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="important-parameters">
+<h2>Important Parameters<a class="headerlink" href="#important-parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="number-of-spin-flips-ip-ea">
+<h3>Number of Spin-Flips/IP/EA<a class="headerlink" href="#number-of-spin-flips-ip-ea" title="Permalink to this headline">¶</a></h3>
+<p>The first and second values define the number of alpha electrons added and
+number of beta electrons removed, respectively. This allows you to
+control the number of spin-flips and the number of IP/EA.</p>
+</div>
+<div class="section" id="excitation-level">
+<h3>Excitation Level<a class="headerlink" href="#excitation-level" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">conf_space</span></code> parameter allows you to add single hole and/or particle
+excitations. The default is CAS-nSF (<code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>). Hole excitations are added by
+specifying <code class="docutils literal notranslate"><span class="pre">conf_space=&quot;h&quot;</span></code> and particle excitations are specified with
+<code class="docutils literal notranslate"><span class="pre">conf_space=&quot;p&quot;</span></code>.</p>
+</div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>Some example function calls for various methods can be found below.</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">CAS</span><span class="o">-</span><span class="n">IP</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conf_space</span><span class="o">=</span><span class="ss">&quot;&quot;</span><span class="p">)</span>
+<span class="o">#</span> <span class="n">CAS</span><span class="o">-</span><span class="mi">1</span><span class="n">SF</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conf_space</span><span class="o">=</span><span class="ss">&quot;&quot;</span><span class="p">)</span>
+<span class="o">#</span> <span class="n">CAS</span><span class="o">-</span><span class="mi">1</span><span class="n">SF</span><span class="o">-</span><span class="n">EA</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conf_space</span><span class="o">=</span><span class="ss">&quot;&quot;</span><span class="p">)</span>
+<span class="o">#</span> <span class="n">RAS</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="n">SF</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conf_space</span><span class="o">=</span><span class="ss">&quot;h&quot;</span><span class="p">)</span>
+<span class="o">#</span> <span class="n">RAS</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">p</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="n">SF</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">fock_ci</span><span class="p">(</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">conf_space</span><span class="o">=</span><span class="ss">&quot;hp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="bloch-effective-hamiltonian-analysis">
+<h2>Bloch Effective Hamiltonian Analysis<a class="headerlink" href="#bloch-effective-hamiltonian-analysis" title="Permalink to this headline">¶</a></h2>
+<p>A Bloch effective Hamiltonian can be built in order to extract information
+about coupling between atoms (for example in a mixed-valent complex). A
+sample input file for such a situation is shown below. Note that
+currently, only 1SF methods are supported.</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>import psi4
+import sf_ip_ea
+from sf_ip_ea import bloch
+
+mol = psi4.core.Molecule.from_string(&quot;&quot;&quot;
+0 7
+O 0 0 0
+O 2 0 0
+O 4 0 0
+symmetry c1
+&quot;&quot;&quot;)
+
+options = {&quot;BASIS&quot;: &quot;sto-3g&quot;}
+sf_options = {&#39;NUM_ROOTS&#39;: 3}
+
+wfn = sf_ip_ea.fock_ci( 1, 1, mol, ref_opts=options, sf_opts=sf_options)
+H = bloch.do_bloch(wfn, 3, site_list=[0,1,2])
+</pre></div>
+</div>
+<p>The Bloch Hamiltonian builder function takes the following form:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">do_bloch</span><span class="p">(</span><span class="n">wfn</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">site_list</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">molden_file</span><span class="o">=</span><span class="s1">&#39;orbs.molden&#39;</span><span class="p">,</span> <span class="n">skip_localization</span><span class="o">=</span><span class="k">False</span><span class="p">)</span>
+<span class="n">wfn</span> <span class="c1">-- Wavefunction object (contains info about SF calculation)</span>
+<span class="n">n_sites</span> <span class="c1">-- Number of sites in the spin lattice</span>
+<span class="n">site_list</span> <span class="c1">-- An array specifying which atoms are the sites. Atoms are indexed in the same order as in the XYZ coordinates, and indexing starts at 0. This argument is required for cases where we have multiple orbitals per center (i.e. the effective Hamiltonian will be rank-deficient). If this argument is not given, it is assumed that there is exactly one unpaired electron/spin per lattice site.</span>
+<span class="n">molden_file</span> <span class="p">(</span><span class="n">optional</span><span class="p">)</span> <span class="c1">-- Name of Molden file for localized orbitals</span>
+<span class="n">skip_localization</span> <span class="c1">-- Option that skips the BOYS localization. If this is set to true, the user should localize the orbitals themselves and write the orbitals to Ca() and Cb() in the Psi4 wavefunction object.</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Readme File</a><ul>
+<li><a class="reference internal" href="#sf-ip-ea">sf-ip-ea</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#running-sf-ip-ea">Running SF/IP/EA</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#important-parameters">Important Parameters</a><ul>
+<li><a class="reference internal" href="#number-of-spin-flips-ip-ea">Number of Spin-Flips/IP/EA</a></li>
+<li><a class="reference internal" href="#excitation-level">Excitation Level</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bloch-effective-hamiltonian-analysis">Bloch Effective Hamiltonian Analysis</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/readme_link.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Shannon E. Houck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

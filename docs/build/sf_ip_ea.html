@@ -1,0 +1,906 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>sf_ip_ea package &#8212; CAS-nSF-IP/EA  documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sf-ip-ea-package">
+<h1>sf_ip_ea package<a class="headerlink" href="#sf-ip-ea-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sf_ip_ea.bloch">
+<span id="sf-ip-ea-bloch-module"></span><h2>sf_ip_ea.bloch module<a class="headerlink" href="#module-sf_ip_ea.bloch" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sf_ip_ea.bloch.do_bloch">
+<code class="sig-prename descclassname">sf_ip_ea.bloch.</code><code class="sig-name descname">do_bloch</code><span class="sig-paren">(</span><em class="sig-param">wfn</em>, <em class="sig-param">n_sites</em>, <em class="sig-param">site_list=None</em>, <em class="sig-param">site_list_orbs=None</em>, <em class="sig-param">molden_file='orbs.molden'</em>, <em class="sig-param">skip_localization=False</em>, <em class="sig-param">neutral=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.bloch.do_bloch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bloch effective Hamiltonian solver.</p>
+<p>Solves the Bloch effective Hamiltonian and returns a matrix of the J couplings.
+It is totally dependent on Psi4 for localization right now.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wfn</strong> – SF-IP-EA wfn object containing info about the calculation.</p></li>
+<li><p><strong>n_sites</strong> – The number of sites (integer).</p></li>
+<li><p><strong>site_list</strong> – List of which atoms are “sites”. If this is not given,
+the program assumes one orbital per site. Atomic center ordering
+starts at zero.</p></li>
+<li><p><strong>site_list_orbs</strong> – Site list using orbitals rather than atomic centers.
+Note that orbital ordering follows the same notation as Psi4
+(i.e. orbital ordering starts at 1, not zero).</p></li>
+<li><p><strong>molden_file</strong> – Name of the Molden file to write for localized orbitals.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Skip_localization</dt>
+<dd class="field-even"><p>Whether to skip orbital localization. If you use
+this, you should localize the orbitals in wfn.wfn yourself!</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>NumPy matrix of J coupling values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sf_ip_ea.bloch.lowdin_orth">
+<code class="sig-prename descclassname">sf_ip_ea.bloch.</code><code class="sig-name descname">lowdin_orth</code><span class="sig-paren">(</span><em class="sig-param">A</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.bloch.lowdin_orth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs Lowdin orthonormalization on a given matrix A.</p>
+<p>Orthonormalizes a given matrix A based on Lowdin’s approach.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>A</strong> – NumPy array to orthogonalize.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An orthogonalized version of A.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sf_ip_ea.f">
+<span id="sf-ip-ea-f-module"></span><h2>sf_ip_ea.f module<a class="headerlink" href="#module-sf_ip_ea.f" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sf_ip_ea.f.get_F">
+<code class="sig-prename descclassname">sf_ip_ea.f.</code><code class="sig-name descname">get_F</code><span class="sig-paren">(</span><em class="sig-param">wfn</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.f.get_F" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets Fa and Fb for spatial orbitals with Psi4.
+:param wfn: Psi4 wavefunction object
+:return: Tuple with Fock matrices</p>
+</dd></dl>
+
+</div>
+<div class="section" id="sf-ip-ea-get-paulis-module">
+<h2>sf_ip_ea.get_paulis module<a class="headerlink" href="#sf-ip-ea-get-paulis-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sf_ip_ea.linop">
+<span id="sf-ip-ea-linop-module"></span><h2>sf_ip_ea.linop module<a class="headerlink" href="#module-sf_ip_ea.linop" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sf_ip_ea.linop.LinOpH">
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.linop.</code><code class="sig-name descname">LinOpH</code><span class="sig-paren">(</span><em class="sig-param">shape_in</em>, <em class="sig-param">offset_in</em>, <em class="sig-param">ras1_in</em>, <em class="sig-param">ras2_in</em>, <em class="sig-param">ras3_in</em>, <em class="sig-param">Fa_in</em>, <em class="sig-param">Fb_in</em>, <em class="sig-param">tei_in</em>, <em class="sig-param">n_SF_in</em>, <em class="sig-param">delta_ec_in</em>, <em class="sig-param">conf_space_in</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.sparse.linalg.interface.LinearOperator</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">H</span></code></dt><dd><p>Hermitian adjoint.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code></dt><dd><p>Transpose this linear operator.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(self, x)</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjoint</span></code>(self)</p></td>
+<td><p>Hermitian adjoint.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.diag" title="sf_ip_ea.linop.LinOpH.diag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diag</span></code></a>(self)</p></td>
+<td><p>Returns approximate diagonal of Hamiltonian for Davidson.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf" title="sf_ip_ea.linop.LinOpH.do_cas_1sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_1sf</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do CAS-1SF.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_ea" title="sf_ip_ea.linop.LinOpH.do_cas_1sf_ea"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_1sf_ea</span></code></a>(self, v, Fa, Fb, tei, …)</p></td>
+<td><p>Do CAS-1SF-EA.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_ip" title="sf_ip_ea.linop.LinOpH.do_cas_1sf_ip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_1sf_ip</span></code></a>(self, v, Fa, Fb, tei, …)</p></td>
+<td><p>Do CAS-1SF-IP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral" title="sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_1sf_neutral</span></code></a>(self, v, Fa, Fb, tei, …)</p></td>
+<td><p>Do CAS-1SF.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_2sf" title="sf_ip_ea.linop.LinOpH.do_cas_2sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_2sf</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do CAS-2SF.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_ea" title="sf_ip_ea.linop.LinOpH.do_cas_ea"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_ea</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do CAS-EA.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_ip" title="sf_ip_ea.linop.LinOpH.do_cas_ip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_ip</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do CAS-IP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_h_1sf" title="sf_ip_ea.linop.LinOpH.do_h_1sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_h_1sf</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(h)-1SF.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_h_1sf_ip" title="sf_ip_ea.linop.LinOpH.do_h_1sf_ip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_h_1sf_ip</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(h)-1SF-IP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_h_ea" title="sf_ip_ea.linop.LinOpH.do_h_ea"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_h_ea</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(h)-EA.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_h_ip" title="sf_ip_ea.linop.LinOpH.do_h_ip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_h_ip</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(h)-IP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_hp_1sf" title="sf_ip_ea.linop.LinOpH.do_hp_1sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_hp_1sf</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(h,p)-1SF.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_p_1sf" title="sf_ip_ea.linop.LinOpH.do_p_1sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_p_1sf</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(p)-1SF.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_p_1sf_ea" title="sf_ip_ea.linop.LinOpH.do_p_1sf_ea"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_p_1sf_ea</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(p)-1SF-EA.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_p_ea" title="sf_ip_ea.linop.LinOpH.do_p_ea"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_p_ea</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(p)-EA.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_p_ip" title="sf_ip_ea.linop.LinOpH.do_p_ip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_p_ip</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
+<td><p>Do RAS(p)-IP.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dot</span></code>(self, x)</p></td>
+<td><p>Matrix-matrix or matrix-vector multiplication.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">matmat</span></code>(self, X)</p></td>
+<td><p>Matrix-matrix multiplication.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">matvec</span></code>(self, x)</p></td>
+<td><p>Matrix-vector multiplication.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rmatvec</span></code>(self, x)</p></td>
+<td><p>Adjoint matrix-vector multiplication.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpose</span></code>(self)</p></td>
+<td><p>Transpose this linear operator.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.diag">
+<code class="sig-name descname">diag</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.diag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns approximate diagonal of Hamiltonian for Davidson.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf">
+<code class="sig-name descname">do_cas_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do CAS-1SF.</p>
+<dl>
+<dt>Evaluate the following matrix vector multiply:</dt><dd><div class="line-block">
+<div class="line">H(1,1) | * v(1) = sig(1)</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf_ea">
+<code class="sig-name descname">do_cas_1sf_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_ea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do CAS-1SF-EA.</p>
+<p>block1 = v(ija:aab)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) = sig(1)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf_ip">
+<code class="sig-name descname">do_cas_1sf_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do CAS-1SF-IP.</p>
+<p>block1 = v(ija:aab)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) = sig(1)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral">
+<code class="sig-name descname">do_cas_1sf_neutral</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do CAS-1SF.</p>
+<dl>
+<dt>Evaluate the following matrix vector multiply:</dt><dd><div class="line-block">
+<div class="line">H(1,1) | * v(1) = sig(1)</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_cas_2sf">
+<code class="sig-name descname">do_cas_2sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_2sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do CAS-2SF.</p>
+<p>block1 = v(ijab:aabb)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) = sig(1)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_cas_ea">
+<code class="sig-name descname">do_cas_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_ea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do CAS-EA.</p>
+<p>block1 = v(a:b)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) = sig(1)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_cas_ip">
+<code class="sig-name descname">do_cas_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do CAS-IP.</p>
+<p>block1 = v(i:a)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) = sig(1)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_h_1sf">
+<code class="sig-name descname">do_h_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_h_1sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(h)-1SF.</p>
+<p>block1 = v(ai:ba)
+block2 = v(Ia:ab)
+block3 = v(Iiab:babb)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<p>H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
+H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
+H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_h_1sf_ip">
+<code class="sig-name descname">do_h_1sf_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_h_1sf_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(h)-1SF-IP.</p>
+<p>block1 = v(ija:aab)
+block2 = v(Iia:aab)
+block2 = v(Iijab:baabb)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)</div>
+<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)</div>
+<div class="line">H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(3)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_h_ea">
+<code class="sig-name descname">do_h_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_h_ea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(h)-EA.</p>
+<p>block1 = v(a:b)
+block2 = v(Iab:bbb)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) = sig(1)</div>
+<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) = sig(2)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_h_ip">
+<code class="sig-name descname">do_h_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_h_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(h)-IP.</p>
+<p>block1 = v(i:a)
+block2 = v(I:a)
+block3 = v(Iia:bab)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)</div>
+<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)</div>
+<div class="line">H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(3)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_hp_1sf">
+<code class="sig-name descname">do_hp_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_hp_1sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(h,p)-1SF.</p>
+<p>block1 = v(ia:ab)
+block2 = v(Ia:ab)
+block3 = v(iA:ab)
+block4 = v(Iiab:babb)
+block5 = v(ijAb:abaa)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<p>H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) + H(1,4) * v(4) + H(1,5) * v(5) = sig(1)
+H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) + H(2,4) * v(4) + H(2,5) * v(5) = sig(2)
+H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) + H(3,4) * v(4) + H(3,5) * v(5) = sig(3)
+H(4,1) * v(1) + H(4,2) * v(2) + H(4,3) * v(3) + H(4,4) * v(4) + H(4,5) * v(5) = sig(4)
+H(5,1) * v(1) + H(5,2) * v(2) + H(5,3) * v(3) + H(5,4) * v(4) + H(5,5) * v(5) = sig(5)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_p_1sf">
+<code class="sig-name descname">do_p_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_1sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(p)-1SF.</p>
+<p>block1 = v(ai:ba)
+block2 = v(Ai:ba)
+block3 = v(Aaij:abaa)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<p>H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
+H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
+H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_p_1sf_ea">
+<code class="sig-name descname">do_p_1sf_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_1sf_ea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(p)-1SF-EA.</p>
+<p>block1 = v(iab:abb)
+block2 = v(Iab:abb)
+block2 = v(Iiabc:babbb)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) = sig(1)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_p_ea">
+<code class="sig-name descname">do_p_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_ea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(p)-EA.</p>
+<p>definitions:
+I      doubly occupied
+i,a    singly occupied
+A      doubly unoccupied</p>
+<p>block1 = v(a:b)
+block2 = v(A:b)
+block3 = v(iAa:aab)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)</div>
+<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)</div>
+<div class="line">H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(2)</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.linop.LinOpH.do_p_ip">
+<code class="sig-name descname">do_p_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do RAS(p)-IP.</p>
+<p>block1 = v(i:a)
+block2 = v(ijA:aaa)</p>
+<p>Evaluate the following matrix vector multiply:</p>
+<div class="line-block">
+<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) = sig(1)</div>
+<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) = sig(2)</div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sf_ip_ea.np_sf">
+<span id="sf-ip-ea-np-sf-module"></span><h2>sf_ip_ea.np_sf module<a class="headerlink" href="#module-sf_ip_ea.np_sf" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sf_ip_ea.np_sf.do_sf_np">
+<code class="sig-prename descclassname">sf_ip_ea.np_sf.</code><code class="sig-name descname">do_sf_np</code><span class="sig-paren">(</span><em class="sig-param">delta_a</em>, <em class="sig-param">delta_b</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei_int</em>, <em class="sig-param">e</em>, <em class="sig-param">conf_space=''</em>, <em class="sig-param">sf_opts={}</em>, <em class="sig-param">J_in=None</em>, <em class="sig-param">C_in=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.do_sf_np" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the RAS-SF-IP/EA calculation.</p>
+<p>Performs a RAS-SF-IP/EA calculation. The number of spin flips 
+and IP/EA is determined by the given parameters delta_a (number 
+of alpha electrons removed) and delta_b (number of beta electrons 
+added). One- and two-electron integrals are passed in as NumPy 
+arrays. Whether to perform hole and/or particle excitations is 
+specified using conf_space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delta_a</strong> – Desired number of alpha electrons to remove (int)</p></li>
+<li><p><strong>delta_b</strong> – Desired number of beta electrons to add (int)</p></li>
+<li><p><strong>ras1</strong> – RAS1 space (int)</p></li>
+<li><p><strong>ras2</strong> – RAS2 space (int)</p></li>
+<li><p><strong>ras3</strong> – RAS3 space (int)</p></li>
+<li><p><strong>Fa</strong> – Alpha Fock matrix (NumPy array)</p></li>
+<li><p><strong>Fb</strong> – Beta Fock matrix (NumPy array)</p></li>
+<li><p><strong>tei_int</strong> – Two-electron integrals (NumPy array)</p></li>
+<li><p><strong>e</strong> – ROHF energy (float)</p></li>
+<li><p><strong>conf_space</strong> – Desired excitation scheme.
+See __init__ for more information.</p></li>
+<li><p><strong>sf_opts</strong> – Additional options (dict)
+See __init__ for more information.</p></li>
+<li><p><strong>J_in</strong> – J matrix (for DF calculations)</p></li>
+<li><p><strong>C_in</strong> – MO coefficients matrix (for DF calculations)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A sf_wfn object with calculation result info</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="sf_ip_ea.np_sf.wfn_sf">
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.np_sf.</code><code class="sig-name descname">wfn_sf</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">n_roots</em>, <em class="sig-param">n_dets</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.wfn_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains information about the RAS-SF-IP/EA calculation.</p>
+<p>The wfn_sf class stores important information about the calculation, 
+including RAS spaces, eigenvectors, energies, S**2 values, and so on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_SF</strong> – Number of spin-flips to perform (SF)</p></li>
+<li><p><strong>delta_ec</strong> – Change in electron count (IP/EA)</p></li>
+<li><p><strong>conf_space</strong> – Configuration space</p></li>
+<li><p><strong>ras1</strong> – RAS1 orbital count</p></li>
+<li><p><strong>ras2</strong> – RAS2 orbital count</p></li>
+<li><p><strong>ras3</strong> – RAS3 orbital count</p></li>
+<li><p><strong>n_roots</strong> – Number of roots calculated</p></li>
+<li><p><strong>n_dets</strong> – Number of determinants</p></li>
+<li><p><strong>e</strong> – Calculated energy values</p></li>
+<li><p><strong>vecs</strong> – Calculated eigenvectors</p></li>
+<li><p><strong>local_vecs</strong> – Localized eigenvectors</p></li>
+<li><p><strong>s</strong> – Array of S values (per root)</p></li>
+<li><p><strong>sz</strong> – Array of Sz values (per root)</p></li>
+<li><p><strong>s2</strong> – Array of S**2 values (per root)</p></li>
+<li><p><strong>H</strong> – Calculated Hamiltonian (only if requested)</p></li>
+<li><p><strong>wfn</strong> – ROHF wavefunction object (Psi4 Wavefunction)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.np_sf.wfn_sf.print_important_dets" title="sf_ip_ea.np_sf.wfn_sf.print_important_dets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_important_dets</span></code></a>(self)</p></td>
+<td><p>Prints the most important determinants for each root.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.np_sf.wfn_sf.print_local_dets" title="sf_ip_ea.np_sf.wfn_sf.print_local_dets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_local_dets</span></code></a>(self)</p></td>
+<td><p>Prints the most important determinants for each root (localized).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.np_sf.wfn_sf.print_roots" title="sf_ip_ea.np_sf.wfn_sf.print_roots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_roots</span></code></a>(self)</p></td>
+<td><p>Prints the calculated energies, with S**2 and Sz values.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="sf_ip_ea.np_sf.wfn_sf.print_important_dets">
+<code class="sig-name descname">print_important_dets</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.wfn_sf.print_important_dets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the most important determinants for each root.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.np_sf.wfn_sf.print_local_dets">
+<code class="sig-name descname">print_local_dets</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.wfn_sf.print_local_dets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the most important determinants for each root (localized).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.np_sf.wfn_sf.print_roots">
+<code class="sig-name descname">print_roots</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.wfn_sf.print_roots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the calculated energies, with S**2 and Sz values.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sf_ip_ea.post_ci_analysis">
+<span id="sf-ip-ea-post-ci-analysis-module"></span><h2>sf_ip_ea.post_ci_analysis module<a class="headerlink" href="#module-sf_ip_ea.post_ci_analysis" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sf_ip_ea.post_ci_analysis.calc_s2">
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">calc_s2</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">vect</em>, <em class="sig-param">docc</em>, <em class="sig-param">socc</em>, <em class="sig-param">virt</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.calc_s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates S**2 for a given CI vector.
+Input</p>
+<blockquote>
+<div><p>n_SF – Number of spin-flips
+delta_ec – Change in electron count
+conf_space – Excitation scheme (Options: “”, “h”, “p”, “h,p”)
+vect – Eigenvector (CI coefficients)
+docc – Number of doubly occupied orbitals
+socc – Number of singly occupied orbitals
+virt – Number of doubly unoccupied orbitals</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns</dt><dd><p>s2 – The S**2 expectation value for the state</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sf_ip_ea.post_ci_analysis.calc_sz">
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">calc_sz</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">vect</em>, <em class="sig-param">docc</em>, <em class="sig-param">socc</em>, <em class="sig-param">virt</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.calc_sz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sf_ip_ea.post_ci_analysis.generate_dets">
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">generate_dets</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.generate_dets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns ordered list of all determinants in the following form:
+det = […] (det[0] is 0th determinant, det[1] is 1st, etc.)
+det[count] = [[[elim (alpha)], [elim (beta)]], [[add (a)], [add (b)]]]
+Indexing starts at zero.
+Input</p>
+<blockquote>
+<div><p>n_SF – Number of spin-flips
+delta_ec – Change in electron count
+conf_space – Configuration space
+ras1 – Number of RAS1 orbitals
+ras2 – Number of RAS2 orbitals
+ras3 – Number of RAS3 orbitals</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns</dt><dd><p>dets_list – List of determinants</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sf_ip_ea.post_ci_analysis.print_det_list">
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">print_det_list</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.print_det_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the full list of determinants to standard out.
+This is useful for post-CI analysis.
+Input</p>
+<blockquote>
+<div><p>n_SF – Number of spin-flips
+delta_ec – Change in electron count
+conf_space – Configuration space
+ras1 – Number of RAS1 orbitals
+ras2 – Number of RAS2 orbitals
+ras3 – Number of RAS3 orbitals</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="sf_ip_ea.post_ci_analysis.print_dets">
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">print_dets</code><span class="sig-paren">(</span><em class="sig-param">vect</em>, <em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">dets_to_print=10</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.print_dets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a CI vector, prints information about the most important
+determinants.
+Input</p>
+<blockquote>
+<div><p>vect – CI vector
+n_SF – Number of spin-flips
+delta_ec – Change in electron count
+conf_space – Configuration space
+ras1 – Number of RAS1 orbitals
+ras2 – Number of RAS2 orbitals
+ras3 – Number of RAS3 orbitals
+dets_to_print – Number of determinants to print</p>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sf_ip_ea.psi4_sf">
+<span id="sf-ip-ea-psi4-sf-module"></span><h2>sf_ip_ea.psi4_sf module<a class="headerlink" href="#module-sf_ip_ea.psi4_sf" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sf_ip_ea.psi4_sf.do_sf_psi4">
+<code class="sig-prename descclassname">sf_ip_ea.psi4_sf.</code><code class="sig-name descname">do_sf_psi4</code><span class="sig-paren">(</span><em class="sig-param">delta_a</em>, <em class="sig-param">delta_b</em>, <em class="sig-param">mol</em>, <em class="sig-param">conf_space=''</em>, <em class="sig-param">ref_opts={}</em>, <em class="sig-param">sf_opts={}</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.psi4_sf.do_sf_psi4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs SF-CAS using Psi4’s integral packages</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delta_a</strong> – Number of alpha electrons to eliminate</p></li>
+<li><p><strong>delta_b</strong> – Number of beta electrons to create</p></li>
+<li><p><strong>mol</strong> – Psi4 Molecule object on which to run the calculation</p></li>
+<li><p><strong>conf_space</strong> – Excitation scheme (Options: “”, “h”, “p”, “h,p”)</p></li>
+<li><p><strong>ref_opts</strong> – Additional options for Psi4 (dictionary)</p></li>
+<li><p><strong>sf_opts</strong> – Additional options for Fock CI (dictionary)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A sf_wfn object containing calculation results</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sf_ip_ea.solvers">
+<span id="sf-ip-ea-solvers-module"></span><h2>sf_ip_ea.solvers module<a class="headerlink" href="#module-sf_ip_ea.solvers" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sf_ip_ea.solvers.davidson">
+<code class="sig-prename descclassname">sf_ip_ea.solvers.</code><code class="sig-name descname">davidson</code><span class="sig-paren">(</span><em class="sig-param">A</em>, <em class="sig-param">vInit</em>, <em class="sig-param">e_conv=1e-08</em>, <em class="sig-param">r_conv=0.0001</em>, <em class="sig-param">vect_cutoff=1e-05</em>, <em class="sig-param">maxIter=200</em>, <em class="sig-param">collapse_per_root=20</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.solvers.davidson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solves for the eigenvalues and eigenvectors of a Hamiltonian.</p>
+<p>Uses the Davidson method to solve for the eigenvalues and eigenvectors
+of a given Hermitian matrix A.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> – Hamiltonian (LinOp object)</p></li>
+<li><p><strong>vInit</strong> – Initial guess vector (numpy)</p></li>
+<li><p><strong>e_conv</strong> – Cutoff for energy convergence</p></li>
+<li><p><strong>r_conv</strong> – Cutoff for residual squared convergence</p></li>
+<li><p><strong>vect_cutoff</strong> – Cutoff for adding vectors to Krylov space</p></li>
+<li><p><strong>maxIter</strong> – Maximum number of iterations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Eigenvalues/eigenvectors for the Hamiltonian.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sf_ip_ea.tei">
+<span id="sf-ip-ea-tei-module"></span><h2>sf_ip_ea.tei module<a class="headerlink" href="#module-sf_ip_ea.tei" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sf_ip_ea.tei.TEI">
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEI</code><a class="headerlink" href="#sf_ip_ea.tei.TEI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>General class for two-electron integral object handling.</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.tei.TEI.get_subblock" title="sf_ip_ea.tei.TEI.get_subblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_subblock</span></code></a>(self, a, b, c, d)</p></td>
+<td><p>Returns a given subblock of the ERI matrix.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="sf_ip_ea.tei.TEI.get_subblock">
+<code class="sig-name descname">get_subblock</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">a</em>, <em class="sig-param">b</em>, <em class="sig-param">c</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEI.get_subblock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a given subblock of the ERI matrix.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sf_ip_ea.tei.TEIDF">
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIDF</code><span class="sig-paren">(</span><em class="sig-param">C</em>, <em class="sig-param">basis</em>, <em class="sig-param">aux</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ref_method='PSI4'</em>, <em class="sig-param">np_tei=None</em>, <em class="sig-param">np_J=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sf_ip_ea.tei.TEI" title="sf_ip_ea.tei.TEI"><code class="xref py py-class docutils literal notranslate"><span class="pre">sf_ip_ea.tei.TEI</span></code></a></p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.tei.TEIDF.get_subblock" title="sf_ip_ea.tei.TEIDF.get_subblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_subblock</span></code></a>(self, a, b, c, d)</p></td>
+<td><p>Returns a given subblock of the two-electron integrals (DF).</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="sf_ip_ea.tei.TEIDF.get_subblock">
+<code class="sig-name descname">get_subblock</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">a</em>, <em class="sig-param">b</em>, <em class="sig-param">c</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIDF.get_subblock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a given subblock of the two-electron integrals (DF).</p>
+<p>Returns a given subblock of the DF two-electron integral object.
+The RAS space to return is given by a, b, c, and d, and 
+the returned integral has the form &lt;ab|cd&gt;.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – RAS space of index 1</p></li>
+<li><p><strong>b</strong> – RAS space of index 2</p></li>
+<li><p><strong>c</strong> – RAS space of index 3</p></li>
+<li><p><strong>d</strong> – RAS space of index 4</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Desired subblock (NumPy array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sf_ip_ea.tei.TEIFull">
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIFull</code><span class="sig-paren">(</span><em class="sig-param">C</em>, <em class="sig-param">basis</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ref_method='PSI4'</em>, <em class="sig-param">np_tei=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIFull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sf_ip_ea.tei.TEI" title="sf_ip_ea.tei.TEI"><code class="xref py py-class docutils literal notranslate"><span class="pre">sf_ip_ea.tei.TEI</span></code></a></p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.tei.TEIFull.get_full" title="sf_ip_ea.tei.TEIFull.get_full"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full</span></code></a>(self)</p></td>
+<td><p>Returns the full set of two-electron integrals as a NumPy array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.tei.TEIFull.get_subblock" title="sf_ip_ea.tei.TEIFull.get_subblock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_subblock</span></code></a>(self, a, b, c, d)</p></td>
+<td><p>Returns a given subblock of the two-electron integrals.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="sf_ip_ea.tei.TEIFull.get_full">
+<code class="sig-name descname">get_full</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIFull.get_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the full set of two-electron integrals as a NumPy array.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sf_ip_ea.tei.TEIFull.get_subblock">
+<code class="sig-name descname">get_subblock</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">a</em>, <em class="sig-param">b</em>, <em class="sig-param">c</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIFull.get_subblock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a given subblock of the two-electron integrals.
+The RAS space to return is given by a, b, c, and d, and 
+the returned integral has the form &lt;ab|cd&gt;.
+So to get the block with a and c in RAS1 and b and d in RAS2,
+one would use get_subblock(1, 2, 1, 2).
+:param a: RAS space of index 1
+:param b: RAS space of index 2
+:param c: RAS space of index 3
+:param d: RAS space of index 4
+:return: Desired subblock (NumPy array)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sf_ip_ea">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sf_ip_ea" title="Permalink to this headline">¶</a></h2>
+<p>FOCK SPACE CI PROGRAM</p>
+<p>Runs RAS-SF-IP/EA calculations.</p>
+<p>References:
+Crawford Tutorials (<a class="reference external" href="http://sirius.chem.vt.edu/wiki/doku.php?id=crawdad:programming:project12">http://sirius.chem.vt.edu/wiki/doku.php?id=crawdad:programming:project12</a>)
+DePrince Tutorials (<a class="reference external" href="https://www.chem.fsu.edu/~deprince/programming_projects/cis/">https://www.chem.fsu.edu/~deprince/programming_projects/cis/</a>)
+Sherrill Notes (<a class="reference external" href="http://vergil.chemistry.gatech.edu/notes/cis/cis.html">http://vergil.chemistry.gatech.edu/notes/cis/cis.html</a>)
+Psi4NumPy Tutorials</p>
+<dl class="function">
+<dt id="sf_ip_ea.fock_ci">
+<code class="sig-prename descclassname">sf_ip_ea.</code><code class="sig-name descname">fock_ci</code><span class="sig-paren">(</span><em class="sig-param">delta_a</em>, <em class="sig-param">delta_b</em>, <em class="sig-param">mol</em>, <em class="sig-param">conf_space=''</em>, <em class="sig-param">ref_opts={}</em>, <em class="sig-param">sf_opts={}</em>, <em class="sig-param">program='PSI4'</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.fock_ci" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs Fock-space CI (SF-IP/EA).</p>
+<p>This is the main function call for the program.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>delta_a (int)</strong><span class="classifier">Desired number of alpha electrons to remove.</span></dt><dd></dd>
+<dt><strong>delta_b (int)</strong><span class="classifier">Desired number of beta electrons to add.</span></dt><dd></dd>
+<dt><strong>mol (Molecule)</strong><span class="classifier">The molecule object to run the calculation on.</span></dt><dd><p>This should be built in whichever program you’ll use 
+to run the reference, and should be handled properly by the reference program.</p>
+</dd>
+<dt><strong>conf_space (string)</strong><span class="classifier">Desired configuration space/additional excitations.</span></dt><dd><ul class="simple">
+<li><p>“” CAS</p></li>
+<li><p>“h” 1 hole excitation</p></li>
+<li><p>“p” 1 particle excitation</p></li>
+<li><p>“h,p” 1 hole + 1 particle excitation</p></li>
+</ul>
+</dd>
+<dt><strong>ref_opts</strong><span class="classifier">Options for the reference program.</span></dt><dd><p>See relevant ref code (ex. do_sf_psi4) for details</p>
+</dd>
+<dt><strong>sf_opts</strong><span class="classifier">Additional options for stand-alone SF code.</span></dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>sf_diag_method – Diagonalization method to use.</dt><dd><ul>
+<li><p>“RSP” Direct (deprecated)</p></li>
+<li><p>“LANCZOS” Use NumPy’s Lanczos</p></li>
+<li><p>“DAVIDSON” Use our Davidson</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>num_roots – Number of roots to solve for.</p></li>
+<li><dl class="simple">
+<dt>guess_type – Type of guess vector to use</dt><dd><ul>
+<li><p>“CAS” Do CAS first and use that as an initial guess.</p></li>
+<li><p>“RANDOM” Random orthonormal basis</p></li>
+<li><p>“READ” Read guess from a NumPy file (TODO)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>integral_type  Which integrals to use (DF or FULL)</dt><dd><ul>
+<li><p>“FULL” Use full integrals (no density fitting)</p></li>
+<li><p>“DF” Use density fit integrals</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>return_vects – Whether to return eigenvectors</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>SF wavefunction object containing calculation data and results</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">sf_ip_ea package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea.bloch">sf_ip_ea.bloch module</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea.f">sf_ip_ea.f module</a></li>
+<li><a class="reference internal" href="#sf-ip-ea-get-paulis-module">sf_ip_ea.get_paulis module</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea.linop">sf_ip_ea.linop module</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea.np_sf">sf_ip_ea.np_sf module</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea.post_ci_analysis">sf_ip_ea.post_ci_analysis module</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea.psi4_sf">sf_ip_ea.psi4_sf module</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea.solvers">sf_ip_ea.solvers module</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea.tei">sf_ip_ea.tei module</a></li>
+<li><a class="reference internal" href="#module-sf_ip_ea">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sf_ip_ea.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CAS-nSF-IP/EA  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Shannon E. Houck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

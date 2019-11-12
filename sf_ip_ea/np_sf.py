@@ -286,4 +286,3 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     
     return wfn
 
-
