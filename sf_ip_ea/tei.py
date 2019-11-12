@@ -31,7 +31,37 @@ class TEI:
         """
         pass
 
-class TEIFullNumPy(TEI):
+class TEIFullBase(TEI):
+    """Base class for constructing full TEI integrals.
+    """
+    def __init__(self, ras1, ras2, ras3, conf_space, np_tei):
+        """Initialize TEI object.
+        """
+        pass
+
+    def get_subblock(self, a, b, c, d):
+        """Returns a given subblock of the two-electron integrals.
+           The RAS space to return is given by a, b, c, and d, and 
+           the returned integral has the form <ab|cd>.
+           So to get the block with a and c in RAS1 and b and d in RAS2,
+           one would use get_subblock(1, 2, 1, 2).
+           :param a: RAS space of index 1
+           :param b: RAS space of index 2
+           :param c: RAS space of index 3
+           :param d: RAS space of index 4
+           :return: Desired subblock (NumPy array)
+        """
+        return self.eri[self.ind[a][0]:self.ind[a][1],
+                        self.ind[b][0]:self.ind[b][1],
+                        self.ind[c][0]:self.ind[c][1],
+                        self.ind[d][0]:self.ind[d][1]]
+
+    def get_full(self):
+        """Returns the full set of two-electron integrals as a NumPy array.
+        """
+        return self.eri
+
+class TEIFullNumPy(TEIFullBase):
     """Class for constructing full TEI integrals from a NumPy array.
 
     This class stores the integrals as a NumPy array, given a NumPy array.
@@ -68,38 +98,11 @@ class TEIFullNumPy(TEI):
                         [ras1+ras2,ras1+ras2+ras3]]
         print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
 
-    def get_subblock(self, a, b, c, d):
-        """Returns a given subblock of the two-electron integrals.
-           The RAS space to return is given by a, b, c, and d, and 
-           the returned integral has the form <ab|cd>.
-           So to get the block with a and c in RAS1 and b and d in RAS2,
-           one would use get_subblock(1, 2, 1, 2).
-           :param a: RAS space of index 1
-           :param b: RAS space of index 2
-           :param c: RAS space of index 3
-           :param d: RAS space of index 4
-           :return: Desired subblock (NumPy array)
-        """
-        return self.eri[self.ind[a][0]:self.ind[a][1],
-                        self.ind[b][0]:self.ind[b][1],
-                        self.ind[c][0]:self.ind[c][1],
-                        self.ind[d][0]:self.ind[d][1]]
-
-    def get_full(self):
-        """Returns the full set of two-electron integrals as a NumPy array.
-        """
-        return self.eri
-
-class TEIFullPsi4(TEI):
+class TEIFullPsi4(TEIFullBase):
     """Class for constructing full TEI integrals using Psi4.
 
     This class constructs the full two-electron integrals using Psi4. 
     It then stores the integrals as NumPy arrays.
-
-    Attributes
-    ----------
-    
-
 
     """
     def __init__(self, C, basis, ras1, ras2, ras3, conf_space):
@@ -153,70 +156,12 @@ class TEIFullPsi4(TEI):
                         [ras1+ras2,ras1+ras2+ras3]]
         print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
 
-    def get_subblock(self, a, b, c, d):
-        """Returns a given subblock of the two-electron integrals.
-           The RAS space to return is given by a, b, c, and d, and 
-           the returned integral has the form <ab|cd>.
-           So to get the block with a and c in RAS1 and b and d in RAS2,
-           one would use get_subblock(1, 2, 1, 2).
-           :param a: RAS space of index 1
-           :param b: RAS space of index 2
-           :param c: RAS space of index 3
-           :param d: RAS space of index 4
-           :return: Desired subblock (NumPy array)
-        """
-        return self.eri[self.ind[a][0]:self.ind[a][1],
-                        self.ind[b][0]:self.ind[b][1],
-                        self.ind[c][0]:self.ind[c][1],
-                        self.ind[d][0]:self.ind[d][1]]
-
-    def get_full(self):
-        """Returns the full set of two-electron integrals as a NumPy array.
-        """
-        return self.eri
-
 # DF TEI INTEGRALS
 
-class TEIDFNumPy(TEI):
+class TEIDFBase(TEI):
     def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space,
                  np_tei, np_J):
-        eri = np_tei
-        J = np_J
-        # Contract and obtain final form
-        eri = np.einsum("PQ,Qpq->Ppq", J, eri)
-        # set up C
-        C_ras1 = C[:, 0:ras1]
-        C_ras2 = C[:, ras1:ras1+ras2]
-        C_ras3 = C[:, ras1+ras2:]
-        # move to MO basis
-        # Notation: ij in active space, IJ in docc, AB in virtual
-        # Bnm notation, where n and m indicate RAS space (1/2/3)
-        # all of them need RAS2
-        B2m = np.einsum('Ppq,pi->Piq', eri, C_ras2)
-        self.B22 = np.einsum('Piq,qj->Pij', B2m, C_ras2)
-        # if configuration space is "h"
-        if(conf_space == "h"):
-            B1m = np.einsum('Ppq,pI->PIq', eri, C_ras1)
-            self.B11 = np.einsum('PIq,qJ->PIJ', B1m, C_ras1)
-            self.B12 = np.einsum('PIq,qj->PIj', B1m, C_ras2)
-            self.B21 = np.einsum('Piq,qJ->PiJ', B2m, C_ras1)
-        if(conf_space == "p"):
-            B3m = np.einsum('Ppq,pA->PAq', eri, C_ras3)
-            self.B33 = np.einsum('PAq,qB->PAB', B3m, C_ras3)
-            self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
-            self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
-        if(conf_space == "h,p"):
-            B1m = np.einsum('Ppq,pI->PIq', eri, C_ras1)
-            self.B11 = np.einsum('PIq,qJ->PIJ', B1m, C_ras1)
-            self.B12 = np.einsum('PIq,qj->PIj', B1m, C_ras2)
-            self.B21 = np.einsum('Piq,qJ->PiJ', B2m, C_ras1)
-            self.B13 = np.einsum('PIq,qA->PIA', B1m, C_ras3)
-            B3m = np.einsum('Ppq,pA->PAq', eri, C_ras3)
-            self.B33 = np.einsum('PAq,qB->PAB', B3m, C_ras3)
-            self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
-            self.B31 = np.einsum('PAq,qJ->PAJ', B3m, C_ras1)
-            self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
-        print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
+        pass
 
     def get_subblock(self, a, b, c, d):
         """Returns a given subblock of the two-electron integrals (DF).
@@ -274,12 +219,53 @@ class TEIDFNumPy(TEI):
                 B_ket = self.B31
             if(d == 2):
                 B_ket = self.B32
-            if(d == 3): 
+            if(d == 3):
                 B_ket = self.B33
 
         return np.einsum("Pij,Pkl->ijkl", B_bra, B_ket).transpose(0, 2, 1, 3)
 
-class TEIDFPsi4(TEI):
+class TEIDFNumPy(TEIDFBase):
+    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space,
+                 np_tei, np_J):
+        eri = np_tei
+        J = np_J
+        # Contract and obtain final form
+        eri = np.einsum("PQ,Qpq->Ppq", J, eri)
+        # set up C
+        C_ras1 = C[:, 0:ras1]
+        C_ras2 = C[:, ras1:ras1+ras2]
+        C_ras3 = C[:, ras1+ras2:]
+        # move to MO basis
+        # Notation: ij in active space, IJ in docc, AB in virtual
+        # Bnm notation, where n and m indicate RAS space (1/2/3)
+        # all of them need RAS2
+        B2m = np.einsum('Ppq,pi->Piq', eri, C_ras2)
+        self.B22 = np.einsum('Piq,qj->Pij', B2m, C_ras2)
+        # if configuration space is "h"
+        if(conf_space == "h"):
+            B1m = np.einsum('Ppq,pI->PIq', eri, C_ras1)
+            self.B11 = np.einsum('PIq,qJ->PIJ', B1m, C_ras1)
+            self.B12 = np.einsum('PIq,qj->PIj', B1m, C_ras2)
+            self.B21 = np.einsum('Piq,qJ->PiJ', B2m, C_ras1)
+        if(conf_space == "p"):
+            B3m = np.einsum('Ppq,pA->PAq', eri, C_ras3)
+            self.B33 = np.einsum('PAq,qB->PAB', B3m, C_ras3)
+            self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
+            self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
+        if(conf_space == "h,p"):
+            B1m = np.einsum('Ppq,pI->PIq', eri, C_ras1)
+            self.B11 = np.einsum('PIq,qJ->PIJ', B1m, C_ras1)
+            self.B12 = np.einsum('PIq,qj->PIj', B1m, C_ras2)
+            self.B21 = np.einsum('Piq,qJ->PiJ', B2m, C_ras1)
+            self.B13 = np.einsum('PIq,qA->PIA', B1m, C_ras3)
+            B3m = np.einsum('Ppq,pA->PAq', eri, C_ras3)
+            self.B33 = np.einsum('PAq,qB->PAB', B3m, C_ras3)
+            self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
+            self.B31 = np.einsum('PAq,qJ->PAJ', B3m, C_ras1)
+            self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
+        print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
+
+class TEIDFPsi4(TEIDFBase):
     # Used Psi4NumPy for reference for this section
     def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space,
                  np_tei=None, np_J=None):
@@ -346,64 +332,4 @@ class TEIDFPsi4(TEI):
             self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
         print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
 
-    def get_subblock(self, a, b, c, d):
-        """Returns a given subblock of the two-electron integrals (DF).
-
-           Returns a given subblock of the DF two-electron integral object.
-           The RAS space to return is given by a, b, c, and d, and 
-           the returned integral has the form <ab|cd>.
-
-           :param a: RAS space of index 1
-           :param b: RAS space of index 2
-           :param c: RAS space of index 3
-           :param d: RAS space of index 4
-           :return: Desired subblock (NumPy array)
-        """
-        # the B matrices are still in chemists' notation
-        # don't switch b and c index until end
-        if(a == 1):
-            if(c == 1):
-                B_bra = self.B11
-            if(c == 2):
-                B_bra = self.B12
-            if(c == 3):
-                B_bra = self.B13
-        if(a == 2):
-            if(c == 1):
-                B_bra = self.B21
-            if(c == 2):
-                B_bra = self.B22
-            if(c == 3):
-                B_bra = self.B23
-        if(a == 3):
-            if(c == 1):
-                B_bra = self.B31
-            if(c == 2):
-                B_bra = self.B32
-            if(c == 3):
-                B_bra = self.B33
-
-        if(b == 1):
-            if(d == 1):
-                B_ket = self.B11
-            if(d == 2):
-                B_ket = self.B12
-            if(d == 3):
-                B_ket = self.B13
-        if(b == 2):
-            if(d == 1):
-                B_ket = self.B21
-            if(d == 2):
-                B_ket = self.B22
-            if(d == 3):
-                B_ket = self.B23
-        if(b == 3):
-            if(d == 1):
-                B_ket = self.B31
-            if(d == 2):
-                B_ket = self.B32
-            if(d == 3): 
-                B_ket = self.B33
-
-        return np.einsum("Pij,Pkl->ijkl", B_bra, B_ket).transpose(0, 2, 1, 3)
 
