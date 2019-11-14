@@ -27,9 +27,9 @@ H 2 2 0
 """
 
 options = {"BASIS": "vdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}
-sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 900}
+sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 1134}
 
-wfn = fock_ci( 2, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
+wfn = fock_ci( 2, 1, n2_7, conf_space="h", ref_opts=options, sf_opts=sf_options)
 
 '''
 options = {"basis": "cc-pvtz", "BASIS_GUESS": "sto-3g", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}

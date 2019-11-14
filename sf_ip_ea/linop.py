@@ -1596,7 +1596,7 @@ class LinOpH (LinearOperator):
         ################################################ 
         #   sig(Iia:aab) += v(Iijba:baabb)*F(Ib:bb)
         Fb_tmp = Fb[0:ras1, ras1:ras1+ras2]
-        sig_1 = sig_1 - np.einsum("Iijban,Ib->ijan", v_ref3, Fb_tmp)
+        sig_1 = sig_1 + np.einsum("Iijban,Ib->ijan", v_ref3, Fb_tmp)
         #   sig(Iia:aab) += v(Iijbc:baabb)*F(Iabc:bbbb)
         tei_tmp = self.tei.get_subblock(1, 2, 2, 2)
         sig_1 = sig_1 + 0.5*(np.einsum("Iijbcn,Iabc->ijan", v_ref3, tei_tmp) - np.einsum("Iijbcn,Iacb->ijan", v_ref3, tei_tmp))
