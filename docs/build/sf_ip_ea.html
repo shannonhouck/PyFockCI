@@ -97,7 +97,8 @@ Optional. Defaults to False.</p>
 <dt id="sf_ip_ea.bloch.lowdin_orth">
 <code class="sig-prename descclassname">sf_ip_ea.bloch.</code><code class="sig-name descname">lowdin_orth</code><span class="sig-paren">(</span><em class="sig-param">A</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.bloch.lowdin_orth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs Lowdin orthonormalization on a given matrix A.</p>
-<p>Orthonormalizes a given matrix A based on Lowdin’s approach.</p>
+<p>Orthonormalizes a given NumPy matrix A based on Lowdin’s approach 
+(i.e. based on the SVD of A).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -117,12 +118,30 @@ Optional. Defaults to False.</p>
 </div>
 <div class="section" id="module-sf_ip_ea.f">
 <span id="sf-ip-ea-f-module"></span><h2>sf_ip_ea.f module<a class="headerlink" href="#module-sf_ip_ea.f" title="Permalink to this headline">¶</a></h2>
+<p>Handling of the Fock matrix.</p>
+<p>This module is responsible for handling things related to the Fock matrix.</p>
 <dl class="function">
 <dt id="sf_ip_ea.f.get_F">
 <code class="sig-prename descclassname">sf_ip_ea.f.</code><code class="sig-name descname">get_F</code><span class="sig-paren">(</span><em class="sig-param">wfn</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.f.get_F" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets Fa and Fb for spatial orbitals with Psi4.
-:param wfn: Psi4 wavefunction object
-:return: Tuple with Fock matrices</p>
+<dd><p>Gets alpha and beta Fock matrices.</p>
+<p>Given a Psi4 Wavefunction object, this returns NumPy representations of 
+the alpha and beta Fock matrices in the spatial orbital MO basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>wfn</strong><span class="classifier">psi4.core.Wavefunction</span></dt><dd><p>Psi4 wavefunction object from which to obtain alpha and beta 
+Fock matrices.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tuple</dt><dd><p>A tuple (Fa, Fb) containing NumPy representations of the alpha 
+and beta Fock matrices, respectively.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -131,16 +150,43 @@ Optional. Defaults to False.</p>
 </div>
 <div class="section" id="module-sf_ip_ea.linop">
 <span id="sf-ip-ea-linop-module"></span><h2>sf_ip_ea.linop module<a class="headerlink" href="#module-sf_ip_ea.linop" title="Permalink to this headline">¶</a></h2>
+<p>LinOp module responsible for performing Hamiltonian-vector multiplication.</p>
+<p>This module contains a derived class of NumPy’s LinearOperator. This 
+class contains all of the information necessary to do a Hamiltonian-vector 
+multiply (the most expensive step in Davidson) using NumPy’s <code class="docutils literal notranslate"><span class="pre">einsum</span></code> 
+method.</p>
 <dl class="class">
 <dt id="sf_ip_ea.linop.LinOpH">
 <em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.linop.</code><code class="sig-name descname">LinOpH</code><span class="sig-paren">(</span><em class="sig-param">shape_in</em>, <em class="sig-param">offset_in</em>, <em class="sig-param">ras1_in</em>, <em class="sig-param">ras2_in</em>, <em class="sig-param">ras3_in</em>, <em class="sig-param">Fa_in</em>, <em class="sig-param">Fb_in</em>, <em class="sig-param">tei_in</em>, <em class="sig-param">n_SF_in</em>, <em class="sig-param">delta_ec_in</em>, <em class="sig-param">conf_space_in</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.sparse.linalg.interface.LinearOperator</span></code></p>
+<p>Linear operator for Hamiltonian-vector multiplication.</p>
+<p>This is a derived class of NumPy’s LinearOperator class. It contains 
+information on how to perform tensor-contraction-based multiplication 
+of the Hamiltonian with a given vector or set of vectors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">H</span></code></dt><dd><p>Hermitian adjoint.</p>
+<dt><strong>offset</strong><span class="classifier">double</span></dt><dd><p>Diagonal offset to Hamiltonian (usually reference energy).</p>
 </dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code></dt><dd><p>Transpose this linear operator.</p>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>The RAS1 space (doubly occupied in reference).</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>The RAS2 space (singly occupied in reference).</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>The RAS3 space (virtual in reference).</p>
+</dd>
+<dt><strong>n_SF</strong><span class="classifier">int</span></dt><dd><p>Number of spin-flips to perform.</p>
+</dd>
+<dt><strong>delta_ec</strong><span class="classifier">int</span></dt><dd><p>Change in electron count (indicates IP/EA).</p>
+</dd>
+<dt><strong>conf_space</strong><span class="classifier">string</span></dt><dd><p>Excitations to include (hole, particle, etc).</p>
+</dd>
+<dt><strong>num_dets</strong><span class="classifier">int</span></dt><dd><p>Number of determinants.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integrals.</p>
 </dd>
 </dl>
 </dd>
@@ -159,7 +205,7 @@ Optional. Defaults to False.</p>
 <td><p>Hermitian adjoint.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.diag" title="sf_ip_ea.linop.LinOpH.diag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diag</span></code></a>(self)</p></td>
-<td><p>Returns approximate diagonal of Hamiltonian for Davidson.</p></td>
+<td><p>Returns approximate diagonal of Hamiltonian.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf" title="sf_ip_ea.linop.LinOpH.do_cas_1sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_1sf</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
 <td><p>Do CAS-1SF.</p></td>
@@ -229,19 +275,32 @@ Optional. Defaults to False.</p>
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.diag">
 <code class="sig-name descname">diag</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.diag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns approximate diagonal of Hamiltonian for Davidson.</p>
+<dd><p>Returns approximate diagonal of Hamiltonian.</p>
+<p>This returns the approximate diagonal of the Hamiltonian for the 
+Davidson code (used in the preconditioner step). This is calculated 
+for each determinant by summing over the occupied orbital energies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>np.ndarray</dt><dd><p>1-D NumPy representation of the diagonal of the Hamiltonian.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf">
 <code class="sig-name descname">do_cas_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-1SF.</p>
-<dl>
+<blockquote>
+<div><dl>
 <dt>Evaluate the following matrix vector multiply:</dt><dd><div class="line-block">
 <div class="line">H(1,1) | * v(1) = sig(1)</div>
 </div>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -401,13 +460,16 @@ H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)</p>
 <dt id="sf_ip_ea.linop.LinOpH.do_p_1sf_ea">
 <code class="sig-name descname">do_p_1sf_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_1sf_ea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(p)-1SF-EA.</p>
-<p>block1 = v(iab:abb)
-block2 = v(Iab:abb)
-block2 = v(Iiabc:babbb)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) = sig(1)</div>
-</div>
+<p>Defines the necessary contractions for RAS(p)-1SF-EA.</p>
+<blockquote>
+<div><p>block1 = v(iab:abb)
+block2 = v(Aia:bab)
+block3 = v(Aijab:baabb)</p>
+<p>Evaluate the following matrix vector multiplications:</p>
+<p><a href="#id1"><span class="problematic" id="id2">|H(1,1)|</span></a> * v(1) + <a href="#id3"><span class="problematic" id="id4">|H(1,2)|</span></a> * v(2) + <a href="#id5"><span class="problematic" id="id6">|H(1,3)|</span></a> * v(3) = sig(1)
+<a href="#id7"><span class="problematic" id="id8">|H(2,1)|</span></a> * v(1) + <a href="#id9"><span class="problematic" id="id10">|H(2,2)|</span></a> * v(2) + <a href="#id11"><span class="problematic" id="id12">|H(2,3)|</span></a> * v(3) = sig(2)
+<a href="#id13"><span class="problematic" id="id14">|H(3,1)|</span></a> * v(1) + <a href="#id15"><span class="problematic" id="id16">|H(3,2)|</span></a> * v(2) + <a href="#id17"><span class="problematic" id="id18">|H(3,3)|</span></a> * v(3) = sig(3)</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -661,6 +723,8 @@ dets_to_print – Number of determinants to print</p>
 </div>
 <div class="section" id="module-sf_ip_ea.solvers">
 <span id="sf-ip-ea-solvers-module"></span><h2>sf_ip_ea.solvers module<a class="headerlink" href="#module-sf_ip_ea.solvers" title="Permalink to this headline">¶</a></h2>
+<p>Davidson solver module.</p>
+<p>This module holds the Davidson solver and related functions.</p>
 <dl class="function">
 <dt id="sf_ip_ea.solvers.davidson">
 <code class="sig-prename descclassname">sf_ip_ea.solvers.</code><code class="sig-name descname">davidson</code><span class="sig-paren">(</span><em class="sig-param">A</em>, <em class="sig-param">vInit</em>, <em class="sig-param">e_conv=1e-08</em>, <em class="sig-param">r_conv=0.0001</em>, <em class="sig-param">vect_cutoff=1e-05</em>, <em class="sig-param">maxIter=200</em>, <em class="sig-param">collapse_per_root=20</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.solvers.davidson" title="Permalink to this definition">¶</a></dt>
@@ -669,17 +733,29 @@ dets_to_print – Number of determinants to print</p>
 of a given Hermitian matrix A.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> – Hamiltonian (LinOp object)</p></li>
-<li><p><strong>vInit</strong> – Initial guess vector (numpy)</p></li>
-<li><p><strong>e_conv</strong> – Cutoff for energy convergence</p></li>
-<li><p><strong>r_conv</strong> – Cutoff for residual squared convergence</p></li>
-<li><p><strong>vect_cutoff</strong> – Cutoff for adding vectors to Krylov space</p></li>
-<li><p><strong>maxIter</strong> – Maximum number of iterations</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>A</strong><span class="classifier">sf_ip_ea.linop.LinOpH</span></dt><dd><p>LinOp object defining our matrix-vector multiply.</p>
+</dd>
+<dt><strong>vInit</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Initial guess vector(s).</p>
+</dd>
+<dt><strong>e_conv</strong><span class="classifier">float</span></dt><dd><p>Cutoff for energy convergence. (Default: 1e-8)</p>
+</dd>
+<dt><strong>r_conv</strong><span class="classifier">float</span></dt><dd><p>Cutoff for residual squared convergence. (Default: 1e-4)</p>
+</dd>
+<dt><strong>vect_cutoff</strong><span class="classifier">float</span></dt><dd><p>Cutoff for adding vectors to Krylov space. (Default: 1e-5)</p>
+</dd>
+<dt><strong>maxIter</strong><span class="classifier">int</span></dt><dd><p>Maximum number of iterations. (Default: 200)</p>
+</dd>
+<dt><strong>collapse_per_root</strong><span class="classifier">int</span></dt><dd><p>Number of vectors per root to save after collapsing the Krylov space.
+(Default: 20)</p>
+</dd>
+</dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Eigenvalues/eigenvectors for the Hamiltonian.</p>
+<dd class="field-even"><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>Eigenvalues/eigenvectors for the Hamiltonian.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -687,11 +763,21 @@ of a given Hermitian matrix A.</p>
 </div>
 <div class="section" id="module-sf_ip_ea.tei">
 <span id="sf-ip-ea-tei-module"></span><h2>sf_ip_ea.tei module<a class="headerlink" href="#module-sf_ip_ea.tei" title="Permalink to this headline">¶</a></h2>
+<p>Two-electron integral object handling.</p>
+<p>This module handles the two-electron integrals. It generates and stores 
+integrals in the form of NumPy arrays. The TEI subclasses handle 
+full (TEIFullBase) and density-fitted integrals (TEIDFBase), 
+and both of these have subclasses which handle the multiple ways of 
+constructing the integrals (by using Psi4, by passing in pre-constructed 
+NumPy arrays, and so on). When an interface to a new program is added, 
+a corresponding TEI object specific to that program should be added here 
+as a subclass of TEIFullBase or TEIDFBase.</p>
+<p>Used Psi4NumPy Tutorials for reference for the density fitting.</p>
 <dl class="class">
 <dt id="sf_ip_ea.tei.TEI">
 <em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEI</code><a class="headerlink" href="#sf_ip_ea.tei.TEI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>General parent class for two-electron integral object handling.</p>
+<p>Abstract parent class for two-electron integral object handling.</p>
 <p>This class handles the two-electron integrals. It generates and stores 
 integrals in the form of NumPy arrays. Relevant sub-blocks can be easily 
 accessed via the <code class="docutils literal notranslate"><span class="pre">get_subblock</span></code> routine.</p>
@@ -709,7 +795,7 @@ accessed via the <code class="docutils literal notranslate"><span class="pre">ge
 </table>
 <dl class="method">
 <dt id="sf_ip_ea.tei.TEI.get_subblock">
-<code class="sig-name descname">get_subblock</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">a</em>, <em class="sig-param">b</em>, <em class="sig-param">c</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEI.get_subblock" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">get_subblock</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">a</em>, <em class="sig-param">b</em>, <em class="sig-param">c</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEI.get_subblock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a given subblock of the ERI matrix.</p>
 </dd></dl>
 
@@ -717,8 +803,9 @@ accessed via the <code class="docutils literal notranslate"><span class="pre">ge
 
 <dl class="class">
 <dt id="sf_ip_ea.tei.TEIDFBase">
-<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIDFBase</code><span class="sig-paren">(</span><em class="sig-param">C</em>, <em class="sig-param">basis</em>, <em class="sig-param">aux</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">np_tei</em>, <em class="sig-param">np_J</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIDFBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIDFBase</code><a class="headerlink" href="#sf_ip_ea.tei.TEIDFBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sf_ip_ea.tei.TEI" title="sf_ip_ea.tei.TEI"><code class="xref py py-class docutils literal notranslate"><span class="pre">sf_ip_ea.tei.TEI</span></code></a></p>
+<p>Base class for constructing density-fitted two-electron integrals.</p>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -736,19 +823,28 @@ accessed via the <code class="docutils literal notranslate"><span class="pre">ge
 <code class="sig-name descname">get_subblock</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">a</em>, <em class="sig-param">b</em>, <em class="sig-param">c</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIDFBase.get_subblock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a given subblock of the two-electron integrals (DF).</p>
 <p>Returns a given subblock of the DF two-electron integral object.
-The RAS space to return is given by a, b, c, and d, and 
-the returned integral has the form &lt;ab|cd&gt;.</p>
+The RAS space to return is given by <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, 
+and <code class="docutils literal notranslate"><span class="pre">d</span></code>. This function performs the contraction of the given 
+bra (B_ab) and ket (B_cd) matrices using einsum. The output 
+is given in physicists’ notation with the form &lt;ab|cd&gt;.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> – RAS space of index 1</p></li>
-<li><p><strong>b</strong> – RAS space of index 2</p></li>
-<li><p><strong>c</strong> – RAS space of index 3</p></li>
-<li><p><strong>d</strong> – RAS space of index 4</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a</strong><span class="classifier">int</span></dt><dd><p>RAS space of index 1.</p>
+</dd>
+<dt><strong>b</strong><span class="classifier">int</span></dt><dd><p>RAS space of index 2.</p>
+</dd>
+<dt><strong>c</strong><span class="classifier">int</span></dt><dd><p>RAS space of index 3.</p>
+</dd>
+<dt><strong>d</strong><span class="classifier">int</span></dt><dd><p>RAS space of index 4.</p>
+</dd>
+</dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Desired subblock (NumPy array)</p>
+<dd class="field-even"><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>NumPy representation of the desired subblock.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -757,8 +853,38 @@ the returned integral has the form &lt;ab|cd&gt;.</p>
 
 <dl class="class">
 <dt id="sf_ip_ea.tei.TEIDFNumPy">
-<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIDFNumPy</code><span class="sig-paren">(</span><em class="sig-param">C</em>, <em class="sig-param">basis</em>, <em class="sig-param">aux</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">np_tei</em>, <em class="sig-param">np_J</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIDFNumPy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIDFNumPy</code><span class="sig-paren">(</span><em class="sig-param">C</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">np_tei</em>, <em class="sig-param">np_J</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIDFNumPy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sf_ip_ea.tei.TEIDFBase" title="sf_ip_ea.tei.TEIDFBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">sf_ip_ea.tei.TEIDFBase</span></code></a></p>
+<p>Class for constructing TEIs using NumPy arrays.</p>
+<p>This allows for construction of DF integrals using NumPy arrays as 
+input. B matrices are constructed in the initialization step and 
+are subsequently multiplied to form the appropriate subblocks.
+B matrices are only formed for the necessary subblocks, given the 
+excitation scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>B11</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS1/RAS1 B-matrix.</p>
+</dd>
+<dt><strong>B12</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS1/RAS2 B-matrix.</p>
+</dd>
+<dt><strong>B13</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS1/RAS3 B-matrix.</p>
+</dd>
+<dt><strong>B21</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS2/RAS1 B-matrix.</p>
+</dd>
+<dt><strong>B22</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS2/RAS2 B-matrix.</p>
+</dd>
+<dt><strong>B23</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS2/RAS3 B-matrix.</p>
+</dd>
+<dt><strong>B31</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS3/RAS1 B-matrix.</p>
+</dd>
+<dt><strong>B32</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS3/RAS2 B-matrix.</p>
+</dd>
+<dt><strong>B33</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RAS3/RAS3 B-matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -775,7 +901,7 @@ the returned integral has the form &lt;ab|cd&gt;.</p>
 
 <dl class="class">
 <dt id="sf_ip_ea.tei.TEIDFPsi4">
-<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIDFPsi4</code><span class="sig-paren">(</span><em class="sig-param">C</em>, <em class="sig-param">basis</em>, <em class="sig-param">aux</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">np_tei=None</em>, <em class="sig-param">np_J=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIDFPsi4" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIDFPsi4</code><span class="sig-paren">(</span><em class="sig-param">C</em>, <em class="sig-param">basis</em>, <em class="sig-param">aux</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">conf_space</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIDFPsi4" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sf_ip_ea.tei.TEIDFBase" title="sf_ip_ea.tei.TEIDFBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">sf_ip_ea.tei.TEIDFBase</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
@@ -793,9 +919,9 @@ the returned integral has the form &lt;ab|cd&gt;.</p>
 
 <dl class="class">
 <dt id="sf_ip_ea.tei.TEIFullBase">
-<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIFullBase</code><span class="sig-paren">(</span><em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">np_tei</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIFullBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.tei.</code><code class="sig-name descname">TEIFullBase</code><a class="headerlink" href="#sf_ip_ea.tei.TEIFullBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sf_ip_ea.tei.TEI" title="sf_ip_ea.tei.TEI"><code class="xref py py-class docutils literal notranslate"><span class="pre">sf_ip_ea.tei.TEI</span></code></a></p>
-<p>Base class for constructing full TEI integrals.</p>
+<p>Base class for constructing full two-electron integrals.</p>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -815,21 +941,50 @@ the returned integral has the form &lt;ab|cd&gt;.</p>
 <dt id="sf_ip_ea.tei.TEIFullBase.get_full">
 <code class="sig-name descname">get_full</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIFullBase.get_full" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full set of two-electron integrals as a NumPy array.</p>
+<p>This returns the full two-electron integral (for the necessary 
+RAS spaces, given the excitations) as a NumPy array. This is 
+useful for storing the array for use in future calculations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>NumPy representation of two-electron integral object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.tei.TEIFullBase.get_subblock">
 <code class="sig-name descname">get_subblock</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">a</em>, <em class="sig-param">b</em>, <em class="sig-param">c</em>, <em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.tei.TEIFullBase.get_subblock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a given subblock of the two-electron integrals.
-The RAS space to return is given by a, b, c, and d, and 
-the returned integral has the form &lt;ab|cd&gt;.
-So to get the block with a and c in RAS1 and b and d in RAS2,
-one would use get_subblock(1, 2, 1, 2).
-:param a: RAS space of index 1
-:param b: RAS space of index 2
-:param c: RAS space of index 3
-:param d: RAS space of index 4
-:return: Desired subblock (NumPy array)</p>
+<dd><p>Returns a given subblock of the two-electron integrals.</p>
+<p>This returns a NumPy representation of a given subblock of the 
+full two-electron integrals. The subblock to return is given by 
+parameters <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, and <code class="docutils literal notranslate"><span class="pre">d</span></code>, where each indicates 
+a RAS space (1, 2, or 3). The returned integral is in physicists’ 
+notation and has the form &lt;ab|cd&gt;.</p>
+<p>So to get the block with a and c in RAS1 and b and d in RAS2,
+one would use get_subblock(1, 2, 1, 2).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a</strong><span class="classifier">int</span></dt><dd><p>RAS space of index 1.</p>
+</dd>
+<dt><strong>b</strong><span class="classifier">int</span></dt><dd><p>RAS space of index 2.</p>
+</dd>
+<dt><strong>c</strong><span class="classifier">int</span></dt><dd><p>RAS space of index 3.</p>
+</dd>
+<dt><strong>d</strong><span class="classifier">int</span></dt><dd><p>RAS space of index 4.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>NumPy representation of the desired subblock.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -843,6 +998,16 @@ one would use get_subblock(1, 2, 1, 2).
 Note that the relevant subset of the array should be given. So, in the 
 case of a RAS(h) calculation, one would give the TEI constructed in the 
 basis of RAS1 and RAS2 orbitals only (not RAS3).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>eri</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Numpy representation of the relevant two-electron integrals.</p>
+</dd>
+<dt><strong>ind</strong><span class="classifier">list</span></dt><dd><p>A list of index ranges for the subblocks (RAS1, RAS2, RAS3).</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -867,6 +1032,16 @@ basis of RAS1 and RAS2 orbitals only (not RAS3).</p>
 <p>Class for constructing full TEI integrals using Psi4.</p>
 <p>This class constructs the full two-electron integrals using Psi4. 
 It then stores the integrals as NumPy arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>eri</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Numpy representation of the relevant two-electron integrals.</p>
+</dd>
+<dt><strong>ind</strong><span class="classifier">list</span></dt><dd><p>A list of index ranges for the subblocks (RAS1, RAS2, RAS3).</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -892,14 +1067,6 @@ It then stores the integrals as NumPy arrays.</p>
 tensor-contraction-based scheme. The contractions have been hand-derived and 
 use NumPy’s einsum for efficiency. The program is run primarily through 
 the main <code class="docutils literal notranslate"><span class="pre">fock_ci</span></code> function.</p>
-<div class="section" id="references">
-<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>Crawford Tutorials (<a class="reference external" href="http://sirius.chem.vt.edu/wiki/doku.php">http://sirius.chem.vt.edu/wiki/doku.php</a>)</p></li>
-<li><p>DePrince Tutorials (<a class="reference external" href="https://www.chem.fsu.edu/~deprince/programming_projects/cis/">https://www.chem.fsu.edu/~deprince/programming_projects/cis/</a>)</p></li>
-<li><p>Sherrill Notes (<a class="reference external" href="http://vergil.chemistry.gatech.edu/notes/cis/cis.html">http://vergil.chemistry.gatech.edu/notes/cis/cis.html</a>)</p></li>
-<li><p>Psi4NumPy Tutorials</p></li>
-</ul>
 <dl class="function">
 <dt id="sf_ip_ea.fock_ci">
 <code class="sig-prename descclassname">sf_ip_ea.</code><code class="sig-name descname">fock_ci</code><span class="sig-paren">(</span><em class="sig-param">delta_a</em>, <em class="sig-param">delta_b</em>, <em class="sig-param">mol</em>, <em class="sig-param">conf_space=''</em>, <em class="sig-param">ref_opts={}</em>, <em class="sig-param">sf_opts={}</em>, <em class="sig-param">program='PSI4'</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.fock_ci" title="Permalink to this definition">¶</a></dt>
@@ -978,7 +1145,6 @@ See relevant reference program docs (ex. Psi4 docs) for details.</p>
 
 </div>
 </div>
-</div>
 
 
           </div>
@@ -999,10 +1165,7 @@ See relevant reference program docs (ex. Psi4 docs) for details.</p>
 <li><a class="reference internal" href="#module-sf_ip_ea.psi4_sf">sf_ip_ea.psi4_sf module</a></li>
 <li><a class="reference internal" href="#module-sf_ip_ea.solvers">sf_ip_ea.solvers module</a></li>
 <li><a class="reference internal" href="#module-sf_ip_ea.tei">sf_ip_ea.tei module</a></li>
-<li><a class="reference internal" href="#module-sf_ip_ea">Module contents</a><ul>
-<li><a class="reference internal" href="#references">References</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#module-sf_ip_ea">Module contents</a></li>
 </ul>
 </li>
 </ul>

@@ -1,16 +1,57 @@
+"""
+LinOp module responsible for performing Hamiltonian-vector multiplication.
+
+This module contains a derived class of NumPy's LinearOperator. This 
+class contains all of the information necessary to do a Hamiltonian-vector 
+multiply (the most expensive step in Davidson) using NumPy's ``einsum`` 
+method.
+"""
+
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
 from .post_ci_analysis import generate_dets
 
 class LinOpH (LinearOperator):
+    """
+    Linear operator for Hamiltonian-vector multiplication.
+
+    This is a derived class of NumPy's LinearOperator class. It contains 
+    information on how to perform tensor-contraction-based multiplication 
+    of the Hamiltonian with a given vector or set of vectors.
+
+    Attributes
+    ----------
+    offset : double
+        Diagonal offset to Hamiltonian (usually reference energy).
+    ras1 : int
+        The RAS1 space (doubly occupied in reference).
+    ras2 : int
+        The RAS2 space (singly occupied in reference).
+    ras3 : int
+        The RAS3 space (virtual in reference).
+    n_SF : int
+        Number of spin-flips to perform.
+    delta_ec : int
+        Change in electron count (indicates IP/EA).
+    conf_space : string
+        Excitations to include (hole, particle, etc).
+    num_dets : int
+        Number of determinants.
+    Fa : numpy.ndarray
+        Alpha Fock matrix.
+    Fb : numpy.ndarray
+        Beta Fock matrix.
+    tei : TEI
+        Two-electron integrals.
+    """
     
     def __init__(self, shape_in, offset_in, ras1_in, ras2_in, ras3_in,
                  Fa_in, Fb_in, tei_in, n_SF_in, delta_ec_in, conf_space_in):
         super(LinOpH, self).__init__(dtype=np.dtype('float64'), shape=shape_in)
         # getting the numbers of orbitals
         self.offset = offset_in # diagonal offset (usually energy)
-        self.ras1 = ras1_in # number of beta occupied
-        self.ras2 = ras2_in # number of beta occupied
+        self.ras1 = ras1_in # number of doubly occupied
+        self.ras2 = ras2_in # number of singly occupied
         self.ras3 = ras3_in # number of alpha virtual
         # setting useful parameters
         self.n_SF = n_SF_in # number of spin-flips
@@ -23,7 +64,17 @@ class LinOpH (LinearOperator):
         self.tei = tei_in
 
     def diag(self):
-        """Returns approximate diagonal of Hamiltonian for Davidson.
+        """
+        Returns approximate diagonal of Hamiltonian.
+
+        This returns the approximate diagonal of the Hamiltonian for the 
+        Davidson code (used in the preconditioner step). This is calculated 
+        for each determinant by summing over the occupied orbital energies.
+
+        Returns
+        -------
+        np.ndarray
+            1-D NumPy representation of the diagonal of the Hamiltonian.
         """
         # grabbing necessary info from self
         n_dets = self.num_dets
@@ -65,7 +116,8 @@ class LinOpH (LinearOperator):
         return diag_out
 
     def do_cas_1sf(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """Do CAS-1SF.
+        """
+        Do CAS-1SF.
 
            Evaluate the following matrix vector multiply:
                 | H(1,1) | * v(1) = sig(1)
@@ -2057,15 +2109,20 @@ class LinOpH (LinearOperator):
     '''
 
     def do_p_1sf_ea(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """ Do RAS(p)-1SF-EA.
+        """
+        Do RAS(p)-1SF-EA.
+
+        Defines the necessary contractions for RAS(p)-1SF-EA.
 
             block1 = v(iab:abb)
-            block2 = v(Iab:abb)
-            block2 = v(Iiabc:babbb)
+            block2 = v(Aia:bab)
+            block3 = v(Aijab:baabb)
 
-            Evaluate the following matrix vector multiply:
+            Evaluate the following matrix vector multiplications:
 
-            | H(1,1) | * v(1) = sig(1)
+            |H(1,1)| * v(1) + |H(1,2)| * v(2) + |H(1,3)| * v(3) = sig(1)
+            |H(2,1)| * v(1) + |H(2,2)| * v(2) + |H(2,3)| * v(3) = sig(2)
+            |H(3,1)| * v(1) + |H(3,2)| * v(2) + |H(3,3)| * v(3) = sig(3)
        
         """
         nbf = ras1 + ras2 + ras3
@@ -2104,7 +2161,7 @@ class LinOpH (LinearOperator):
                                 index = index + 1
 
         ################################################ 
-        # Do the following term: OK
+        # Do the following term:
         #       H(1,1) v(1) = sig(1)
         ################################################ 
         #   sig(iab:abb) += P(ab)*t(iab:abb)*F(ac:bb)
@@ -2296,12 +2353,22 @@ class LinOpH (LinearOperator):
         return np.vstack((sig_1_out, sig_2_out, sig_3_out)) + offset_v
 
     def _matvec(self, v):
-        """Defines matrix-vector multiplication for Hamiltonian and
-        guess vector.
-        Input
-            v -- guess vector
+        """
+        Defines H*v for a given vector.
+
+        This defines matrix-vector multiplication for the Hamiltonian with 
+        a given guess vector, v. Note that this only works for single 
+        vectors; for a set of vectors, use matrix multiplication.
+
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector on which to perform H*v multiplication.
+
         Returns
-            sig_out -- result of H*v multiplication
+        -------
+        numpy.ndarray
+            NumPy array containing the result of H*v multiplication.
         """
         # grabbing necessary info from self
         Fa = self.Fa
@@ -2378,17 +2445,23 @@ class LinOpH (LinearOperator):
         if(n_SF==1 and delta_ec==0 and conf_space=="h,p"):
             return self.do_hp_1sf(v, Fa, Fb, tei, offset_v, ras1, ras2, ras3)
 
-
-
-    # These two are vestigial-- I'm sure they served some purpose in the parent class,
-    # but we only really need matvec for our purposes!
     def _matmat(self, v):
-        """Defines matrix-vector multiplication for Hamiltonian and
-        guess vector.
-        Input
-            v -- set of guess vectors
+        """
+        Defines H*v for a given matrix v.
+
+        This defines matrix-matrix multiplication between the Hamiltonian 
+        and a given NumPy matrix, v. (For our purposes, this v will usually 
+        be a set of Davidson guess vectors.)
+
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Matrix on which to perform multiplication H*v.
+
         Returns
-            sig_out -- result of H*v multiplication
+        -------
+        numpy.ndarray
+            NumPy array containing result of H*v multiplication.
         """
         # grabbing necessary info from self
         Fa = self.Fa
@@ -2469,6 +2542,23 @@ class LinOpH (LinearOperator):
 
 
     def _rmatvec(self, v):
+        """
+        Right matrix-vector multiplication.
+
+        This defines right-side v*H multiplication. It is a vestigial 
+        function from the parent class and isn't needed for our purposes.
+        This function, therefore, does nothing.
+
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Vector with which to multiply.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array of zeros.
+        """
         print("rmatvec function called -- not implemented yet!!")
         return np.zeros(30)
 

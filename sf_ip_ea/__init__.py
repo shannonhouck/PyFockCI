@@ -5,13 +5,6 @@ This program runs RAS-SF-IP/EA calculations using an efficient
 tensor-contraction-based scheme. The contractions have been hand-derived and 
 use NumPy's einsum for efficiency. The program is run primarily through 
 the main ``fock_ci`` function.
-
-References
-----------
-* Crawford Tutorials (http://sirius.chem.vt.edu/wiki/doku.php)
-* DePrince Tutorials (https://www.chem.fsu.edu/~deprince/programming_projects/cis/)
-* Sherrill Notes (http://vergil.chemistry.gatech.edu/notes/cis/cis.html)
-* Psi4NumPy Tutorials
 """
 
 # importing general python functionality

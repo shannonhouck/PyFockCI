@@ -1,55 +1,85 @@
+"""
+Two-electron integral object handling.
+
+This module handles the two-electron integrals. It generates and stores 
+integrals in the form of NumPy arrays. The TEI subclasses handle 
+full (TEIFullBase) and density-fitted integrals (TEIDFBase), 
+and both of these have subclasses which handle the multiple ways of 
+constructing the integrals (by using Psi4, by passing in pre-constructed 
+NumPy arrays, and so on). When an interface to a new program is added, 
+a corresponding TEI object specific to that program should be added here 
+as a subclass of TEIFullBase or TEIDFBase.
+
+Used Psi4NumPy Tutorials for reference for the density fitting.
+"""
+
 import math
 import numpy as np
 import time
 import psi4
-
-"""
-Class for two-electron integral object handling.
-
-This class handles the two-electron integrals. It generates and stores 
-integrals in the form of NumPy arrays. Relevant sub-blocks can be easily 
-accessed via the ``get_subblock`` routine.
-
-Refs:
-* Psi4NumPy Tutorials
-"""
+from abc import ABCMeta, abstractmethod
 
 class TEI:
-    """General parent class for two-electron integral object handling.
+    """
+    Abstract parent class for two-electron integral object handling.
 
     This class handles the two-electron integrals. It generates and stores 
     integrals in the form of NumPy arrays. Relevant sub-blocks can be easily 
     accessed via the ``get_subblock`` routine.
     """
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self):
         """Initialize TEI object.
         """
         pass
 
+    @abstractmethod
     def get_subblock(self, a, b, c, d): 
         """Returns a given subblock of the ERI matrix.
         """
         pass
 
+# FULL TEI INTEGRALS
+
 class TEIFullBase(TEI):
-    """Base class for constructing full TEI integrals.
+    """Base class for constructing full two-electron integrals.
     """
-    def __init__(self, ras1, ras2, ras3, conf_space, np_tei):
-        """Initialize TEI object.
+    @abstractmethod
+    def __init__(self):
+        """Initialize full TEI object (abstract).
         """
         pass
 
     def get_subblock(self, a, b, c, d):
-        """Returns a given subblock of the two-electron integrals.
-           The RAS space to return is given by a, b, c, and d, and 
-           the returned integral has the form <ab|cd>.
-           So to get the block with a and c in RAS1 and b and d in RAS2,
-           one would use get_subblock(1, 2, 1, 2).
-           :param a: RAS space of index 1
-           :param b: RAS space of index 2
-           :param c: RAS space of index 3
-           :param d: RAS space of index 4
-           :return: Desired subblock (NumPy array)
+        """
+        Returns a given subblock of the two-electron integrals.
+
+        This returns a NumPy representation of a given subblock of the 
+        full two-electron integrals. The subblock to return is given by 
+        parameters ``a``, ``b``, ``c``, and ``d``, where each indicates 
+        a RAS space (1, 2, or 3). The returned integral is in physicists' 
+        notation and has the form <ab|cd>.
+
+        So to get the block with a and c in RAS1 and b and d in RAS2,
+        one would use get_subblock(1, 2, 1, 2).
+
+        Parameters
+        ----------
+        a : int
+            RAS space of index 1.
+        b : int 
+            RAS space of index 2.
+        c : int
+            RAS space of index 3.
+        d : int
+            RAS space of index 4.
+
+        Returns
+        -------
+        numpy.ndarray
+            NumPy representation of the desired subblock.
         """
         return self.eri[self.ind[a][0]:self.ind[a][1],
                         self.ind[b][0]:self.ind[b][1],
@@ -57,72 +87,118 @@ class TEIFullBase(TEI):
                         self.ind[d][0]:self.ind[d][1]]
 
     def get_full(self):
-        """Returns the full set of two-electron integrals as a NumPy array.
+        """
+        Returns the full set of two-electron integrals as a NumPy array.
+
+        This returns the full two-electron integral (for the necessary 
+        RAS spaces, given the excitations) as a NumPy array. This is 
+        useful for storing the array for use in future calculations.
+
+        Returns
+        -------
+        numpy.ndarray
+            NumPy representation of two-electron integral object.
         """
         return self.eri
 
 class TEIFullNumPy(TEIFullBase):
-    """Class for constructing full TEI integrals from a NumPy array.
+    """
+    Class for constructing full TEI integrals from a NumPy array.
 
     This class stores the integrals as a NumPy array, given a NumPy array.
     Note that the relevant subset of the array should be given. So, in the 
     case of a RAS(h) calculation, one would give the TEI constructed in the 
     basis of RAS1 and RAS2 orbitals only (not RAS3).
+
+    Attributes
+    ----------
+    eri : numpy.ndarray
+        Numpy representation of the relevant two-electron integrals.
+    ind : list
+        A list of index ranges for the subblocks (RAS1, RAS2, RAS3).
+
     """
     def __init__(self, ras1, ras2, ras3, conf_space, np_tei):
-        """Initialize TEI object.
+        """
+        Initialize TEIFullNumPy object.
+
+        This initializes the full NumPy two-electron integral object.
+        The TEI is stored as a NumPy array in physicists' notation.
 
         Parameters
         ----------
-        ras1 (int): RAS1 orbitals
-        ras2 (int): RAS2 orbitals
-        ras3 (int): RAS3 orbitals
-        np_tei: NumPy array for previously-constructed integrals.
-                      This allows us to avoid integral construction.
+        ras1 : int 
+            Number of RAS1 orbitals
+        ras2 : int 
+            Number of RAS2 orbitals
+        ras3 : int 
+            Number of RAS3 orbitals
+        np_tei : numpy.ndarray
+            A NumPy array containing previously-constructed integrals.
+            This allows us to avoid integral construction. This should be 
+            truncated to contain only the relevant subspaces.
+
         Returns
         -------
-        Initialized TEI object
+        TEIFullNumPy
+            Initialized TEI object
         """
         tei_start_time = time.time()
         print("Reading in two-electron integrals...")
         self.eri = np_tei
         # ind stores the indexing of ras1/ras2/ras3 for get_subblock method
         if(conf_space == ""):
-            self.ind = [[0,0],[0,0],[0,ras2],[0,0]] # only worry about RAS2 block
+            self.ind = [[0,0],[0,0],[0,ras2],[0,0]] 
         if(conf_space == "h"):
-            self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[0,0]] # only worry about RAS1+2
+            self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[0,0]]
         if(conf_space == "p"):
-            self.ind = [[0,0],[0,0],[0,ras2],[ras2, ras2+ras3]] # only worry about RAS2+3
+            self.ind = [[0,0],[0,0],[0,ras2],[ras2, ras2+ras3]] 
         if(conf_space == "h,p"):
             self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],
                         [ras1+ras2,ras1+ras2+ras3]]
-        print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
+        print("Constructed TEI object in %i seconds." 
+              %(time.time() - tei_start_time))
 
 class TEIFullPsi4(TEIFullBase):
-    """Class for constructing full TEI integrals using Psi4.
+    """
+    Class for constructing full TEI integrals using Psi4.
 
     This class constructs the full two-electron integrals using Psi4. 
     It then stores the integrals as NumPy arrays.
 
+    Attributes
+    ----------
+    eri : numpy.ndarray
+        Numpy representation of the relevant two-electron integrals.
+    ind : list
+        A list of index ranges for the subblocks (RAS1, RAS2, RAS3).
     """
     def __init__(self, C, basis, ras1, ras2, ras3, conf_space):
-        """Initialize two-electron integral object.
+        """
+        Initialize two-electron integral object.
 
         This initializes a TEI object for the given basis set using Psi4. 
-        The TEI is stored as a NumPy array and the 
+        The TEI is stored as a NumPy array in physicists' notation.
 
         Parameters
         ----------
-        C (numpy array): MO coefficient matrix
-        basis (psi4.core.BasisSet): Basis set
-        ras1 (int): RAS1 orbitals
-        ras2 (int): RAS2 orbitals
-        ras3 (int): RAS3 orbitals
-        conf_space (string): Hole/particle excitations
+        C : numpy.ndarray
+            MO coefficient matrix.
+        basis : psi4.core.BasisSet
+            Psi4 basis set object to use for integral construction.
+        ras1 : int 
+            Number of RAS1 orbitals.
+        ras2 : int 
+            Number of RAS2 orbitals.
+        ras3 : int 
+            Number of RAS3 orbitals.
+        conf_space : string
+            Excitations to include (hole, particle, etc).
 
         Returns
         -------
-        Initialized TEI object
+        TEIFullPsi4
+            Initialized TEI object.
         """
         tei_start_time = time.time()
         # truncate C as needed
@@ -141,40 +217,59 @@ class TEIFullPsi4(TEIFullBase):
         # get necessary integrals/matrices from Psi4 (AO basis)
         mints = psi4.core.MintsHelper(basis)
         C_act = psi4.core.Matrix.from_array(C_act)
-        self.eri = psi4.core.Matrix.to_array(mints.mo_eri(C_act,C_act,C_act,C_act))
+        self.eri = psi4.core.Matrix.to_array(
+                       mints.mo_eri(C_act,C_act,C_act,C_act))
         # put in physicists' notation
         self.eri = self.eri.transpose(0, 2, 1, 3)
         # ind stores the indexing of ras1/ras2/ras3 for get_subblock method
         if(conf_space == ""):
-            self.ind = [[0,0],[0,0],[0,ras2],[0,0]] # only worry about RAS2 block
+            self.ind = [[0,0],[0,0],[0,ras2],[0,0]]
         if(conf_space == "h"):
-            self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[0,0]] # only worry about RAS1+2
+            self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],[0,0]]
         if(conf_space == "p"):
-            self.ind = [[0,0],[0,0],[0,ras2],[ras2, ras2+ras3]] # only worry about RAS2+3
+            self.ind = [[0,0],[0,0],[0,ras2],[ras2, ras2+ras3]]
         if(conf_space == "h,p"):
             self.ind = [[0,0],[0,ras1],[ras1,ras1+ras2],
                         [ras1+ras2,ras1+ras2+ras3]]
-        print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
+        print("Constructed TEI object in %i seconds." 
+              %(time.time() - tei_start_time))
 
 # DF TEI INTEGRALS
 
 class TEIDFBase(TEI):
-    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space,
-                 np_tei, np_J):
+    """Base class for constructing density-fitted two-electron integrals.
+    """
+    @abstractmethod
+    def __init__(self):
+        """Constructs TEI DF objects (abstract).
+        """
         pass
 
     def get_subblock(self, a, b, c, d):
-        """Returns a given subblock of the two-electron integrals (DF).
+        """
+        Returns a given subblock of the two-electron integrals (DF).
 
-           Returns a given subblock of the DF two-electron integral object.
-           The RAS space to return is given by a, b, c, and d, and 
-           the returned integral has the form <ab|cd>.
+        Returns a given subblock of the DF two-electron integral object.
+        The RAS space to return is given by ``a``, ``b``, ``c``, 
+        and ``d``. This function performs the contraction of the given 
+        bra (B_ab) and ket (B_cd) matrices using einsum. The output 
+        is given in physicists' notation with the form <ab|cd>.
 
-           :param a: RAS space of index 1
-           :param b: RAS space of index 2
-           :param c: RAS space of index 3
-           :param d: RAS space of index 4
-           :return: Desired subblock (NumPy array)
+        Parameters
+        ----------
+        a : int
+            RAS space of index 1.
+        b : int 
+            RAS space of index 2.
+        c : int
+            RAS space of index 3.
+        d : int
+            RAS space of index 4.
+
+        Returns
+        -------
+        numpy.ndarray
+            NumPy representation of the desired subblock.
         """
         # the B matrices are still in chemists' notation
         # don't switch b and c index until end
@@ -225,8 +320,65 @@ class TEIDFBase(TEI):
         return np.einsum("Pij,Pkl->ijkl", B_bra, B_ket).transpose(0, 2, 1, 3)
 
 class TEIDFNumPy(TEIDFBase):
-    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space,
-                 np_tei, np_J):
+    """
+    Class for constructing TEIs using NumPy arrays.
+
+    This allows for construction of DF integrals using NumPy arrays as 
+    input. B matrices are constructed in the initialization step and 
+    are subsequently multiplied to form the appropriate subblocks.
+    B matrices are only formed for the necessary subblocks, given the 
+    excitation scheme.
+
+    Attributes
+    ----------
+    B11 : numpy.ndarray
+        RAS1/RAS1 B-matrix.
+    B12 : numpy.ndarray
+        RAS1/RAS2 B-matrix.
+    B13 : numpy.ndarray
+        RAS1/RAS3 B-matrix.
+    B21 : numpy.ndarray
+        RAS2/RAS1 B-matrix.
+    B22 : numpy.ndarray
+        RAS2/RAS2 B-matrix.
+    B23 : numpy.ndarray
+        RAS2/RAS3 B-matrix.
+    B31 : numpy.ndarray
+        RAS3/RAS1 B-matrix.
+    B32 : numpy.ndarray
+        RAS3/RAS2 B-matrix.
+    B33 : numpy.ndarray
+        RAS3/RAS3 B-matrix.
+    """
+    def __init__(self, C, ras1, ras2, ras3, conf_space, np_tei, np_J):
+        """
+        Initialize two-electron integral object.
+
+        This initializes a TEI object for the given basis set using Psi4. 
+        The TEI is stored as a NumPy array in physicists' notation.
+
+        Parameters
+        ----------
+        C : numpy.ndarray
+            MO coefficient matrix.
+        ras1 : int 
+            Number of RAS1 orbitals.
+        ras2 : int 
+            Number of RAS2 orbitals.
+        ras3 : int 
+            Number of RAS3 orbitals.
+        conf_space : string
+            Excitations to include (hole, particle, etc).
+        np_tei : numpy.ndarray
+            Basic NumPy two-electron integrals (AO).
+        np_J : numpy.ndarray
+            The J matrix for rotation.
+
+        Returns
+        -------
+        TEIDFNumPy
+            Initialized TEIDFNumPy object.
+        """
         eri = np_tei
         J = np_J
         # Contract and obtain final form
@@ -263,24 +415,40 @@ class TEIDFNumPy(TEIDFBase):
             self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
             self.B31 = np.einsum('PAq,qJ->PAJ', B3m, C_ras1)
             self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
-        print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
+        print("Constructed TEI object in %i seconds." 
+              %(time.time() - tei_start_time))
 
 class TEIDFPsi4(TEIDFBase):
     # Used Psi4NumPy for reference for this section
-    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space,
-                 np_tei=None, np_J=None):
-        """Initialize density-fitted TEI object.
+    def __init__(self, C, basis, aux, ras1, ras2, ras3, conf_space):
+        """
+        Initialize density-fitted TEI object using Psi4.
 
-           :param C: MO coefficient matrix (NumPy array)
-           :param basis: Basis set object (Psi4 BasisSet)
-           :param ras1: RAS1 orbitals (int)
-           :param ras2: RAS2 orbitals (int)
-           :param ras3: RAS3 orbitals (int)
-           :param ref_method: Program to use to generate TEIs
-           :param np_tei: NumPy array for previously-constructed integrals.
-                     This allows us to avoid integral construction.
-           :param J_tei: Previously-constructed J matrix (NumPy)
-           :return: Initialized TEI object
+        This constructs a density-fitted TEI object using Psi4. 
+        The B matrices are only constructed for the necessary subblocks 
+        given the configuration space.
+
+        Parameters
+        ----------
+        C : numpy.ndarray
+            MO coefficient matrix.
+        basis : psi4.core.BasisSet
+            Psi4 basis set to use for integral construction.
+        aux : psi4.core.BasisSet
+            Auxiliary Psi4 basis set to use for integral construction.
+        ras1 : int 
+            Number of RAS1 orbitals.
+        ras2 : int 
+            Number of RAS2 orbitals.
+        ras3 : int 
+            Number of RAS3 orbitals.
+        conf_space : string
+            Excitations to include (hole, particle, etc).
+
+        Returns
+        -------
+        TEIDFNumPy
+            Initialized TEIDFPsi4 object.
         """
         print("Inititalizing DF-TEI Object....")
         tei_start_time = time.time()
@@ -330,6 +498,7 @@ class TEIDFPsi4(TEIDFBase):
             self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
             self.B31 = np.einsum('PAq,qJ->PAJ', B3m, C_ras1)
             self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
-        print("Constructed TEI object in %i seconds." %(time.time() - tei_start_time))
+        print("Constructed TEI object in %i seconds." 
+              %(time.time() - tei_start_time))
 
 

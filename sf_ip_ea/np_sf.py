@@ -161,8 +161,8 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
         if(opts['INTEGRAL_TYPE']=="FULL"):
             tei_int = TEIFullNumPy(0, 0, ras1, ras2, ras3, np_tei=tei_int)
         elif(opts['INTEGRAL_TYPE']=="DF"):
-            tei_int = TEIDFNumPy(C_in, 0, 0, ras1, ras2, ras3, conf_space,
-                            np_tei=tei_int, np_J=J_in)
+            tei_int = TEIDFNumPy(C_in, ras1, ras2, ras3, conf_space,
+                                 np_tei, np_J)
     # CALCULATION SETUP
     # determine number of spin-flips and total change in electron count
     n_SF = min(delta_a, delta_b)

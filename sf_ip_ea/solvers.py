@@ -1,3 +1,9 @@
+"""
+Davidson solver module.
+
+This module holds the Davidson solver and related functions.
+"""
+
 from __future__ import print_function
 import numpy as np
 import math
@@ -8,18 +14,34 @@ from scipy.sparse.linalg import spsolve
 
 def davidson( A, vInit, e_conv=1e-8, r_conv=1e-4, vect_cutoff=1e-5,
               maxIter=200, collapse_per_root=20 ):
-    """Solves for the eigenvalues and eigenvectors of a Hamiltonian.
+    """
+    Solves for the eigenvalues and eigenvectors of a Hamiltonian.
 
     Uses the Davidson method to solve for the eigenvalues and eigenvectors
     of a given Hermitian matrix A.
-       
-    :param A: Hamiltonian (LinOp object)
-    :param vInit: Initial guess vector (numpy)
-    :param e_conv: Cutoff for energy convergence
-    :param r_conv: Cutoff for residual squared convergence
-    :param vect_cutoff: Cutoff for adding vectors to Krylov space
-    :param maxIter: Maximum number of iterations
-    :return: Eigenvalues/eigenvectors for the Hamiltonian.
+
+    Parameters
+    ----------
+    A : sf_ip_ea.linop.LinOpH
+        LinOp object defining our matrix-vector multiply.
+    vInit : numpy.ndarray
+        Initial guess vector(s).
+    e_conv : float
+        Cutoff for energy convergence. (Default: 1e-8)
+    r_conv : float
+        Cutoff for residual squared convergence. (Default: 1e-4)
+    vect_cutoff : float
+        Cutoff for adding vectors to Krylov space. (Default: 1e-5)
+    maxIter : int
+        Maximum number of iterations. (Default: 200)
+    collapse_per_root : int
+        Number of vectors per root to save after collapsing the Krylov space.
+        (Default: 20)
+
+    Returns 
+    -------
+    numpy.ndarray
+        Eigenvalues/eigenvectors for the Hamiltonian.
     """
     # initialize vSpace (search subspace)
     # NOTE: Rows are determinants, cols are n_roots
@@ -101,7 +123,8 @@ def davidson( A, vInit, e_conv=1e-8, r_conv=1e-4, vect_cutoff=1e-5,
                 all_converged = False
             '''
             # if one of the roots has converged for the first time...
-            if( (abs(LIN.norm(r[:,i])) < r_conv) and (abs(eVals[i]-lastVals[i]) < e_conv)):
+            if( (abs(LIN.norm(r[:,i])) < r_conv) and 
+                (abs(eVals[i]-lastVals[i]) < e_conv)):
                 if(not converged[i]):
                     converged[i] = True
                     tmp = vSpace[:, -k:]

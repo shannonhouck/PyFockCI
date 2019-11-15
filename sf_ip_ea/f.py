@@ -15,7 +15,7 @@ def get_F(wfn):
     the alpha and beta Fock matrices in the spatial orbital MO basis.
 
     Parameters
-    -------    
+    ----------
     wfn : psi4.core.Wavefunction
         Psi4 wavefunction object from which to obtain alpha and beta 
         Fock matrices.
@@ -23,8 +23,8 @@ def get_F(wfn):
     Returns
     -------    
     tuple
-        A tuple (Fa, Fb) containing NumPy matrices of the alpha and beta 	
-        Fock matrices, respectively.
+        A tuple (Fa, Fb) containing NumPy representations of the alpha 
+        and beta Fock matrices, respectively.
     """
     # get necessary integrals/matrices from Psi4 (AO basis)
     C = psi4.core.Matrix.to_array(wfn.Ca())
