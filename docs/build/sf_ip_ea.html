@@ -40,32 +40,47 @@
 </div>
 <div class="section" id="module-sf_ip_ea.bloch">
 <span id="sf-ip-ea-bloch-module"></span><h2>sf_ip_ea.bloch module<a class="headerlink" href="#module-sf_ip_ea.bloch" title="Permalink to this headline">¶</a></h2>
+<p>Bloch effective Hamiltonian solver.</p>
+<p>This module constructs a Bloch effective Hamiltonian for a given SF-IP/EA 
+wavefunction. Note that this module is currently dependent on Psi4.</p>
 <dl class="function">
 <dt id="sf_ip_ea.bloch.do_bloch">
 <code class="sig-prename descclassname">sf_ip_ea.bloch.</code><code class="sig-name descname">do_bloch</code><span class="sig-paren">(</span><em class="sig-param">wfn</em>, <em class="sig-param">n_sites</em>, <em class="sig-param">site_list=None</em>, <em class="sig-param">site_list_orbs=None</em>, <em class="sig-param">molden_file='orbs.molden'</em>, <em class="sig-param">skip_localization=False</em>, <em class="sig-param">neutral=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.bloch.do_bloch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bloch effective Hamiltonian solver.</p>
-<p>Solves the Bloch effective Hamiltonian and returns a matrix of the J couplings.
-It is totally dependent on Psi4 for localization right now.</p>
+<p>Solves the Bloch effective Hamiltonian and returns a matrix containing 
+J coupling information. Sites are designated using <code class="docutils literal notranslate"><span class="pre">site_list</span></code> or 
+<code class="docutils literal notranslate"><span class="pre">site_list_orbs</span></code>; if neither of these keywords are specified, 
+each orbital in the CAS/RAS2 space is assumed to be its own site. 
+A Molden file containing the orbitals is written to <code class="docutils literal notranslate"><span class="pre">orbs.molden</span></code> (or 
+whichever file is specified by the user). The J coupling values are 
+also written to standard output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>wfn</strong> – SF-IP-EA wfn object containing info about the calculation.</p></li>
-<li><p><strong>n_sites</strong> – The number of sites (integer).</p></li>
-<li><p><strong>site_list</strong> – List of which atoms are “sites”. If this is not given,
-the program assumes one orbital per site. Atomic center ordering
-starts at zero.</p></li>
-<li><p><strong>site_list_orbs</strong> – Site list using orbitals rather than atomic centers.
-Note that orbital ordering follows the same notation as Psi4
-(i.e. orbital ordering starts at 1, not zero).</p></li>
-<li><p><strong>molden_file</strong> – Name of the Molden file to write for localized orbitals.</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>wfn (sf_wfn): SF-IP-EA wfn object containing info about the calculation.</strong></dt><dd></dd>
+<dt><strong>n_sites (int)</strong><span class="classifier">The number of sites.</span></dt><dd></dd>
+<dt><strong>site_list (list)</strong><span class="classifier">List of which atoms are “sites”. If this is not given,</span></dt><dd><p>the program assumes one orbital per site. Atomic center ordering
+starts at zero. Optional.</p>
 </dd>
-<dt class="field-even">Skip_localization</dt>
-<dd class="field-even"><p>Whether to skip orbital localization. If you use
-this, you should localize the orbitals in wfn.wfn yourself!</p>
+<dt><strong>site_list_orbs (list): A list of sites, using lists of orbitals rather</strong></dt><dd><p>than atomic centers. (It’s a list of lists. For example, for a 
+two-site case where MOs 55, 56, and 59 are on one site and the 
+remaining orbitals are on the other, use <code class="docutils literal notranslate"><span class="pre">[[55,56,59],[57,58,60]]</span></code>.) 
+Note that ordering starts at 1, not zero, so it follows the same 
+indexing as the MO printing in the Psi4 output files. Optional.</p>
 </dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>NumPy matrix of J coupling values</p>
+<dt><strong>molden_file (string)</strong><span class="classifier">Molden filename to which orbitals are written.</span></dt><dd><p>Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">orbs.molden</span></code>.</p>
+</dd>
+<dt><strong>skip_localization (bool)</strong><span class="classifier">Whether to skip orbital localization. If true,</span></dt><dd><p>the user should localize the orbitals in wfn.wfn beforehand! 
+Optional. Defaults to False.</p>
+</dd>
+<dt><strong>neutral (bool)</strong><span class="classifier">Calculate the J couplings using neutral determinants</span></dt><dd><p>only. Optional. Defaults to False.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>NumPy matrix of J coupling values</dt><dd></dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>

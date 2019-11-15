@@ -23,6 +23,11 @@ For more information on modules, see below.
 
 .. include:: modules.rst
 
+References
+==========
+
+.. include:: references.rst
+
 Indices and tables
 ==================
 
