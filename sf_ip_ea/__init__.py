@@ -36,38 +36,43 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
 
     Parameters
     ----------
-    delta_a (int) : Desired number of alpha electrons to remove.
-    delta_b (int) : Desired number of beta electrons to add.
-    mol (Molecule) : The molecule object to run the calculation on. 
+    delta_a : int
+        Desired number of alpha electrons to remove.
+    delta_b : int
+        Desired number of beta electrons to add.
+    mol : Molecule
+        The molecule object to run the calculation on. 
         This should be built in whichever program you'll use 
         to run the reference, and should be handled properly by the 
         reference program.
-    conf_space (string) : Desired configuration space/additional excitations.
-        * ``""`` CAS
-        * ``"h"`` 1 hole excitation
-        * ``"p"`` 1 particle excitation
-        * ``"h,p"`` 1 hole + 1 particle excitation
-    ref_opts (dict) : Options for the reference program.
-        See relevant ref code (ex. do_sf_psi4) for details
-    sf_opts (dict) : Additional options for stand-alone SF code. 
-        * sf_diag_method -- Diagonalization method to use.
-            * ``RSP`` Direct (deprecated)
-            * ``LANCZOS`` Use NumPy's Lanczos
-            * ``DAVIDSON`` Use our Davidson
-        * num_roots -- Number of roots to solve for.
-        * guess_type -- Type of guess vector to use
-            * ``CAS`` Do CAS first and use that as an initial guess.
-            * ``RANDOM`` Random orthonormal basis
-            * ``READ`` Read guess from a NumPy file (TODO)
-        * integral_type  Which integrals to use (DF or FULL)
-            * ``FULL`` Use full integrals (no density fitting)
-            * ``DF`` Use density fit integrals
-        * return_vects -- Whether to return eigenvectors
+    conf_space : string
+        Desired configuration space/additional excitations.
+            * ``""`` CAS
+            * ``"h"`` 1 hole excitation
+            * ``"p"`` 1 particle excitation
+            * ``"h,p"`` 1 hole + 1 particle excitation
+    ref_opts : dict
+        Options for the reference program.
+        See relevant reference program docs (ex. Psi4 docs) for details.
+    sf_opts : dict
+        Additional options for stand-alone SF code. 
+            * ``sf_diag_method``: Diagonalization method to use.
+                * ``RSP`` Direct (deprecated)
+                * ``LANCZOS`` Use NumPy's Lanczos
+                * ``DAVIDSON`` Use our Davidson
+            * ``num_roots``: Number of roots to solve for.
+            * ``guess_type``: Type of guess vector to use
+                * ``CAS`` Do CAS first and use that as an initial guess.
+                * ``RANDOM`` Random orthonormal basis
+                * ``READ`` Read guess from a NumPy file (TODO)
+            * ``integral_type``: Which integrals to use (DF or FULL)
+                * ``FULL`` Use full integrals (no density fitting)
+                * ``DF`` Use density fit integrals
 
     Returns
     -------
-    Wavefunction object (sf_wfn) containing calculation data and results
-
+    sf_wfn
+        Wavefunction object (sf_wfn) containing calculation data and results
     """
 
     # update options to pass into SF code

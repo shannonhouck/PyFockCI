@@ -16,10 +16,18 @@ def lowdin_orth(A):
     """
     Performs Lowdin orthonormalization on a given matrix A.
 
-    Orthonormalizes a given matrix A based on Lowdin's approach.
+    Orthonormalizes a given NumPy A based on Lowdin's approach. 
+    This does an SVD decomposition of the NumPy array
 
-    :param A: NumPy array to orthogonalize.
-    :return: An orthogonalized version of A.
+    Parameters
+    ----------
+    A : numpy.ndarray
+        NumPy array to orthogonalize.
+
+    Returns
+    -------
+    numpy.ndarray
+        An orthogonalized version of A.
     """
     U, S, V = LIN.svd(A)
     return np.dot(U, V)
@@ -39,28 +47,36 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
 
     Parameters
     ----------
-    wfn (sf_wfn): SF-IP-EA wfn object containing info about the calculation.
-    n_sites (int) : The number of sites.
-    site_list (list) : List of which atoms are "sites". If this is not given,
+    sf_wfn : sf_wfn
+        SF-IP-EA wfn object containing info about the calculation.
+    n_sites : int
+        The number of sites.
+    site_list : list
+        List of which atoms are "sites". If this is not given,
         the program assumes one orbital per site. Atomic center ordering
         starts at zero. Optional.
-    site_list_orbs (list): A list of sites, using lists of orbitals rather 
+    site_list_orbs : list
+        A list of sites, using lists of orbitals rather 
         than atomic centers. (It's a list of lists. For example, for a 
         two-site case where MOs 55, 56, and 59 are on one site and the 
         remaining orbitals are on the other, use ``[[55,56,59],[57,58,60]]``.) 
         Note that ordering starts at 1, not zero, so it follows the same 
         indexing as the MO printing in the Psi4 output files. Optional.
-    molden_file (string) : Molden filename to which orbitals are written. 
-        Optional. Defaults to ``orbs.molden``.
-    skip_localization (bool) : Whether to skip orbital localization. If true, 
-        the user should localize the orbitals in wfn.wfn beforehand! 
+    molden_file : string
+        Molden filename to which orbitals are written. Optional. 
+        Defaults to ``orbs.molden``.
+    skip_localization : bool
+        Whether to skip orbital localization. If true, the user should 
+        localize the orbitals in wfn.wfn beforehand! Optional. 
+        Defaults to False.
+    neutral : bool
+        Calculate the J couplings using neutral determinants only. 
         Optional. Defaults to False.
-    neutral (bool) : Calculate the J couplings using neutral determinants 
-        only. Optional. Defaults to False.
 
     Returns
     -------
-    NumPy matrix of J coupling values
+    numpy.ndarray
+        NumPy matrix of J coupling values
     """
 
     np.set_printoptions(suppress=True)

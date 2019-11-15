@@ -57,29 +57,37 @@ also written to standard output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>wfn (sf_wfn): SF-IP-EA wfn object containing info about the calculation.</strong></dt><dd></dd>
-<dt><strong>n_sites (int)</strong><span class="classifier">The number of sites.</span></dt><dd></dd>
-<dt><strong>site_list (list)</strong><span class="classifier">List of which atoms are “sites”. If this is not given,</span></dt><dd><p>the program assumes one orbital per site. Atomic center ordering
+<dt><strong>sf_wfn</strong><span class="classifier">sf_wfn</span></dt><dd><p>SF-IP-EA wfn object containing info about the calculation.</p>
+</dd>
+<dt><strong>n_sites</strong><span class="classifier">int</span></dt><dd><p>The number of sites.</p>
+</dd>
+<dt><strong>site_list</strong><span class="classifier">list</span></dt><dd><p>List of which atoms are “sites”. If this is not given,
+the program assumes one orbital per site. Atomic center ordering
 starts at zero. Optional.</p>
 </dd>
-<dt><strong>site_list_orbs (list): A list of sites, using lists of orbitals rather</strong></dt><dd><p>than atomic centers. (It’s a list of lists. For example, for a 
+<dt><strong>site_list_orbs</strong><span class="classifier">list</span></dt><dd><p>A list of sites, using lists of orbitals rather 
+than atomic centers. (It’s a list of lists. For example, for a 
 two-site case where MOs 55, 56, and 59 are on one site and the 
 remaining orbitals are on the other, use <code class="docutils literal notranslate"><span class="pre">[[55,56,59],[57,58,60]]</span></code>.) 
 Note that ordering starts at 1, not zero, so it follows the same 
 indexing as the MO printing in the Psi4 output files. Optional.</p>
 </dd>
-<dt><strong>molden_file (string)</strong><span class="classifier">Molden filename to which orbitals are written.</span></dt><dd><p>Optional. Defaults to <code class="docutils literal notranslate"><span class="pre">orbs.molden</span></code>.</p>
+<dt><strong>molden_file</strong><span class="classifier">string</span></dt><dd><p>Molden filename to which orbitals are written. Optional. 
+Defaults to <code class="docutils literal notranslate"><span class="pre">orbs.molden</span></code>.</p>
 </dd>
-<dt><strong>skip_localization (bool)</strong><span class="classifier">Whether to skip orbital localization. If true,</span></dt><dd><p>the user should localize the orbitals in wfn.wfn beforehand! 
+<dt><strong>skip_localization</strong><span class="classifier">bool</span></dt><dd><p>Whether to skip orbital localization. If true, the user should 
+localize the orbitals in wfn.wfn beforehand! Optional. 
+Defaults to False.</p>
+</dd>
+<dt><strong>neutral</strong><span class="classifier">bool</span></dt><dd><p>Calculate the J couplings using neutral determinants only. 
 Optional. Defaults to False.</p>
-</dd>
-<dt><strong>neutral (bool)</strong><span class="classifier">Calculate the J couplings using neutral determinants</span></dt><dd><p>only. Optional. Defaults to False.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>NumPy matrix of J coupling values</dt><dd></dd>
+<dt>numpy.ndarray</dt><dd><p>NumPy matrix of J coupling values</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -92,10 +100,16 @@ Optional. Defaults to False.</p>
 <p>Orthonormalizes a given matrix A based on Lowdin’s approach.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>A</strong> – NumPy array to orthogonalize.</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>A</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>NumPy array to orthogonalize.</p>
+</dd>
+</dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An orthogonalized version of A.</p>
+<dd class="field-even"><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>An orthogonalized version of A.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -896,24 +910,32 @@ spin-flips and IP/EAs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>delta_a (int)</strong><span class="classifier">Desired number of alpha electrons to remove.</span></dt><dd></dd>
-<dt><strong>delta_b (int)</strong><span class="classifier">Desired number of beta electrons to add.</span></dt><dd></dd>
-<dt><strong>mol (Molecule)</strong><span class="classifier">The molecule object to run the calculation on.</span></dt><dd><p>This should be built in whichever program you’ll use 
+<dt><strong>delta_a</strong><span class="classifier">int</span></dt><dd><p>Desired number of alpha electrons to remove.</p>
+</dd>
+<dt><strong>delta_b</strong><span class="classifier">int</span></dt><dd><p>Desired number of beta electrons to add.</p>
+</dd>
+<dt><strong>mol</strong><span class="classifier">Molecule</span></dt><dd><p>The molecule object to run the calculation on. 
+This should be built in whichever program you’ll use 
 to run the reference, and should be handled properly by the 
 reference program.</p>
 </dd>
-<dt><strong>conf_space (string)</strong><span class="classifier">Desired configuration space/additional excitations.</span></dt><dd><ul class="simple">
+<dt><strong>conf_space</strong><span class="classifier">string</span></dt><dd><dl class="simple">
+<dt>Desired configuration space/additional excitations.</dt><dd><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> CAS</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;h&quot;</span></code> 1 hole excitation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;p&quot;</span></code> 1 particle excitation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;h,p&quot;</span></code> 1 hole + 1 particle excitation</p></li>
 </ul>
 </dd>
-<dt><strong>ref_opts (dict)</strong><span class="classifier">Options for the reference program.</span></dt><dd><p>See relevant ref code (ex. do_sf_psi4) for details</p>
+</dl>
 </dd>
-<dt><strong>sf_opts (dict)</strong><span class="classifier">Additional options for stand-alone SF code.</span></dt><dd><ul class="simple">
+<dt><strong>ref_opts</strong><span class="classifier">dict</span></dt><dd><p>Options for the reference program.
+See relevant reference program docs (ex. Psi4 docs) for details.</p>
+</dd>
+<dt><strong>sf_opts</strong><span class="classifier">dict</span></dt><dd><dl class="simple">
+<dt>Additional options for stand-alone SF code. </dt><dd><ul class="simple">
 <li><dl class="simple">
-<dt>sf_diag_method – Diagonalization method to use.</dt><dd><ul>
+<dt><code class="docutils literal notranslate"><span class="pre">sf_diag_method</span></code>: Diagonalization method to use.</dt><dd><ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">RSP</span></code> Direct (deprecated)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">LANCZOS</span></code> Use NumPy’s Lanczos</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DAVIDSON</span></code> Use our Davidson</p></li>
@@ -921,9 +943,9 @@ reference program.</p>
 </dd>
 </dl>
 </li>
-<li><p>num_roots – Number of roots to solve for.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_roots</span></code>: Number of roots to solve for.</p></li>
 <li><dl class="simple">
-<dt>guess_type – Type of guess vector to use</dt><dd><ul>
+<dt><code class="docutils literal notranslate"><span class="pre">guess_type</span></code>: Type of guess vector to use</dt><dd><ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">CAS</span></code> Do CAS first and use that as an initial guess.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">RANDOM</span></code> Random orthonormal basis</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">READ</span></code> Read guess from a NumPy file (TODO)</p></li>
@@ -932,21 +954,23 @@ reference program.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>integral_type  Which integrals to use (DF or FULL)</dt><dd><ul>
+<dt><code class="docutils literal notranslate"><span class="pre">integral_type</span></code>: Which integrals to use (DF or FULL)</dt><dd><ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">FULL</span></code> Use full integrals (no density fitting)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DF</span></code> Use density fit integrals</p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><p>return_vects – Whether to return eigenvectors</p></li>
 </ul>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>Wavefunction object (sf_wfn) containing calculation data and results</dt><dd></dd>
+<dt>sf_wfn</dt><dd><p>Wavefunction object (sf_wfn) containing calculation data and results</p>
+</dd>
 </dl>
 </dd>
 </dl>
