@@ -16,8 +16,8 @@ def lowdin_orth(A):
     """
     Performs Lowdin orthonormalization on a given matrix A.
 
-    Orthonormalizes a given NumPy A based on Lowdin's approach. 
-    This does an SVD decomposition of the NumPy array
+    Orthonormalizes a given NumPy matrix A based on Lowdin's approach 
+    (i.e. based on the SVD of A).
 
     Parameters
     ----------
