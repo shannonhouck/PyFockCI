@@ -1,13 +1,22 @@
-from __future__ import print_function
-import numpy as np
-from .tei import *
-
 """
+Handling post-CI analysis.
+
 These are functions to handle post-CI analysis, primarily the S**2 values
 and information about the determinants.
 """
 
-def calc_sz(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
+from __future__ import print_function
+import numpy as np
+from .tei import *
+
+def calc_sz(vect, wfn):
+    n_SF = wfn.n_SF
+    delta_ec = wfn.delta_ec
+    conf_space = wfn.conf_space
+    docc = wfn.ras1
+    socc = wfn.ras2
+    virt = wfn.ras3
+    det_list = wfn.det_list
     # obtain Sz and Sz (same general formula regardless of method)
     na = docc + socc - n_SF
     nb = docc + n_SF
@@ -15,7 +24,7 @@ def calc_sz(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         nb = nb + 1
     if(delta_ec==-1): # EA
         na = na - 1
-    det_list = generate_dets(n_SF, delta_ec, conf_space, docc, socc, virt)
+    
     # construct Sz*Sz
     sz_final = 0
     for i, v in enumerate(vect):
@@ -60,8 +69,10 @@ def calc_sz(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         sz_final = sz_final + v*v*np.sum(sz_vect)
     return sz_final
 
-def calc_s2(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
-    """Calculates S**2 for a given CI vector.
+def calc_s2(vect, wfn):
+    """
+    Calculates S**2 for a given CI vector.
+
        Input
            n_SF -- Number of spin-flips
            delta_ec -- Change in electron count
@@ -73,6 +84,13 @@ def calc_s2(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
        Returns
            s2 -- The S**2 expectation value for the state
     """
+    n_SF = wfn.n_SF
+    delta_ec = wfn.delta_ec
+    conf_space = wfn.conf_space
+    docc = wfn.ras1
+    socc = wfn.ras2
+    virt = wfn.ras3
+    det_list = wfn.det_list
     s2 = 0.0
     # obtain Sz and Sz (same general formula regardless of method)
     na = docc + socc - n_SF
@@ -81,7 +99,7 @@ def calc_s2(n_SF, delta_ec, conf_space, vect, docc, socc, virt):
         nb = nb + 1
     if(delta_ec==-1): # EA
         na = na - 1
-    det_list = generate_dets(n_SF, delta_ec, conf_space, docc, socc, virt)
+    
     # construct Sz*Sz
     for i, v in enumerate(vect):
         # grab determinants
@@ -798,7 +816,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
 
     return dets_list
 
-def print_det_list(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
+def print_det_list(wfn):
     """Prints the full list of determinants to standard out.
        This is useful for post-CI analysis.
        Input
@@ -809,12 +827,17 @@ def print_det_list(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
            ras2 -- Number of RAS2 orbitals
            ras3 -- Number of RAS3 orbitals
     """
+    n_SF = wfn.n_SF
+    delta_ec = wfn.delta_ec
+    conf_space = wfn.conf_space
+    ras1 = wfn.ras1
+    ras2 = wfn.ras2
+    ras3 = wfn.ras3
+    det_list = wfn.det_list
     print("ROHF Config:")
     print("\tDOCC: %i" %ras1)
     print("\tSOCC: %i" %ras2)
     print("\tVIRT: %i" %ras3)
-    # generate list of determinants (start ordering at 1)
-    det_list = generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3)
     count = 0
     for i in range(len(det_list)):
         print("DET %i" %i, end='')
@@ -825,8 +848,7 @@ def print_det_list(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
         print("\tB: %9s" %(det_list[i][1][1]))
 
 
-def print_dets(vect, n_SF, delta_ec, conf_space, ras1, ras2, ras3,
-               dets_to_print=10):
+def print_dets(vect, wfn, dets_to_print=10):
     """Given a CI vector, prints information about the most important
        determinants.
        Input
@@ -839,11 +861,15 @@ def print_dets(vect, n_SF, delta_ec, conf_space, ras1, ras2, ras3,
            ras3 -- Number of RAS3 orbitals
            dets_to_print -- Number of determinants to print
     """
-
+    n_SF = wfn.n_SF
+    delta_ec = wfn.delta_ec
+    conf_space = wfn.conf_space
+    ras1 = wfn.ras1
+    ras2 = wfn.ras2
+    ras3 = wfn.ras3
+    dets = wfn.det_list
     # find largest-magnitude contributions
     sort = abs(vect).argsort()[::-1]
-    # obtain ordered determinant lists, start order at 1
-    dets = generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3)
     # fix dets_to_print if larger than number of dets
     if(dets_to_print > len(dets)):
         dets_to_print = len(dets)

@@ -217,7 +217,7 @@ of the Hamiltonian with a given vector or set of vectors.</p>
 <td><p>Do CAS-1SF-IP.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral" title="sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_1sf_neutral</span></code></a>(self, v, Fa, Fb, tei, …)</p></td>
-<td><p>Do CAS-1SF.</p></td>
+<td><p>Do CAS-1SF with neutral determinants only.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.linop.LinOpH.do_cas_2sf" title="sf_ip_ea.linop.LinOpH.do_cas_2sf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_cas_2sf</span></code></a>(self, v, Fa, Fb, tei, offset_v, …)</p></td>
 <td><p>Do CAS-2SF.</p></td>
@@ -293,14 +293,11 @@ for each determinant by summing over the occupied orbital energies.</p>
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf">
 <code class="sig-name descname">do_cas_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-1SF.</p>
-<blockquote>
-<div><dl>
-<dt>Evaluate the following matrix vector multiply:</dt><dd><div class="line-block">
-<div class="line">H(1,1) | * v(1) = sig(1)</div>
-</div>
+<p>block1 = v(ia:ab)</p>
+<dl class="simple">
+<dt>Evaluate the following matrix vector multiply:</dt><dd><p>H(1,1) * v(1) = sig(1)</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -328,11 +325,10 @@ for each determinant by summing over the occupied orbital energies.</p>
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral">
 <code class="sig-name descname">do_cas_1sf_neutral</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral" title="Permalink to this definition">¶</a></dt>
-<dd><p>Do CAS-1SF.</p>
-<dl>
-<dt>Evaluate the following matrix vector multiply:</dt><dd><div class="line-block">
-<div class="line">H(1,1) | * v(1) = sig(1)</div>
-</div>
+<dd><p>Do CAS-1SF with neutral determinants only.</p>
+<p>block1 = v(ia:ab) where i==a</p>
+<dl class="simple">
+<dt>Evaluate the following matrix vector multiply:</dt><dd><p>H(1,1) * v(1) = sig(1)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -342,10 +338,10 @@ for each determinant by summing over the occupied orbital energies.</p>
 <code class="sig-name descname">do_cas_2sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_2sf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-2SF.</p>
 <p>block1 = v(ijab:aabb)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) = sig(1)</div>
-</div>
+<dl class="simple">
+<dt>Evaluate the following matrix vector multiply:</dt><dd><p>H(1,1) * v(1) = sig(1)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -509,6 +505,9 @@ block2 = v(ijA:aaa)</p>
 </div>
 <div class="section" id="module-sf_ip_ea.np_sf">
 <span id="sf-ip-ea-np-sf-module"></span><h2>sf_ip_ea.np_sf module<a class="headerlink" href="#module-sf_ip_ea.np_sf" title="Permalink to this headline">¶</a></h2>
+<p>NumPy-based Fock-space CI.</p>
+<p>Runs a RAS-nSF-IP/EA calculation, given the integrals in the form of NumPy 
+arrays as input.</p>
 <dl class="function">
 <dt id="sf_ip_ea.np_sf.do_sf_np">
 <code class="sig-prename descclassname">sf_ip_ea.np_sf.</code><code class="sig-name descname">do_sf_np</code><span class="sig-paren">(</span><em class="sig-param">delta_a</em>, <em class="sig-param">delta_b</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei_int</em>, <em class="sig-param">e</em>, <em class="sig-param">conf_space=''</em>, <em class="sig-param">sf_opts={}</em>, <em class="sig-param">J_in=None</em>, <em class="sig-param">C_in=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.do_sf_np" title="Permalink to this definition">¶</a></dt>
@@ -521,123 +520,72 @@ arrays. Whether to perform hole and/or particle excitations is
 specified using conf_space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>delta_a</strong> – Desired number of alpha electrons to remove (int)</p></li>
-<li><p><strong>delta_b</strong> – Desired number of beta electrons to add (int)</p></li>
-<li><p><strong>ras1</strong> – RAS1 space (int)</p></li>
-<li><p><strong>ras2</strong> – RAS2 space (int)</p></li>
-<li><p><strong>ras3</strong> – RAS3 space (int)</p></li>
-<li><p><strong>Fa</strong> – Alpha Fock matrix (NumPy array)</p></li>
-<li><p><strong>Fb</strong> – Beta Fock matrix (NumPy array)</p></li>
-<li><p><strong>tei_int</strong> – Two-electron integrals (NumPy array)</p></li>
-<li><p><strong>e</strong> – ROHF energy (float)</p></li>
-<li><p><strong>conf_space</strong> – Desired excitation scheme.
-See __init__ for more information.</p></li>
-<li><p><strong>sf_opts</strong> – Additional options (dict)
-See __init__ for more information.</p></li>
-<li><p><strong>J_in</strong> – J matrix (for DF calculations)</p></li>
-<li><p><strong>C_in</strong> – MO coefficients matrix (for DF calculations)</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>delta_a</strong><span class="classifier">int</span></dt><dd><p>Desired number of alpha electrons to remove</p>
+</dd>
+<dt><strong>delta_b</strong><span class="classifier">int</span></dt><dd><p>Desired number of beta electrons to add</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Size of RAS1 space</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Size of RAS2 space</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Size of RAS3 space</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix</p>
+</dd>
+<dt><strong>tei_int</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Two-electron integrals</p>
+</dd>
+<dt><strong>e</strong><span class="classifier">float</span></dt><dd><p>ROHF energy</p>
+</dd>
+<dt><strong>conf_space</strong><span class="classifier">str</span></dt><dd><p>Desired excitation scheme</p>
+</dd>
+<dt><strong>sf_opts</strong><span class="classifier">dict</span></dt><dd><p>Additional options for spin-flip</p>
+</dd>
+<dt><strong>J_in</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>J matrix (for DF calculations)</p>
+</dd>
+<dt><strong>C_in</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>MO coefficients matrix (for DF calculations)</p>
+</dd>
+</dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A sf_wfn object with calculation result info</p>
+<dd class="field-even"><dl class="simple">
+<dt>A FockWfn object with calculation information and results</dt><dd></dd>
+</dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="class">
-<dt id="sf_ip_ea.np_sf.wfn_sf">
-<em class="property">class </em><code class="sig-prename descclassname">sf_ip_ea.np_sf.</code><code class="sig-name descname">wfn_sf</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">n_roots</em>, <em class="sig-param">n_dets</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.wfn_sf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Contains information about the RAS-SF-IP/EA calculation.</p>
-<p>The wfn_sf class stores important information about the calculation, 
-including RAS spaces, eigenvectors, energies, S**2 values, and so on.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n_SF</strong> – Number of spin-flips to perform (SF)</p></li>
-<li><p><strong>delta_ec</strong> – Change in electron count (IP/EA)</p></li>
-<li><p><strong>conf_space</strong> – Configuration space</p></li>
-<li><p><strong>ras1</strong> – RAS1 orbital count</p></li>
-<li><p><strong>ras2</strong> – RAS2 orbital count</p></li>
-<li><p><strong>ras3</strong> – RAS3 orbital count</p></li>
-<li><p><strong>n_roots</strong> – Number of roots calculated</p></li>
-<li><p><strong>n_dets</strong> – Number of determinants</p></li>
-<li><p><strong>e</strong> – Calculated energy values</p></li>
-<li><p><strong>vecs</strong> – Calculated eigenvectors</p></li>
-<li><p><strong>local_vecs</strong> – Localized eigenvectors</p></li>
-<li><p><strong>s</strong> – Array of S values (per root)</p></li>
-<li><p><strong>sz</strong> – Array of Sz values (per root)</p></li>
-<li><p><strong>s2</strong> – Array of S**2 values (per root)</p></li>
-<li><p><strong>H</strong> – Calculated Hamiltonian (only if requested)</p></li>
-<li><p><strong>wfn</strong> – ROHF wavefunction object (Psi4 Wavefunction)</p></li>
-</ul>
-</dd>
-</dl>
-<p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.np_sf.wfn_sf.print_important_dets" title="sf_ip_ea.np_sf.wfn_sf.print_important_dets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_important_dets</span></code></a>(self)</p></td>
-<td><p>Prints the most important determinants for each root.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#sf_ip_ea.np_sf.wfn_sf.print_local_dets" title="sf_ip_ea.np_sf.wfn_sf.print_local_dets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_local_dets</span></code></a>(self)</p></td>
-<td><p>Prints the most important determinants for each root (localized).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sf_ip_ea.np_sf.wfn_sf.print_roots" title="sf_ip_ea.np_sf.wfn_sf.print_roots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_roots</span></code></a>(self)</p></td>
-<td><p>Prints the calculated energies, with S**2 and Sz values.</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="sf_ip_ea.np_sf.wfn_sf.print_important_dets">
-<code class="sig-name descname">print_important_dets</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.wfn_sf.print_important_dets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints the most important determinants for each root.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="sf_ip_ea.np_sf.wfn_sf.print_local_dets">
-<code class="sig-name descname">print_local_dets</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.wfn_sf.print_local_dets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints the most important determinants for each root (localized).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="sf_ip_ea.np_sf.wfn_sf.print_roots">
-<code class="sig-name descname">print_roots</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.np_sf.wfn_sf.print_roots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints the calculated energies, with S**2 and Sz values.</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
 <div class="section" id="module-sf_ip_ea.post_ci_analysis">
 <span id="sf-ip-ea-post-ci-analysis-module"></span><h2>sf_ip_ea.post_ci_analysis module<a class="headerlink" href="#module-sf_ip_ea.post_ci_analysis" title="Permalink to this headline">¶</a></h2>
+<p>Handling post-CI analysis.</p>
+<p>These are functions to handle post-CI analysis, primarily the S**2 values
+and information about the determinants.</p>
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.calc_s2">
-<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">calc_s2</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">vect</em>, <em class="sig-param">docc</em>, <em class="sig-param">socc</em>, <em class="sig-param">virt</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.calc_s2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates S**2 for a given CI vector.
-Input</p>
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">calc_s2</code><span class="sig-paren">(</span><em class="sig-param">vect</em>, <em class="sig-param">wfn</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.calc_s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates S**2 for a given CI vector.</p>
 <blockquote>
-<div><p>n_SF – Number of spin-flips
+<div><dl class="simple">
+<dt>Input</dt><dd><p>n_SF – Number of spin-flips
 delta_ec – Change in electron count
 conf_space – Excitation scheme (Options: “”, “h”, “p”, “h,p”)
 vect – Eigenvector (CI coefficients)
 docc – Number of doubly occupied orbitals
 socc – Number of singly occupied orbitals
 virt – Number of doubly unoccupied orbitals</p>
-</div></blockquote>
-<dl class="simple">
+</dd>
 <dt>Returns</dt><dd><p>s2 – The S**2 expectation value for the state</p>
 </dd>
 </dl>
+</div></blockquote>
 </dd></dl>
 
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.calc_sz">
-<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">calc_sz</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">vect</em>, <em class="sig-param">docc</em>, <em class="sig-param">socc</em>, <em class="sig-param">virt</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.calc_sz" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">calc_sz</code><span class="sig-paren">(</span><em class="sig-param">vect</em>, <em class="sig-param">wfn</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.calc_sz" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -664,7 +612,7 @@ ras3 – Number of RAS3 orbitals</p>
 
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.print_det_list">
-<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">print_det_list</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.print_det_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">print_det_list</code><span class="sig-paren">(</span><em class="sig-param">wfn</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.print_det_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints the full list of determinants to standard out.
 This is useful for post-CI analysis.
 Input</p>
@@ -680,7 +628,7 @@ ras3 – Number of RAS3 orbitals</p>
 
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.print_dets">
-<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">print_dets</code><span class="sig-paren">(</span><em class="sig-param">vect</em>, <em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em>, <em class="sig-param">dets_to_print=10</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.print_dets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">print_dets</code><span class="sig-paren">(</span><em class="sig-param">vect</em>, <em class="sig-param">wfn</em>, <em class="sig-param">dets_to_print=10</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.print_dets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a CI vector, prints information about the most important
 determinants.
 Input</p>
@@ -699,23 +647,36 @@ dets_to_print – Number of determinants to print</p>
 </div>
 <div class="section" id="module-sf_ip_ea.psi4_sf">
 <span id="sf-ip-ea-psi4-sf-module"></span><h2>sf_ip_ea.psi4_sf module<a class="headerlink" href="#module-sf_ip_ea.psi4_sf" title="Permalink to this headline">¶</a></h2>
+<p>Fock-space CI using Psi4’s interfact.</p>
+<p>Runs a RAS-nSF-IP/EA calculation using Psi4 to construct the integrals.</p>
 <dl class="function">
 <dt id="sf_ip_ea.psi4_sf.do_sf_psi4">
 <code class="sig-prename descclassname">sf_ip_ea.psi4_sf.</code><code class="sig-name descname">do_sf_psi4</code><span class="sig-paren">(</span><em class="sig-param">delta_a</em>, <em class="sig-param">delta_b</em>, <em class="sig-param">mol</em>, <em class="sig-param">conf_space=''</em>, <em class="sig-param">ref_opts={}</em>, <em class="sig-param">sf_opts={}</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.psi4_sf.do_sf_psi4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs SF-CAS using Psi4’s integral packages</p>
+<dd><p>Runs RAS-nSF-IP/EA using Psi4.</p>
+<p>This runs a RAS-nSF-IP/EA calculation using Psi4 to solve for the 
+reference state ROHF orbitals, if needed, and construct the one- and 
+two-electron integral objects to pass along to the NumPy-based solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>delta_a</strong> – Number of alpha electrons to eliminate</p></li>
-<li><p><strong>delta_b</strong> – Number of beta electrons to create</p></li>
-<li><p><strong>mol</strong> – Psi4 Molecule object on which to run the calculation</p></li>
-<li><p><strong>conf_space</strong> – Excitation scheme (Options: “”, “h”, “p”, “h,p”)</p></li>
-<li><p><strong>ref_opts</strong> – Additional options for Psi4 (dictionary)</p></li>
-<li><p><strong>sf_opts</strong> – Additional options for Fock CI (dictionary)</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>delta_a</strong><span class="classifier">int</span></dt><dd><p>Number of alpha electrons to eliminate</p>
+</dd>
+<dt><strong>delta_b</strong><span class="classifier">int</span></dt><dd><p>Number of beta electrons to create</p>
+</dd>
+<dt><strong>mol</strong><span class="classifier">Psi4.core.Molecule</span></dt><dd><p>Psi4 Molecule object on which to run the calculation</p>
+</dd>
+<dt><strong>conf_space</strong><span class="classifier">str</span></dt><dd><p>Inclusion of holes/particles (Options: “”, “h”, “p”, “h,p”)</p>
+</dd>
+<dt><strong>ref_opts</strong><span class="classifier">dict</span></dt><dd><p>Additional options for Psi4 (see Psi4 docs)</p>
+</dd>
+<dt><strong>sf_opts</strong><span class="classifier">dict</span></dt><dd><p>Additional options for Fock CI</p>
+</dd>
+</dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A sf_wfn object containing calculation results</p>
+<dd class="field-even"><dl class="simple">
+<dt>A FockWfn object containing calculation results</dt><dd></dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>

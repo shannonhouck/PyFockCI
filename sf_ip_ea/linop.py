@@ -119,8 +119,10 @@ class LinOpH (LinearOperator):
         """
         Do CAS-1SF.
 
-           Evaluate the following matrix vector multiply:
-                | H(1,1) | * v(1) = sig(1)
+        block1 = v(ia:ab)
+
+        Evaluate the following matrix vector multiply:
+            H(1,1) * v(1) = sig(1)
            
         """
         ################################################ 
@@ -145,10 +147,13 @@ class LinOpH (LinearOperator):
         return sig_1 + offset_v
 
     def do_cas_1sf_neutral(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """Do CAS-1SF.
+        """
+        Do CAS-1SF with neutral determinants only.
 
-           Evaluate the following matrix vector multiply:
-                | H(1,1) | * v(1) = sig(1)
+        block1 = v(ia:ab) where i==a
+
+        Evaluate the following matrix vector multiply:
+            H(1,1) * v(1) = sig(1)
            
         """
         ################################################ 
@@ -173,13 +178,13 @@ class LinOpH (LinearOperator):
         return sig_1 + offset_v
 
     def do_cas_2sf(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """Do CAS-2SF.
+        """
+        Do CAS-2SF.
 
-                block1 = v(ijab:aabb)
+        block1 = v(ijab:aabb)
 
-                Evaluate the following matrix vector multiply:
-
-                | H(1,1) | * v(1) = sig(1)
+        Evaluate the following matrix vector multiply:
+            H(1,1) * v(1) = sig(1)
            
         """
         # v(1) unpack to indexing: (ijab:aabb)
@@ -233,17 +238,18 @@ class LinOpH (LinearOperator):
         return sig_1_out + offset_v
 
     def do_h_1sf(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """Do RAS(h)-1SF.
+        """
+        Do RAS(h)-1SF.
 
-            block1 = v(ai:ba)
-            block2 = v(Ia:ab)
-            block3 = v(Iiab:babb)
+        block1 = v(ai:ba)
+        block2 = v(Ia:ab)
+        block3 = v(Iiab:babb)
 
-            Evaluate the following matrix vector multiply:
+        Evaluate the following matrix vector multiply:
 
-            H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
-            H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
-            H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)
+        H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
+        H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
+        H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)
         """
         ################################################ 
         # Separate guess vector into blocks 1, 2, and 3
@@ -425,17 +431,18 @@ class LinOpH (LinearOperator):
         return np.vstack((sig_1, sig_2, sig_3_out)) + offset_v
 
     def do_p_1sf(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """Do RAS(p)-1SF.
+        """
+        Do RAS(p)-1SF.
 
-                block1 = v(ai:ba)
-                block2 = v(Ai:ba)
-                block3 = v(Aaij:abaa)
+        block1 = v(ai:ba)
+        block2 = v(Ai:ba)
+        block3 = v(Aaij:abaa)
 
-                Evaluate the following matrix vector multiply:
+        Evaluate the following matrix vector multiply:
 
-                H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
-                H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
-                H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)
+        H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
+        H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
+        H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)
            
         """
         nbf = ras1 + ras2 + ras3
