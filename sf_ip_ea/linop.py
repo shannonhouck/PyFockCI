@@ -119,11 +119,32 @@ class LinOpH (LinearOperator):
         """
         Do CAS-1SF.
 
-        block1 = v(ia:ab)
+        Defines H*v for a CAS-1SF calculation. Blocks are defined as::
 
-        Evaluate the following matrix vector multiply:
-            H(1,1) * v(1) = sig(1)
-           
+            block1 = v(ia:ab)
+
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
+
+        Returns
+        -------
+        The result of H*v.
         """
         ################################################ 
         # Put guess vector into block form
@@ -150,11 +171,33 @@ class LinOpH (LinearOperator):
         """
         Do CAS-1SF with neutral determinants only.
 
-        block1 = v(ia:ab) where i==a
+        Defines H*v for a CAS-1SF calculation, including only neutral 
+        determinants in the Fock space. Blocks are defined as::
 
-        Evaluate the following matrix vector multiply:
-            H(1,1) * v(1) = sig(1)
-           
+            block1 = v(ia:ab) where i==a
+
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
+
+        Returns
+        -------
+        The result of H*v.
         """
         ################################################ 
         # Put guess vector into block form
@@ -181,11 +224,32 @@ class LinOpH (LinearOperator):
         """
         Do CAS-2SF.
 
-        block1 = v(ijab:aabb)
+        Defines H*v for a CAS-2SF calculation. Blocks are defined as::
 
-        Evaluate the following matrix vector multiply:
-            H(1,1) * v(1) = sig(1)
-           
+            block1 = v(ijab:aabb)
+
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
+
+        Returns
+        -------
+        The result of H*v.
         """
         # v(1) unpack to indexing: (ijab:aabb)
         v_ref1 = np.zeros((ras2, ras2, ras2, ras2, v.shape[1]))
@@ -241,15 +305,34 @@ class LinOpH (LinearOperator):
         """
         Do RAS(h)-1SF.
 
-        block1 = v(ai:ba)
-        block2 = v(Ia:ab)
-        block3 = v(Iiab:babb)
+        Defines H*v for a RAS(h)-1SF calculation. Blocks are defined as::
 
-        Evaluate the following matrix vector multiply:
+            block1 = v(ai:ba)
+            block2 = v(Ia:ab)
+            block3 = v(Iiab:babb)
 
-        H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
-        H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
-        H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
+
+        Returns
+        -------
+        The result of H*v.
         """
         ################################################ 
         # Separate guess vector into blocks 1, 2, and 3
@@ -281,7 +364,8 @@ class LinOpH (LinearOperator):
         #   sig(ia:ab) += v(ib:ab)*F(ab:bb) - v(ja:ab)*F(ij:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_1 = np.einsum("ibn,ab->ian", v_ref1, Fb_tmp) - np.einsum("jan,ji->ian", v_ref1, Fa_tmp)
+        sig_1 = np.einsum("ibn,ab->ian", v_ref1, Fb_tmp) 
+        sig_1 = sig_1 - np.einsum("jan,ji->ian", v_ref1, Fa_tmp)
         #   sig(ia:ab) += v(jb:ab)*I(ajbi:baba)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
         sig_1 = sig_1 - np.einsum("jbn,ajbi->ian", v_ref1, tei_tmp)
@@ -334,7 +418,8 @@ class LinOpH (LinearOperator):
         #   sig(Ia:ab) += sig(Ia:ab)*F(ab:bb) - sig(Ja:ab)*F(IJ:aa)
         Fa_tmp = Fa[0:ras1, 0:ras1]
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_2 = sig_2 + np.einsum("Ibn,ab->Ian", v_ref2, Fb_tmp) - np.einsum("Jan,IJ->Ian", v_ref2, Fa_tmp)
+        sig_2 = sig_2 + (np.einsum("Ibn,ab->Ian", v_ref2, Fb_tmp) 
+                         - np.einsum("Jan,IJ->Ian", v_ref2, Fa_tmp))
         #   sig(Ia:ab) += v(Jb:ab)*I(JaIb:abab)
         tei_tmp = self.tei.get_subblock(1, 2, 1, 2)
         sig_2 = sig_2 - np.einsum("Jbn,JaIb->Ian", v_ref2, tei_tmp)
@@ -355,14 +440,17 @@ class LinOpH (LinearOperator):
 
         #   sig(Iiab:babb) += v(ib:ab)*F(Ia:bb) - v(ia:ab)*F(Ib:bb)
         Fb_tmp = Fb[0:ras1, ras1:ras1+ras2]
-        sig_3 = (np.einsum("ibn,Ia->Iiabn", v_ref1, Fb_tmp) - np.einsum("ian,Ib->Iiabn", v_ref1, Fb_tmp))
+        sig_3 = (np.einsum("ibn,Ia->Iiabn", v_ref1, Fb_tmp) 
+                 - np.einsum("ian,Ib->Iiabn", v_ref1, Fb_tmp))
         #   sig(Iiab:babb) += v(ja:ab)*I(jbiI:abab) - v(jb:ab)*I(jaiI:abab)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 1)
-        sig_3 = sig_3 + np.einsum("jan,jbiI->Iiabn", v_ref1, tei_tmp) - np.einsum("jbn,jaiI->Iiabn", v_ref1, tei_tmp)
+        sig_3 = sig_3 + (np.einsum("jan,jbiI->Iiabn", v_ref1, tei_tmp) 
+                         - np.einsum("jbn,jaiI->Iiabn", v_ref1, tei_tmp))
         #   sig(Iiab:aaab) += v(ic:ab)*I(abIc:bbbb)
         tei_tmp_J = self.tei.get_subblock(2, 2, 1, 2)
         tei_tmp_K = self.tei.get_subblock(2, 2, 2, 1)
-        sig_3 = sig_3 + np.einsum("icn,abIc->Iiabn", v_ref1, tei_tmp_J) - np.einsum("icn,abcI->Iiabn", v_ref1, tei_tmp_K)
+        sig_3 = sig_3 + (np.einsum("icn,abIc->Iiabn", v_ref1, tei_tmp_J) 
+                         - np.einsum("icn,abcI->Iiabn", v_ref1, tei_tmp_K))
 
         ################################################ 
         # Do the following term:
@@ -434,16 +522,34 @@ class LinOpH (LinearOperator):
         """
         Do RAS(p)-1SF.
 
-        block1 = v(ai:ba)
-        block2 = v(Ai:ba)
-        block3 = v(Aaij:abaa)
+        Defines H*v for a RAS(p)-1SF calculation. Blocks are defined as::
 
-        Evaluate the following matrix vector multiply:
+            block1 = v(ai:ba)
+            block2 = v(Ai:ba)
+            block3 = v(Aaij:abaa)
 
-        H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
-        H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
-        H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)
-           
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
+
+        Returns
+        -------
+        The result of H*v.
         """
         nbf = ras1 + ras2 + ras3
         ################################################ 
@@ -476,7 +582,8 @@ class LinOpH (LinearOperator):
         #   sig(ia:ab) += v(ib:ab)*F(ab:bb) - v(ja:ab)*F(ij:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_1 = np.einsum("ibn,ab->ian", v_ref1, Fb_tmp) - np.einsum("jan,ji->ian", v_ref1, Fa_tmp)
+        sig_1 = np.einsum("ibn,ab->ian", v_ref1, Fb_tmp) 
+        sig_1 = sig_1 - np.einsum("jan,ji->ian", v_ref1, Fa_tmp)
         #   sig(ia:ab) += v(jb:ab)*I(ajbi:baba)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
         sig_1 = sig_1 - np.einsum("jbn,ajbi->ian", v_ref1, tei_tmp)
@@ -530,7 +637,8 @@ class LinOpH (LinearOperator):
         #   sig(iA:ab) += sig(iB:ab)*F(BA:bb) - sig(jA:ab)*F(ji:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         Fb_tmp = Fb[ras1+ras2:nbf, ras1+ras2:nbf]
-        sig_2 = sig_2 + np.einsum("Bin,AB->Ain", v_ref2, Fb_tmp) - np.einsum("Ajn,ji->Ain", v_ref2, Fa_tmp)
+        sig_2 = sig_2 + (np.einsum("Bin,AB->Ain", v_ref2, Fb_tmp) 
+                         - np.einsum("Ajn,ji->Ain", v_ref2, Fa_tmp))
         #   sig(iA:ab) += v(jB:ab)*I(AjBi:baba)
         tei_tmp = self.tei.get_subblock(3, 2, 3, 2)
         sig_2 = sig_2 - np.einsum("Bjn,AjBi->Ain", v_ref2, tei_tmp)
@@ -551,13 +659,16 @@ class LinOpH (LinearOperator):
 
         #   sig(ijAb:aaab) += v(jb:ab)*F(iA:aa) - v(ib:ab)*F(jA:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1+ras2:nbf]
-        sig_3 = (np.einsum("jbn,iA->Aijbn", v_ref1, Fa_tmp) - np.einsum("ibn,jA->Aijbn", v_ref1, Fa_tmp))
+        sig_3 = (np.einsum("jbn,iA->Aijbn", v_ref1, Fa_tmp) 
+                 - np.einsum("ibn,jA->Aijbn", v_ref1, Fa_tmp))
         #   sig(ijAb:aaab) += - v(ic:ab)*I(Abjc:abab) + v(jc:ab)*I(Abic:abab)
         tei_tmp = self.tei.get_subblock(3, 2, 2, 2)
-        sig_3 = sig_3 - np.einsum("icn,Abjc->Aijbn", v_ref1, tei_tmp) + np.einsum("jcn,Abic->Aijbn", v_ref1, tei_tmp)
+        sig_3 = sig_3 - (np.einsum("icn,Abjc->Aijbn", v_ref1, tei_tmp) 
+                         - np.einsum("jcn,Abic->Aijbn", v_ref1, tei_tmp))
         #   sig(ijAb:aaab) += - v(kb:ab)*I(Akij:aaaa)
         tei_tmp = self.tei.get_subblock(3, 2, 2, 2)
-        sig_3 = sig_3 - (np.einsum("kbn,Akij->Aijbn", v_ref1, tei_tmp) - np.einsum("kbn,Akji->Aijbn", v_ref1, tei_tmp))
+        sig_3 = sig_3 - (np.einsum("kbn,Akij->Aijbn", v_ref1, tei_tmp) 
+                         - np.einsum("kbn,Akji->Aijbn", v_ref1, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -577,16 +688,18 @@ class LinOpH (LinearOperator):
         #   sig(ijAb:aaab) += t(ijAc:aaab)*F(bc:bb) + t(ijAb:aaab)*F(AB:bb) - t(ikAb:aaab)*F(jk:aa) + t(jkAb:aaab)*F(ik:aa)
         F_bc_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
         F_AB_tmp = Fa[ras1+ras2:nbf, ras1+ras2:nbf]
-        sig_3 = sig_3 + np.einsum("Aijcn,bc->Aijbn", v_ref3, F_bc_tmp) # no contribution
-        sig_3 = sig_3 + np.einsum("Bijbn,AB->Aijbn", v_ref3, F_AB_tmp) # no contribution
+        sig_3 = sig_3 + np.einsum("Aijcn,bc->Aijbn", v_ref3, F_bc_tmp)
+        sig_3 = sig_3 + np.einsum("Bijbn,AB->Aijbn", v_ref3, F_AB_tmp)
         Fi_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_3 = sig_3 - np.einsum("Aikbn,kj->Aijbn", v_ref3, Fi_tmp) + np.einsum("Ajkbn,ki->Aijbn", v_ref3, Fi_tmp)
+        sig_3 = sig_3 - (np.einsum("Aikbn,kj->Aijbn", v_ref3, Fi_tmp) 
+                         - np.einsum("Ajkbn,ki->Aijbn", v_ref3, Fi_tmp))
         #   sig(ijAb:aaab) += v(ijBc:aaab)*I(abBc:abab)
         tei_tmp = self.tei.get_subblock(3, 2, 3, 2)
         sig_3 = sig_3 + np.einsum("Bijcn,AbBc->Aijbn", v_ref3, tei_tmp)
         #   sig(ijAb:aaab) += 0.5*v(klAb:aaab)*I(klij:aaaa)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
-        sig_3 = sig_3 + 0.5*(np.einsum("Aklbn,klij->Aijbn", v_ref3, tei_tmp) - np.einsum("Aklbn,klji->Aijbn", v_ref3, tei_tmp))
+        sig_3 = sig_3 + 0.5*(np.einsum("Aklbn,klij->Aijbn", v_ref3, tei_tmp) 
+                             - np.einsum("Aklbn,klji->Aijbn", v_ref3, tei_tmp))
         #   sig(ijAb:aaab) += - v(kjAc:aaab)*I(kbic:abab)
         sig_3 = sig_3 - np.einsum("Akjcn,kbic->Aijbn", v_ref3, tei_tmp) 
         #   sig(ijAb:aaab) += v(kiAc:aaab)*I(kbjc:abab)
@@ -594,9 +707,11 @@ class LinOpH (LinearOperator):
         #   sig(ijAb:aaab) += - v(ijCb:aaab)*I(AkCj:aaaa)
         tei_tmp_J = self.tei.get_subblock(3, 2, 3, 2)
         tei_tmp_K = self.tei.get_subblock(3, 2, 2, 3)
-        sig_3 = sig_3 - (np.einsum("Cikbn,AkCj->Aijbn", v_ref3, tei_tmp_J) - np.einsum("Cikbn,AkjC->Aijbn", v_ref3, tei_tmp_K))
+        sig_3 = sig_3 - (np.einsum("Cikbn,AkCj->Aijbn", v_ref3, tei_tmp_J) 
+                         - np.einsum("Cikbn,AkjC->Aijbn", v_ref3, tei_tmp_K))
         #   sig(ijAb:aaab) += v(jkCb:aaab)*I(AkCi:aaaa)
-        sig_3 = sig_3 + (np.einsum("Cjkbn,AkCi->Aijbn", v_ref3, tei_tmp_J) - np.einsum("Cjkbn,AkiC->Aijbn", v_ref3, tei_tmp_K))
+        sig_3 = sig_3 + (np.einsum("Cjkbn,AkCi->Aijbn", v_ref3, tei_tmp_J) 
+                         - np.einsum("Cjkbn,AkiC->Aijbn", v_ref3, tei_tmp_K))
 
         ################################################ 
         # sigs complete-- free to reshape!
@@ -618,7 +733,10 @@ class LinOpH (LinearOperator):
         return np.vstack((sig_1, sig_2, sig_3_out)) + offset_v
 
     def do_hp_1sf(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """Do RAS(h,p)-1SF.
+        """
+        Do RAS(h,p)-1SF.
+
+        Defines H*v for a RAS(h,p)-1SF calculation. Blocks are defined as::
 
             block1 = v(ia:ab)
             block2 = v(Ia:ab)
@@ -626,13 +744,28 @@ class LinOpH (LinearOperator):
             block4 = v(Iiab:babb)
             block5 = v(ijAb:abaa)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) + H(1,4) * v(4) + H(1,5) * v(5) = sig(1)
-            H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) + H(2,4) * v(4) + H(2,5) * v(5) = sig(2)
-            H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) + H(3,4) * v(4) + H(3,5) * v(5) = sig(3)
-            H(4,1) * v(1) + H(4,2) * v(2) + H(4,3) * v(3) + H(4,4) * v(4) + H(4,5) * v(5) = sig(4)
-            H(5,1) * v(1) + H(5,2) * v(2) + H(5,3) * v(3) + H(5,4) * v(4) + H(5,5) * v(5) = sig(5)
+        Returns
+        -------
+        The result of H*v.
         """
         nbf = ras1 + ras2 + ras3
         ################################################ 
@@ -644,8 +777,8 @@ class LinOpH (LinearOperator):
         n_b4_dets = int(ras1*ras2*(ras2*(ras2-1)/2))
         n_b5_dets = int(ras3*ras2*(ras2*(ras2-1)/2))
         v_b1 = v[0:n_b1_dets, :] # v for block 1
-        v_b2 = v[n_b1_dets:n_b1_dets+n_b2_dets, :] # v for block 2
-        v_b3 = v[n_b1_dets+n_b2_dets:n_b1_dets+n_b2_dets+n_b3_dets, :] # v for block 3
+        v_b2 = v[n_b1_dets:n_b1_dets+n_b2_dets, :] # block 2
+        v_b3 = v[n_b1_dets+n_b2_dets:n_b1_dets+n_b2_dets+n_b3_dets, :] # block 3
         v_b4 = v[n_b1_dets+n_b2_dets+n_b3_dets:n_b1_dets+n_b2_dets+n_b3_dets+n_b4_dets, :] # v for block 4
         v_b5 = v[n_b1_dets+n_b2_dets+n_b3_dets+n_b4_dets:n_b1_dets+n_b2_dets+n_b3_dets+n_b4_dets+n_b5_dets, :] # v for block 5
         # v(1) indexing: (ia:ab)
@@ -685,7 +818,8 @@ class LinOpH (LinearOperator):
         #   sig(ia:ab) += v(ib:ab)*F(ab:bb) - v(ja:ab)*F(ij:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_1 = np.einsum("ibn,ab->ian", v_ref1, Fb_tmp) - np.einsum("jan,ji->ian", v_ref1, Fa_tmp)
+        sig_1 = (np.einsum("ibn,ab->ian", v_ref1, Fb_tmp) 
+                 - np.einsum("jan,ji->ian", v_ref1, Fa_tmp))
         #   sig(ia:ab) += v(jb:ab)*I(ajbi:baba)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
         sig_1 = sig_1 - np.einsum("jbn,ajbi->ian", v_ref1, tei_tmp)
@@ -767,7 +901,8 @@ class LinOpH (LinearOperator):
         #   sig(Ia:ab) += sig(Ia:ab)*F(ab:bb) - sig(Ja:ab)*F(IJ:aa)
         Fa_tmp = Fa[0:ras1, 0:ras1]
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_2 = sig_2 + np.einsum("Ibn,ab->Ian", v_ref2, Fb_tmp) - np.einsum("Jan,IJ->Ian", v_ref2, Fa_tmp)
+        sig_2 = sig_2 + (np.einsum("Ibn,ab->Ian", v_ref2, Fb_tmp) 
+                         - np.einsum("Jan,IJ->Ian", v_ref2, Fa_tmp))
         #   sig(Ia:ab) += v(Jb:ab)*I(JaIb:abab)
         tei_tmp = self.tei.get_subblock(1, 2, 1, 2)
         sig_2 = sig_2 - np.einsum("Jbn,JaIb->Ian", v_ref2, tei_tmp)
@@ -798,7 +933,8 @@ class LinOpH (LinearOperator):
         #   sig(Ia:ab) += - v(ijAa:aaab)*I(ijAI:aaaa)
         tei_tmp_J = self.tei.get_subblock(2, 2, 3, 1)
         tei_tmp_K = self.tei.get_subblock(2, 2, 1, 3)
-        sig_2 = sig_2 - 0.5*(np.einsum("Aijan,ijAI->Ian", v_ref5, tei_tmp_J) - np.einsum("Aijan,ijIA->Ian", v_ref5, tei_tmp_K))
+        sig_2 = sig_2 - 0.5*(np.einsum("Aijan,ijAI->Ian", v_ref5, tei_tmp_J) 
+                             - np.einsum("Aijan,ijIA->Ian", v_ref5, tei_tmp_K))
 
         ################################################ 
         # Do the following term:
@@ -829,7 +965,8 @@ class LinOpH (LinearOperator):
         #   sig(iA:ab) += sig(iB:ab)*F(BA:bb) - sig(jA:ab)*F(ji:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         Fb_tmp = Fb[ras1+ras2:nbf, ras1+ras2:nbf]
-        sig_3 = sig_3 + np.einsum("Bin,AB->Ain", v_ref3, Fb_tmp) - np.einsum("Ajn,ji->Ain", v_ref3, Fa_tmp)
+        sig_3 = sig_3 + (np.einsum("Bin,AB->Ain", v_ref3, Fb_tmp) 
+                         - np.einsum("Ajn,ji->Ain", v_ref3, Fa_tmp))
         #   sig(iA:ab) += v(jB:ab)*I(AjBi:baba)
         tei_tmp = self.tei.get_subblock(3, 2, 3, 2)
         sig_3 = sig_3 - np.einsum("Bjn,AjBi->Ain", v_ref3, tei_tmp)
@@ -841,7 +978,8 @@ class LinOpH (LinearOperator):
 
         #   sig(iA:ab) += v(Iibc:babb)*I(IAbc:bbbb)
         tei_tmp = self.tei.get_subblock(1, 3, 2, 2)
-        sig_3 = sig_3 + 0.5*(np.einsum("Iibcn,IAbc->Ain", v_ref4, tei_tmp) - np.einsum("Iibcn,IAcb->Ain", v_ref4, tei_tmp))
+        sig_3 = sig_3 + 0.5*(np.einsum("Iibcn,IAbc->Ain", v_ref4, tei_tmp) 
+                             - np.einsum("Iibcn,IAcb->Ain", v_ref4, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -859,14 +997,17 @@ class LinOpH (LinearOperator):
 
         #   sig(Iiab:babb) += v(ib:ab)*F(Ia:bb) - v(ia:ab)*F(Ib:bb)
         Fb_tmp = Fb[0:ras1, ras1:ras1+ras2]
-        sig_4 = (np.einsum("ibn,Ia->Iiabn", v_ref1, Fb_tmp) - np.einsum("ian,Ib->Iiabn", v_ref1, Fb_tmp))
+        sig_4 = (np.einsum("ibn,Ia->Iiabn", v_ref1, Fb_tmp) 
+                 - np.einsum("ian,Ib->Iiabn", v_ref1, Fb_tmp))
         #   sig(Iiab:babb) += v(ja:ab)*I(jbiI:abab) - v(jb:ab)*I(jaiI:abab)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 1)
-        sig_4 = sig_4 + np.einsum("jan,jbiI->Iiabn", v_ref1, tei_tmp) - np.einsum("jbn,jaiI->Iiabn", v_ref1, tei_tmp)
+        sig_4 = sig_4 + (np.einsum("jan,jbiI->Iiabn", v_ref1, tei_tmp) 
+                         - np.einsum("jbn,jaiI->Iiabn", v_ref1, tei_tmp))
         #   sig(Iiab:aaab) += v(ic:ab)*I(abIc:bbbb)
         tei_tmp_J = self.tei.get_subblock(2, 2, 1, 2)
         tei_tmp_K = self.tei.get_subblock(2, 2, 2, 1)
-        sig_4 = sig_4 + np.einsum("icn,abIc->Iiabn", v_ref1, tei_tmp_J) - np.einsum("icn,abcI->Iiabn", v_ref1, tei_tmp_K)
+        sig_4 = sig_4 + (np.einsum("icn,abIc->Iiabn", v_ref1, tei_tmp_J) 
+                         - np.einsum("icn,abcI->Iiabn", v_ref1, tei_tmp_K))
 
         ################################################ 
         # Do the following term:
@@ -886,7 +1027,8 @@ class LinOpH (LinearOperator):
         #   sig(Iiab:babb) += v(iA:ab)*I(abIA:bbbb)
         tei_tmp_J = self.tei.get_subblock(2, 2, 1, 3)
         tei_tmp_K = self.tei.get_subblock(2, 2, 3, 1)
-        sig_4 = sig_4 + (np.einsum("Ain,abIA->Iiabn", v_ref3, tei_tmp_J) - np.einsum("Ain,abAI->Iiabn", v_ref3, tei_tmp_K))
+        sig_4 = sig_4 + (np.einsum("Ain,abIA->Iiabn", v_ref3, tei_tmp_J) 
+                         - np.einsum("Ain,abAI->Iiabn", v_ref3, tei_tmp_K))
 
         ################################################ 
         # Do the following term:
@@ -895,7 +1037,8 @@ class LinOpH (LinearOperator):
 
         #   sig(Iiab:babb) += t(Iiac:babb)*F(bc:bb) - t(Iibc:babb)*F(ac:bb)
         F_ac_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_4 = sig_4 + np.einsum("Iiacn,bc->Iiabn", v_ref4, F_ac_tmp) - np.einsum("Iibcn,ac->Iiabn", v_ref4, F_ac_tmp)
+        sig_4 = sig_4 + (np.einsum("Iiacn,bc->Iiabn", v_ref4, F_ac_tmp) 
+                         - np.einsum("Iibcn,ac->Iiabn", v_ref4, F_ac_tmp))
         #   sig(Iiab:babb) += -1.0*t(Ijab:babb)*F(ij:aa)
         F_ij_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_4 = sig_4 - np.einsum("Ijabn,ij->Iiabn", v_ref4, F_ij_tmp)
@@ -908,15 +1051,18 @@ class LinOpH (LinearOperator):
                              - np.einsum("Iicdn,abdc->Iiabn", v_ref4, tei_tmp))
         #   sig(Iiab:babb) += -1.0*v(Ijcb:babb)*I(ajci:baba) + v(Ijca:babb)*I(bjci:baba)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
-        sig_4 = sig_4 - np.einsum("Ijcbn,ajci->Iiabn", v_ref4, tei_tmp) + np.einsum("Ijcan,bjci->Iiabn", v_ref4, tei_tmp)
+        sig_4 = sig_4 - (np.einsum("Ijcbn,ajci->Iiabn", v_ref4, tei_tmp) 
+                         - np.einsum("Ijcan,bjci->Iiabn", v_ref4, tei_tmp))
         #   sig(Iiab:babb) += -1.0*v(Jiac:babb)*I(JbIc:bbbb)
         tei_tmp_J = self.tei.get_subblock(1, 2, 1, 2)
         tei_tmp_K = self.tei.get_subblock(1, 2, 2, 1)
-        sig_4 = sig_4 - (np.einsum("Jiacn,JbIc->Iiabn", v_ref4, tei_tmp_J) - np.einsum("Jiacn,JbcI->Iiabn", v_ref4, tei_tmp_K))
+        sig_4 = sig_4 - (np.einsum("Jiacn,JbIc->Iiabn", v_ref4, tei_tmp_J) 
+                         - np.einsum("Jiacn,JbcI->Iiabn", v_ref4, tei_tmp_K))
         #   sig(Iiab:babb) += v(Jibc:babb)*I(JaIc:bbbb)
         tei_tmp_J = self.tei.get_subblock(1, 2, 1, 2)
         tei_tmp_K = self.tei.get_subblock(1, 2, 2, 1)
-        sig_4 = sig_4 + (np.einsum("Jibcn,JaIc->Iiabn", v_ref4, tei_tmp_J) - np.einsum("Jibcn,JacI->Iiabn", v_ref4, tei_tmp_K))
+        sig_4 = sig_4 + (np.einsum("Jibcn,JaIc->Iiabn", v_ref4, tei_tmp_J) 
+                         - np.einsum("Jibcn,JacI->Iiabn", v_ref4, tei_tmp_K))
         #   sig(Iiab:babb) += v(Jjab:babb)*I(JjIi:baba)
         tei_tmp = self.tei.get_subblock(1, 2, 1, 2)
         sig_4 = sig_4 + np.einsum("Jjabn,JjIi->Iiabn", v_ref4, tei_tmp)
@@ -928,7 +1074,8 @@ class LinOpH (LinearOperator):
 
         #   sig(Iiab:babb) += v(jiAa:aaab)*I(jbAI:abab)
         tei_tmp = self.tei.get_subblock(2, 2, 3, 1)
-        sig_4 = sig_4 - (np.einsum("Ajian,jbAI->Iiabn", v_ref5, tei_tmp) - np.einsum("Ajibn,jaAI->Iiabn", v_ref5, tei_tmp))
+        sig_4 = sig_4 - (np.einsum("Ajian,jbAI->Iiabn", v_ref5, tei_tmp) 
+                         - np.einsum("Ajibn,jaAI->Iiabn", v_ref5, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -937,13 +1084,16 @@ class LinOpH (LinearOperator):
 
         #   sig(ijAb:aaab) += v(jb:ab)*F(iA:aa) - v(ib:ab)*F(jA:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1+ras2:nbf]
-        sig_5 = (np.einsum("jbn,iA->Aijbn", v_ref1, Fa_tmp) - np.einsum("ibn,jA->Aijbn", v_ref1, Fa_tmp))
+        sig_5 = (np.einsum("jbn,iA->Aijbn", v_ref1, Fa_tmp) 
+                 - np.einsum("ibn,jA->Aijbn", v_ref1, Fa_tmp))
         #   sig(ijAb:aaab) += - v(ic:ab)*I(Abjc:abab) + v(jc:ab)*I(Abic:abab)
         tei_tmp = self.tei.get_subblock(3, 2, 2, 2)
-        sig_5 = sig_5 - np.einsum("icn,Abjc->Aijbn", v_ref1, tei_tmp) + np.einsum("jcn,Abic->Aijbn", v_ref1, tei_tmp)
+        sig_5 = sig_5 - (np.einsum("icn,Abjc->Aijbn", v_ref1, tei_tmp) 
+                         - np.einsum("jcn,Abic->Aijbn", v_ref1, tei_tmp))
         #   sig(ijAb:aaab) += - v(kb:ab)*I(Akij:aaaa)
         tei_tmp = self.tei.get_subblock(3, 2, 2, 2)
-        sig_5 = sig_5 - (np.einsum("kbn,Akij->Aijbn", v_ref1, tei_tmp) - np.einsum("kbn,Akji->Aijbn", v_ref1, tei_tmp))
+        sig_5 = sig_5 - (np.einsum("kbn,Akij->Aijbn", v_ref1, tei_tmp) 
+                         - np.einsum("kbn,Akji->Aijbn", v_ref1, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -952,7 +1102,8 @@ class LinOpH (LinearOperator):
 
         #   sig(ijAb:aaab) += -v(Ib:ab)*I(AIij:aaaa)
         tei_tmp = self.tei.get_subblock(3, 1, 2, 2)
-        sig_5 = sig_5 - (np.einsum("Ibn,AIij->Aijbn", v_ref2, tei_tmp) - np.einsum("Ibn,AIji->Aijbn", v_ref2, tei_tmp))
+        sig_5 = sig_5 - (np.einsum("Ibn,AIij->Aijbn", v_ref2, tei_tmp) 
+                         - np.einsum("Ibn,AIji->Aijbn", v_ref2, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -982,10 +1133,11 @@ class LinOpH (LinearOperator):
         #   sig(ijAb:aaab) += t(ijAc:aaab)*F(bc:bb) + t(ijAb:aaab)*F(AB:bb) - t(ikAb:aaab)*F(jk:aa) + t(jkAb:aaab)*F(ik:aa)
         F_bc_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
         F_AB_tmp = Fa[ras1+ras2:nbf, ras1+ras2:nbf]
-        sig_5 = sig_5 + np.einsum("Aijcn,bc->Aijbn", v_ref5, F_bc_tmp) # no contribution
-        sig_5 = sig_5 + np.einsum("Bijbn,AB->Aijbn", v_ref5, F_AB_tmp) # no contribution
+        sig_5 = sig_5 + np.einsum("Aijcn,bc->Aijbn", v_ref5, F_bc_tmp)
+        sig_5 = sig_5 + np.einsum("Bijbn,AB->Aijbn", v_ref5, F_AB_tmp)
         Fi_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_5 = sig_5 - np.einsum("Aikbn,kj->Aijbn", v_ref5, Fi_tmp) + np.einsum("Ajkbn,ki->Aijbn", v_ref5, Fi_tmp)
+        sig_5 = sig_5 - (np.einsum("Aikbn,kj->Aijbn", v_ref5, Fi_tmp) 
+                         - np.einsum("Ajkbn,ki->Aijbn", v_ref5, Fi_tmp))
         #   sig(ijAb:aaab) += v(ijBc:aaab)*I(abBc:abab)
         tei_tmp = self.tei.get_subblock(3, 2, 3, 2)
         sig_5 = sig_5 + np.einsum("Bijcn,AbBc->Aijbn", v_ref5, tei_tmp)
@@ -1000,9 +1152,11 @@ class LinOpH (LinearOperator):
         #   sig(ijAb:aaab) += - v(ijCb:aaab)*I(AkCj:aaaa)
         tei_tmp_J = self.tei.get_subblock(3, 2, 3, 2)
         tei_tmp_K = self.tei.get_subblock(3, 2, 2, 3)
-        sig_5 = sig_5 - (np.einsum("Cikbn,AkCj->Aijbn", v_ref5, tei_tmp_J) - np.einsum("Cikbn,AkjC->Aijbn", v_ref5, tei_tmp_K))
+        sig_5 = sig_5 - (np.einsum("Cikbn,AkCj->Aijbn", v_ref5, tei_tmp_J) 
+                         - np.einsum("Cikbn,AkjC->Aijbn", v_ref5, tei_tmp_K))
         #   sig(ijAb:aaab) += v(jkCb:aaab)*I(AkCi:aaaa)
-        sig_5 = sig_5 + (np.einsum("Cjkbn,AkCi->Aijbn", v_ref5, tei_tmp_J) - np.einsum("Cjkbn,AkiC->Aijbn", v_ref5, tei_tmp_K))
+        sig_5 = sig_5 + (np.einsum("Cjkbn,AkCi->Aijbn", v_ref5, tei_tmp_J) 
+                         - np.einsum("Cjkbn,AkiC->Aijbn", v_ref5, tei_tmp_K))
 
         ################################################ 
         # sigs complete-- free to reshape!
@@ -1037,28 +1191,68 @@ class LinOpH (LinearOperator):
     def do_cas_ea(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
         """Do CAS-EA.
 
+        Defines H*v for a CAS-EA calculation. Blocks are defined as::
+
             block1 = v(a:b)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) = sig(1)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         F_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = np.einsum("bn,ab->an", v, F_tmp).reshape((v.shape[0], v.shape[1]))
         return sig_1 + offset_v
 
     def do_h_ea(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """Do RAS(h)-EA.
+        """
+        Do RAS(h)-EA.
+
+        Defines H*v for a RAS(h)-EA calculation. Blocks are defined as::
 
             block1 = v(a:b)
             block2 = v(Iab:bbb)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) + | H(1,2) | * v(2) = sig(1)
-            | H(2,1) | * v(1) + | H(2,2) | * v(2) = sig(2)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         v_b1 = v[0:ras2, :] # v for block 1
         v_b2 = v[ras2:, :] # v for block 2
@@ -1092,7 +1286,8 @@ class LinOpH (LinearOperator):
         sig_1 = sig_1 + np.einsum("Iban,Ib->an", v_ref2, F_tmp)
         #   sig(a:b) += 0.5*v(Ibc:bbb)*I(Iabc:bbbb)
         tei_tmp = self.tei.get_subblock(1, 2, 2, 2)
-        sig_1 = sig_1 + 0.5*(np.einsum("Ibcn,Iabc->an", v_ref2, tei_tmp) - np.einsum("Ibcn,Iacb->an", v_ref2, tei_tmp))
+        sig_1 = sig_1 + 0.5*(np.einsum("Ibcn,Iabc->an", v_ref2, tei_tmp) 
+                             - np.einsum("Ibcn,Iacb->an", v_ref2, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -1105,7 +1300,8 @@ class LinOpH (LinearOperator):
         #   sig(Iab:bbb) += v(c:b)*I(abIc:bbbb)
         tei_tmp_J = self.tei.get_subblock(2, 2, 1, 2)
         tei_tmp_K = self.tei.get_subblock(2, 2, 2, 1)
-        sig_2 = sig_2 + (np.einsum("cn,abIc->Iabn", v_ref1, tei_tmp_J) - np.einsum("cn,abcI->Iabn", v_ref1, tei_tmp_K))
+        sig_2 = sig_2 + (np.einsum("cn,abIc->Iabn", v_ref1, tei_tmp_J) 
+                         - np.einsum("cn,abcI->Iabn", v_ref1, tei_tmp_K))
 
         ################################################ 
         # Do the following term:
@@ -1121,11 +1317,14 @@ class LinOpH (LinearOperator):
         #   sig(Iab:bbb) += -P(ab)*v(Jac:bbb)*I(JbIc:bbbb)
         tei_tmp_J = self.tei.get_subblock(1, 2, 1, 2)
         tei_tmp_K = self.tei.get_subblock(1, 2, 2, 1)
-        sig_2 = sig_2 - (np.einsum("Jacn,JbIc->Iabn", v_ref2, tei_tmp_J) - np.einsum("Jacn,JbcI->Iabn", v_ref2, tei_tmp_K))
-        sig_2 = sig_2 + (np.einsum("Jbcn,JaIc->Iabn", v_ref2, tei_tmp_J) - np.einsum("Jbcn,JacI->Iabn", v_ref2, tei_tmp_K)) #P(ab)
+        sig_2 = sig_2 - (np.einsum("Jacn,JbIc->Iabn", v_ref2, tei_tmp_J) 
+                         - np.einsum("Jacn,JbcI->Iabn", v_ref2, tei_tmp_K))
+        sig_2 = sig_2 + (np.einsum("Jbcn,JaIc->Iabn", v_ref2, tei_tmp_J) 
+                      - np.einsum("Jbcn,JacI->Iabn", v_ref2, tei_tmp_K)) #P(ab)
         #   sig(Iab:bbb) += 0.5*v(Icd:bbb)*I(abcd:bbbb)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
-        sig_2 = sig_2 + 0.5*(np.einsum("Icdn,abcd->Iabn", v_ref2, tei_tmp) - np.einsum("Icdn,abdc->Iabn", v_ref2, tei_tmp))
+        sig_2 = sig_2 + 0.5*(np.einsum("Icdn,abcd->Iabn", v_ref2, tei_tmp) 
+                             - np.einsum("Icdn,abdc->Iabn", v_ref2, tei_tmp))
 
         # Sigma evaluations done! Pack back up for returning
         sig_1 = np.reshape(sig_1, (v_b1.shape[0], v.shape[1]))
@@ -1141,23 +1340,37 @@ class LinOpH (LinearOperator):
         return np.vstack((sig_1, sig_2_out)) + offset_v
 
     def do_p_ea(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """Do RAS(p)-EA.
+        """
+        Do RAS(p)-EA.
 
-            definitions:
-            I      doubly occupied
-            i,a    singly occupied
-            A      doubly unoccupied
+        Defines H*v for a RAS(p)-EA calculation. Blocks are defined as::
 
             block1 = v(a:b)
             block2 = v(A:b)
             block3 = v(iAa:aab)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)
-            | H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)
-            | H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(2)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         nbf = ras1 + ras2 + ras3
         v_b1 = v[0:ras2, :] # v for block 1
@@ -1246,7 +1459,8 @@ class LinOpH (LinearOperator):
         sig_3 = sig_3 + np.einsum("Bibn,AaBb->Aian", v_ref3, tei_tmp)
         tei_tmp_J = self.tei.get_subblock(3, 2, 2, 3)
         tei_tmp_K = self.tei.get_subblock(3, 2, 3, 2)
-        sig_3 = sig_3 + (np.einsum("Bjan,AjiB->Aian", v_ref3, tei_tmp_J) - np.einsum("Bjan,AjBi->Aian", v_ref3, tei_tmp_K))
+        sig_3 = sig_3 + (np.einsum("Bjan,AjiB->Aian", v_ref3, tei_tmp_J) 
+                         - np.einsum("Bjan,AjBi->Aian", v_ref3, tei_tmp_K))
 
         sig_1 = np.reshape(sig_1, (v_b1.shape[0], v.shape[1]))
         sig_2 = np.reshape(sig_2, (v_b2.shape[0], v.shape[1]))
@@ -1255,32 +1469,72 @@ class LinOpH (LinearOperator):
         return np.vstack((sig_1, sig_2, sig_3)) + offset_v
 
     def do_cas_ip(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """ Do CAS-IP.
+        """ 
+        Do CAS-IP.
+
+        Defines H*v for a CAS-IP calculation. Blocks are defined as::
 
             block1 = v(i:a)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) = sig(1)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         F_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = -1.0*np.einsum("jn,ji->in", v, F_tmp).reshape((v.shape[0], v.shape[1]))
         return sig_1 + offset_v
 
     def do_h_ip(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """ Do RAS(h)-IP.
+        """ 
+        Do RAS(h)-IP.
+
+        Defines H*v for a RAS(h)-IP calculation. Blocks are defined as::
 
             block1 = v(i:a)
             block2 = v(I:a)
             block3 = v(Iia:bab)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)
-            | H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)
-            | H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(3)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         v_b1 = v[0:ras2, :] # v for block 1
         v_b2 = v[ras2:ras1+ras2, :] # v for block 2
@@ -1379,16 +1633,36 @@ class LinOpH (LinearOperator):
         return np.vstack((sig_1, sig_2, sig_3)) + offset_v
 
     def do_p_ip(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """ Do RAS(p)-IP.
+        """ 
+        Do RAS(p)-IP.
+
+        Defines H*v for a RAS(p)-IP calculation. Blocks are defined as::
 
             block1 = v(i:a)
             block2 = v(ijA:aaa)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) + | H(1,2) | * v(2) = sig(1)
-            | H(2,1) | * v(1) + | H(2,2) | * v(2) = sig(2)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         v_b1 = v[0:ras2, :] # v for block 1
         v_b2 = v[ras2:, :] # v for block 2
@@ -1436,7 +1710,8 @@ class LinOpH (LinearOperator):
         sig_2 = sig_2 - np.einsum("in,Aj->Aijn", v_ref1, F_tmp) #P(ij)
         #   sig(ijA:aaa) += -v(k:a)*I(Akij:aaaa)
         tei_tmp = self.tei.get_subblock(3, 2, 2, 2)
-        sig_2 = sig_2 - (np.einsum("kn,Akij->Aijn", v_ref1, tei_tmp) - np.einsum("kn,Akji->Aijn", v_ref1, tei_tmp))
+        sig_2 = sig_2 - (np.einsum("kn,Akij->Aijn", v_ref1, tei_tmp) 
+                         - np.einsum("kn,Akji->Aijn", v_ref1, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -1451,12 +1726,15 @@ class LinOpH (LinearOperator):
         sig_2 = sig_2 + np.einsum("Akin,kj->Aijn", v_ref2, F_tmp) #P(ij)
         #   sig(ijA:aaa) += 0.5*v(klA:aaa)*I(klij:aaaa)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
-        sig_2 = sig_2 + 0.5*(np.einsum("Akln,klij->Aijn", v_ref2, tei_tmp) - np.einsum("Akln,klji->Aijn", v_ref2, tei_tmp))
+        sig_2 = sig_2 + 0.5*(np.einsum("Akln,klij->Aijn", v_ref2, tei_tmp) 
+                             - np.einsum("Akln,klji->Aijn", v_ref2, tei_tmp))
         #   sig(ijA:aaa) += -P(ij)*v(ikB:aaa)*I(AkBj:aaaa)
         tei_tmp_J = self.tei.get_subblock(3, 2, 3, 2)
         tei_tmp_K = self.tei.get_subblock(3, 2, 2, 3)
-        sig_2 = sig_2 - (np.einsum("Bikn,AkBj->Aijn", v_ref2, tei_tmp_J) - np.einsum("Bikn,AkjB->Aijn", v_ref2, tei_tmp_K))
-        sig_2 = sig_2 + (np.einsum("Bjkn,AkBi->Aijn", v_ref2, tei_tmp_J) - np.einsum("Bjkn,AkiB->Aijn", v_ref2, tei_tmp_K)) #P(ij)
+        sig_2 = sig_2 - (np.einsum("Bikn,AkBj->Aijn", v_ref2, tei_tmp_J) 
+                         - np.einsum("Bikn,AkjB->Aijn", v_ref2, tei_tmp_K))
+        sig_2 = sig_2 + (np.einsum("Bjkn,AkBi->Aijn", v_ref2, tei_tmp_J) 
+                      - np.einsum("Bjkn,AkiB->Aijn", v_ref2, tei_tmp_K)) #P(ij)
 
         # Sigma evaluations done! Pack back up for returning
         sig_1 = np.reshape(sig_1, (v_b1.shape[0], v.shape[1]))
@@ -1474,12 +1752,32 @@ class LinOpH (LinearOperator):
     def do_cas_1sf_ea(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
         """ Do CAS-1SF-EA.
 
+        Defines H*v for a CAS-1SF-EA calculation. Blocks are defined as::
+
             block1 = v(ija:aab)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) = sig(1)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         # v(1) unpack to indexing: (ija:aab)
         v_ref1 = np.zeros((ras2,ras2,ras2, v.shape[1]))
@@ -1497,15 +1795,18 @@ class LinOpH (LinearOperator):
         ################################################ 
         #   sig(ija:aab) += -P(ab)*t(iab:abb)*F(ac:bb)
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_1 = (np.einsum("icbn,ac->iabn", v_ref1, Fb_tmp) - np.einsum("ican,bc->iabn", v_ref1, Fb_tmp))
+        sig_1 = (np.einsum("icbn,ac->iabn", v_ref1, Fb_tmp) 
+                 - np.einsum("ican,bc->iabn", v_ref1, Fb_tmp))
         #   sig(ija:aab) += t(jab:abb)*F(ji:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = sig_1 - np.einsum("jabn,ji->iabn", v_ref1, Fa_tmp)
         #   sig(ija:aab) += P(ab)*t(jac:abb)*I(jbic:abab)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
-        sig_1 = sig_1 - (np.einsum("jacn,jbic->iabn", v_ref1, tei_tmp) - np.einsum("jbcn,jaic->iabn", v_ref1, tei_tmp))
+        sig_1 = sig_1 - (np.einsum("jacn,jbic->iabn", v_ref1, tei_tmp) 
+                         - np.einsum("jbcn,jaic->iabn", v_ref1, tei_tmp))
         #   sig(ija:aab) += -0.5*t(icd:abb)*I(abcd:abab)
-        sig_1 = sig_1 + 0.5*(np.einsum("icdn,abcd->iabn", v_ref1, tei_tmp) - np.einsum("icdn,abdc->iabn", v_ref1, tei_tmp))
+        sig_1 = sig_1 + 0.5*(np.einsum("icdn,abcd->iabn", v_ref1, tei_tmp) 
+                             - np.einsum("icdn,abdc->iabn", v_ref1, tei_tmp))
 
         sig_1_out = np.zeros((v.shape[0], v.shape[1]))
         for n in range(v.shape[1]):
@@ -1519,14 +1820,35 @@ class LinOpH (LinearOperator):
         return sig_1_out + offset_v
 
     def do_cas_1sf_ip(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """ Do CAS-1SF-IP.
+        """ 
+        Do CAS-1SF-IP.
+
+        Defines H*v for a CAS-1SF-IP calculation. Blocks are defined as::
 
             block1 = v(ija:aab)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) = sig(1)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         # v(1) unpack to indexing: (ija:aab)
         v_ref1 = np.zeros((ras2,ras2,ras2, v.shape[1]))
@@ -1545,15 +1867,18 @@ class LinOpH (LinearOperator):
         ################################################ 
         #   sig(ija:aab) += -P(ij)*v(kja:aab)*F(ki:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_1 = -1.0*(np.einsum("kjan,ki->ijan", v_ref1, Fa_tmp) - np.einsum("kian,kj->ijan", v_ref1, Fa_tmp))
+        sig_1 = -1.0*(np.einsum("kjan,ki->ijan", v_ref1, Fa_tmp) 
+                      - np.einsum("kian,kj->ijan", v_ref1, Fa_tmp))
         #   sig(ija:aab) += v(ijb:aab)*F(ab:bb)
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = sig_1 + np.einsum("ijbn,ab->ijan", v_ref1, Fb_tmp)
         #   sig(ija:aab) += -P(ij)*v(ikb:aab)*I(akbj:baba)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
-        sig_1 = sig_1 - (np.einsum("ikbn,akbj->ijan", v_ref1, tei_tmp) - np.einsum("jkbn,akbi->ijan", v_ref1, tei_tmp))
+        sig_1 = sig_1 - (np.einsum("ikbn,akbj->ijan", v_ref1, tei_tmp) 
+                         - np.einsum("jkbn,akbi->ijan", v_ref1, tei_tmp))
         #   sig(ija:aab) += 0.5*v(kla:aab)*I(klij:aaaa)
-        sig_1 = sig_1 + 0.5*(np.einsum("lkan,lkij->ijan", v_ref1, tei_tmp) - np.einsum("lkan,lkji->ijan", v_ref1, tei_tmp))
+        sig_1 = sig_1 + 0.5*(np.einsum("lkan,lkij->ijan", v_ref1, tei_tmp) 
+                             - np.einsum("lkan,lkji->ijan", v_ref1, tei_tmp))
 
         sig_1_out = np.zeros((v.shape[0], v.shape[1]))
         for n in range(v.shape[1]):
@@ -1567,18 +1892,37 @@ class LinOpH (LinearOperator):
         return sig_1_out + offset_v
 
     def do_h_1sf_ip(self, v, Fa, Fb, tei, offset_v, ras1, ras2, ras3):
-        """ Do RAS(h)-1SF-IP.
+        """ 
+        Do RAS(h)-1SF-IP.
+
+        Defines H*v for a RAS(h)-1SF-IP calculation. Blocks are defined as::
 
             block1 = v(ija:aab)
             block2 = v(Iia:aab)
-            block2 = v(Iijab:baabb)
+            block3 = v(Iijab:baabb)
 
-            Evaluate the following matrix vector multiply:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            | H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)
-            | H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)
-            | H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(3)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         nbf = ras1 + ras2 + ras3
 
@@ -1631,7 +1975,8 @@ class LinOpH (LinearOperator):
         sig_1 = sig_1 - np.einsum("ikbn,akbj->ijan", v_ref1, tei_tmp)
         sig_1 = sig_1 + np.einsum("jkbn,akbi->ijan", v_ref1, tei_tmp) #P(ij)
         #   sig(ija:aab) += 0.5*v(kla:aab)*I(klij:aaaa)
-        sig_1 = sig_1 + 0.5*(np.einsum("lkan,lkij->ijan", v_ref1, tei_tmp) - np.einsum("lkan,lkji->ijan", v_ref1, tei_tmp))
+        sig_1 = sig_1 + 0.5*(np.einsum("lkan,lkij->ijan", v_ref1, tei_tmp) 
+                             - np.einsum("lkan,lkji->ijan", v_ref1, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -1643,7 +1988,8 @@ class LinOpH (LinearOperator):
         sig_1 = sig_1 + np.einsum("Iian,Ij->ijan", v_ref2, Fa_tmp) #P(ij)
         #   sig(ija:aab) += v(Ika:aab)*F(Ikij:aaaa)
         tei_tmp = self.tei.get_subblock(1, 2, 2, 2)
-        sig_1 = sig_1 + (np.einsum("Ikan,Ikij->ijan", v_ref2, tei_tmp) - np.einsum("Ikan,Ikji->ijan", v_ref2, tei_tmp))
+        sig_1 = sig_1 + (np.einsum("Ikan,Ikij->ijan", v_ref2, tei_tmp) 
+                         - np.einsum("Ikan,Ikji->ijan", v_ref2, tei_tmp))
         #   sig(ija:aab) += -P(ij)*v(Ijb:aab)*F(aIbi:baba)
         tei_tmp = self.tei.get_subblock(2, 1, 2, 2)
         sig_1 = sig_1 - np.einsum("Ijbn,aIbi->ijan", v_ref2, tei_tmp)
@@ -1658,7 +2004,8 @@ class LinOpH (LinearOperator):
         sig_1 = sig_1 + np.einsum("Iijban,Ib->ijan", v_ref3, Fb_tmp)
         #   sig(Iia:aab) += v(Iijbc:baabb)*F(Iabc:bbbb)
         tei_tmp = self.tei.get_subblock(1, 2, 2, 2)
-        sig_1 = sig_1 + 0.5*(np.einsum("Iijbcn,Iabc->ijan", v_ref3, tei_tmp) - np.einsum("Iijbcn,Iacb->ijan", v_ref3, tei_tmp))
+        sig_1 = sig_1 + 0.5*(np.einsum("Iijbcn,Iabc->ijan", v_ref3, tei_tmp) 
+                             - np.einsum("Iijbcn,Iacb->ijan", v_ref3, tei_tmp))
         #   sig(Iia:aab) += -P(ij)*v(Ikjba:baabb)*F(Ikbi:baba)
         tei_tmp = self.tei.get_subblock(1, 2, 2, 2)
         sig_1 = sig_1 - np.einsum("Ikjban,Ikbi->ijan", v_ref3, tei_tmp)
@@ -1778,10 +2125,10 @@ class LinOpH (LinearOperator):
         sig_3 = sig_3 - np.einsum("Ikican,cjbk->Iijabn", v_ref3, tei_tmp) #P(ij)P(ab)
         #   sig(Iijab:baabb) += 0.5*v(Iijcd:baabb)*I(abcd:bbbb)
         sig_3 = sig_3 + 0.5*(np.einsum("Iijcdn,abcd->Iijabn", v_ref3, tei_tmp)
-                             - np.einsum("Iijcdn,abdc->Iijabn", v_ref3, tei_tmp))
+                            - np.einsum("Iijcdn,abdc->Iijabn", v_ref3, tei_tmp))
         #   sig(Iijab:baabb) += 0.5*v(Iklab:baabb)*I(klij:bbbb)
         sig_3 = sig_3 + 0.5*(np.einsum("Iklabn,klij->Iijabn", v_ref3, tei_tmp)
-                             - np.einsum("Iklabn,klji->Iijabn", v_ref3, tei_tmp))
+                            - np.einsum("Iklabn,klji->Iijabn", v_ref3, tei_tmp))
 
         sig_1_out = np.zeros((v_b1.shape[0], v.shape[1]))
         for n in range(v.shape[1]):
@@ -2119,18 +2466,34 @@ class LinOpH (LinearOperator):
         """
         Do RAS(p)-1SF-EA.
 
-        Defines the necessary contractions for RAS(p)-1SF-EA.
-
+        Defines H*v for a RAS(p)-1SF-EA calculation. Blocks are defined as::
+   
             block1 = v(iab:abb)
             block2 = v(Aia:bab)
             block3 = v(Aijab:baabb)
 
-            Evaluate the following matrix vector multiplications:
+        Parameters
+        ----------
+        v : numpy.ndarray
+            Guess vector to multiply.
+        Fa : numpy.ndarray
+            Alpha Fock matrix.
+        Fb : numpy.ndarray
+            Beta Fock matrix.
+        tei : TEI
+            Two-electron integral object.
+        offset_v : numpy.ndarray   
+            Vector of offset values for guess vector (usually ROHF energy)
+        ras1 : int
+            Number of RAS1 orbitals.
+        ras2 : int
+            Number of RAS2 orbitals.
+        ras3 : int
+            Number of RAS3 orbitals.
 
-            |H(1,1)| * v(1) + |H(1,2)| * v(2) + |H(1,3)| * v(3) = sig(1)
-            |H(2,1)| * v(1) + |H(2,2)| * v(2) + |H(2,3)| * v(3) = sig(2)
-            |H(3,1)| * v(1) + |H(3,2)| * v(2) + |H(3,3)| * v(3) = sig(3)
-       
+        Returns
+        -------
+        The result of H*v.
         """
         nbf = ras1 + ras2 + ras3
 
@@ -2173,15 +2536,18 @@ class LinOpH (LinearOperator):
         ################################################ 
         #   sig(iab:abb) += P(ab)*t(iab:abb)*F(ac:bb)
         Fb_tmp = Fb[ras1:ras1+ras2, ras1:ras1+ras2]
-        sig_1 = (np.einsum("icbn,ac->iabn", v_ref1, Fb_tmp) - np.einsum("ican,bc->iabn", v_ref1, Fb_tmp))
+        sig_1 = (np.einsum("icbn,ac->iabn", v_ref1, Fb_tmp) 
+                 - np.einsum("ican,bc->iabn", v_ref1, Fb_tmp))
         #   sig(iab:abb) += -t(jab:abb)*F(ji:aa)
         Fa_tmp = Fa[ras1:ras1+ras2, ras1:ras1+ras2]
         sig_1 = sig_1 - np.einsum("jabn,ji->iabn", v_ref1, Fa_tmp)
         #   sig(iab:abb) += -P(ab)*t(jac:abb)*I(jbic:abab)
         tei_tmp = self.tei.get_subblock(2, 2, 2, 2)
-        sig_1 = sig_1 - (np.einsum("jacn,jbic->iabn", v_ref1, tei_tmp) - np.einsum("jbcn,jaic->iabn", v_ref1, tei_tmp))
+        sig_1 = sig_1 - (np.einsum("jacn,jbic->iabn", v_ref1, tei_tmp) 
+                         - np.einsum("jbcn,jaic->iabn", v_ref1, tei_tmp))
         #   sig(iab:abb) += 0.5*t(icd:abb)*I(abcd:abab)
-        sig_1 = sig_1 + 0.5*(np.einsum("icdn,abcd->iabn", v_ref1, tei_tmp) - np.einsum("icdn,abdc->iabn", v_ref1, tei_tmp))
+        sig_1 = sig_1 + 0.5*(np.einsum("icdn,abcd->iabn", v_ref1, tei_tmp) 
+                             - np.einsum("icdn,abdc->iabn", v_ref1, tei_tmp))
 
         ################################################ 
         # Do the following term:
@@ -2194,7 +2560,8 @@ class LinOpH (LinearOperator):
         #   sig(iab:abb) += t(iAd:abb)*I(abAd:bbbb)
         tei_tmp_J = self.tei.get_subblock(2, 2, 3, 2)
         tei_tmp_K = self.tei.get_subblock(2, 2, 2, 3)
-        sig_1 = sig_1 + (np.einsum("Aidn,abAd->iabn", v_ref2, tei_tmp_J) - np.einsum("Aidn,abdA->iabn", v_ref2, tei_tmp_K))
+        sig_1 = sig_1 + (np.einsum("Aidn,abAd->iabn", v_ref2, tei_tmp_J) 
+                         - np.einsum("Aidn,abdA->iabn", v_ref2, tei_tmp_K))
         #   sig(iab:abb) += -t(jAb:abb)*I(ajAi:baba)
         tei_tmp = self.tei.get_subblock(2, 2, 3, 2)
         sig_1 = sig_1 - (np.einsum("Ajbn,ajAi->iabn", v_ref2, tei_tmp))
@@ -2212,7 +2579,7 @@ class LinOpH (LinearOperator):
         tei_tmp_J = self.tei.get_subblock(2, 2, 3, 2)
         tei_tmp_K = self.tei.get_subblock(2, 2, 2, 3)
         sig_1 = sig_1 - 0.5*(np.einsum("Ajkabn,jkAi->iabn", v_ref3, tei_tmp_J)
-                             - np.einsum("Ajkabn,jkiA->iabn", v_ref3, tei_tmp_K))
+                            - np.einsum("Ajkabn,jkiA->iabn", v_ref3, tei_tmp_K))
         #   sig(iab:abb) += t(jiAcb:aabbb)*I(jaAc:aaaa)
         tei_tmp = self.tei.get_subblock(2, 2, 3, 2)
         sig_1 = sig_1 + np.einsum("Ajicbn,jaAc->iabn", v_ref3, tei_tmp)

@@ -293,9 +293,35 @@ for each determinant by summing over the occupied orbital energies.</p>
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf">
 <code class="sig-name descname">do_cas_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-1SF.</p>
-<p>block1 = v(ia:ab)</p>
-<dl class="simple">
-<dt>Evaluate the following matrix vector multiply:</dt><dd><p>H(1,1) * v(1) = sig(1)</p>
+<p>Defines H*v for a CAS-1SF calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ia</span><span class="p">:</span><span class="n">ab</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -304,31 +330,110 @@ for each determinant by summing over the occupied orbital energies.</p>
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf_ea">
 <code class="sig-name descname">do_cas_1sf_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_ea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-1SF-EA.</p>
-<p>block1 = v(ija:aab)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) = sig(1)</div>
+<p>Defines H*v for a CAS-1SF-EA calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ija</span><span class="p">:</span><span class="n">aab</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf_ip">
 <code class="sig-name descname">do_cas_1sf_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_ip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-1SF-IP.</p>
-<p>block1 = v(ija:aab)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) = sig(1)</div>
+<p>Defines H*v for a CAS-1SF-IP calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ija</span><span class="p">:</span><span class="n">aab</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral">
 <code class="sig-name descname">do_cas_1sf_neutral</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_1sf_neutral" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-1SF with neutral determinants only.</p>
-<p>block1 = v(ia:ab) where i==a</p>
-<dl class="simple">
-<dt>Evaluate the following matrix vector multiply:</dt><dd><p>H(1,1) * v(1) = sig(1)</p>
+<p>Defines H*v for a CAS-1SF calculation, including only neutral 
+determinants in the Fock space. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ia</span><span class="p">:</span><span class="n">ab</span><span class="p">)</span> <span class="n">where</span> <span class="n">i</span><span class="o">==</span><span class="n">a</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -337,9 +442,35 @@ for each determinant by summing over the occupied orbital energies.</p>
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_2sf">
 <code class="sig-name descname">do_cas_2sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_2sf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-2SF.</p>
-<p>block1 = v(ijab:aabb)</p>
-<dl class="simple">
-<dt>Evaluate the following matrix vector multiply:</dt><dd><p>H(1,1) * v(1) = sig(1)</p>
+<p>Defines H*v for a CAS-2SF calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ijab</span><span class="p">:</span><span class="n">aabb</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -348,156 +479,425 @@ for each determinant by summing over the occupied orbital energies.</p>
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_ea">
 <code class="sig-name descname">do_cas_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_ea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-EA.</p>
-<p>block1 = v(a:b)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) = sig(1)</div>
+<p>Defines H*v for a CAS-EA calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_cas_ip">
 <code class="sig-name descname">do_cas_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_cas_ip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do CAS-IP.</p>
-<p>block1 = v(i:a)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) = sig(1)</div>
+<p>Defines H*v for a CAS-IP calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">i</span><span class="p">:</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_h_1sf">
 <code class="sig-name descname">do_h_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_h_1sf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(h)-1SF.</p>
-<p>block1 = v(ai:ba)
-block2 = v(Ia:ab)
-block3 = v(Iiab:babb)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<p>H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
-H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
-H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)</p>
+<p>Defines H*v for a RAS(h)-1SF calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ai</span><span class="p">:</span><span class="n">ba</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Ia</span><span class="p">:</span><span class="n">ab</span><span class="p">)</span>
+<span class="n">block3</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Iiab</span><span class="p">:</span><span class="n">babb</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_h_1sf_ip">
 <code class="sig-name descname">do_h_1sf_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_h_1sf_ip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(h)-1SF-IP.</p>
-<p>block1 = v(ija:aab)
-block2 = v(Iia:aab)
-block2 = v(Iijab:baabb)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)</div>
-<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)</div>
-<div class="line">H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(3)</div>
+<p>Defines H*v for a RAS(h)-1SF-IP calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ija</span><span class="p">:</span><span class="n">aab</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Iia</span><span class="p">:</span><span class="n">aab</span><span class="p">)</span>
+<span class="n">block3</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Iijab</span><span class="p">:</span><span class="n">baabb</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_h_ea">
 <code class="sig-name descname">do_h_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_h_ea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(h)-EA.</p>
-<p>block1 = v(a:b)
-block2 = v(Iab:bbb)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) = sig(1)</div>
-<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) = sig(2)</div>
+<p>Defines H*v for a RAS(h)-EA calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Iab</span><span class="p">:</span><span class="n">bbb</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_h_ip">
 <code class="sig-name descname">do_h_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_h_ip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(h)-IP.</p>
-<p>block1 = v(i:a)
-block2 = v(I:a)
-block3 = v(Iia:bab)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)</div>
-<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)</div>
-<div class="line">H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(3)</div>
+<p>Defines H*v for a RAS(h)-IP calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">i</span><span class="p">:</span><span class="n">a</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">I</span><span class="p">:</span><span class="n">a</span><span class="p">)</span>
+<span class="n">block3</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Iia</span><span class="p">:</span><span class="n">bab</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_hp_1sf">
 <code class="sig-name descname">do_hp_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_hp_1sf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(h,p)-1SF.</p>
-<p>block1 = v(ia:ab)
-block2 = v(Ia:ab)
-block3 = v(iA:ab)
-block4 = v(Iiab:babb)
-block5 = v(ijAb:abaa)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<p>H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) + H(1,4) * v(4) + H(1,5) * v(5) = sig(1)
-H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) + H(2,4) * v(4) + H(2,5) * v(5) = sig(2)
-H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) + H(3,4) * v(4) + H(3,5) * v(5) = sig(3)
-H(4,1) * v(1) + H(4,2) * v(2) + H(4,3) * v(3) + H(4,4) * v(4) + H(4,5) * v(5) = sig(4)
-H(5,1) * v(1) + H(5,2) * v(2) + H(5,3) * v(3) + H(5,4) * v(4) + H(5,5) * v(5) = sig(5)</p>
+<p>Defines H*v for a RAS(h,p)-1SF calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ia</span><span class="p">:</span><span class="n">ab</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Ia</span><span class="p">:</span><span class="n">ab</span><span class="p">)</span>
+<span class="n">block3</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">iA</span><span class="p">:</span><span class="n">ab</span><span class="p">)</span>
+<span class="n">block4</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Iiab</span><span class="p">:</span><span class="n">babb</span><span class="p">)</span>
+<span class="n">block5</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ijAb</span><span class="p">:</span><span class="n">abaa</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_p_1sf">
 <code class="sig-name descname">do_p_1sf</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_1sf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(p)-1SF.</p>
-<p>block1 = v(ai:ba)
-block2 = v(Ai:ba)
-block3 = v(Aaij:abaa)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<p>H(1,1) * v(1) + H(1,2) * v(2) + H(1,3) * v(3) = sig(1)
-H(2,1) * v(1) + H(2,2) * v(2) + H(2,3) * v(3) = sig(2)
-H(3,1) * v(1) + H(3,2) * v(2) + H(3,3) * v(3) = sig(3)</p>
+<p>Defines H*v for a RAS(p)-1SF calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ai</span><span class="p">:</span><span class="n">ba</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Ai</span><span class="p">:</span><span class="n">ba</span><span class="p">)</span>
+<span class="n">block3</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Aaij</span><span class="p">:</span><span class="n">abaa</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_p_1sf_ea">
 <code class="sig-name descname">do_p_1sf_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_1sf_ea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(p)-1SF-EA.</p>
-<p>Defines the necessary contractions for RAS(p)-1SF-EA.</p>
-<blockquote>
-<div><p>block1 = v(iab:abb)
-block2 = v(Aia:bab)
-block3 = v(Aijab:baabb)</p>
-<p>Evaluate the following matrix vector multiplications:</p>
-<p><a href="#id1"><span class="problematic" id="id2">|H(1,1)|</span></a> * v(1) + <a href="#id3"><span class="problematic" id="id4">|H(1,2)|</span></a> * v(2) + <a href="#id5"><span class="problematic" id="id6">|H(1,3)|</span></a> * v(3) = sig(1)
-<a href="#id7"><span class="problematic" id="id8">|H(2,1)|</span></a> * v(1) + <a href="#id9"><span class="problematic" id="id10">|H(2,2)|</span></a> * v(2) + <a href="#id11"><span class="problematic" id="id12">|H(2,3)|</span></a> * v(3) = sig(2)
-<a href="#id13"><span class="problematic" id="id14">|H(3,1)|</span></a> * v(1) + <a href="#id15"><span class="problematic" id="id16">|H(3,2)|</span></a> * v(2) + <a href="#id17"><span class="problematic" id="id18">|H(3,3)|</span></a> * v(3) = sig(3)</p>
-</div></blockquote>
+<p>Defines H*v for a RAS(p)-1SF-EA calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">iab</span><span class="p">:</span><span class="n">abb</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Aia</span><span class="p">:</span><span class="n">bab</span><span class="p">)</span>
+<span class="n">block3</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">Aijab</span><span class="p">:</span><span class="n">baabb</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_p_ea">
 <code class="sig-name descname">do_p_ea</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_ea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(p)-EA.</p>
-<p>definitions:
-I      doubly occupied
-i,a    singly occupied
-A      doubly unoccupied</p>
-<p>block1 = v(a:b)
-block2 = v(A:b)
-block3 = v(iAa:aab)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) + | H(1,3) | * v(3) = sig(1)</div>
-<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) + | H(2,3) | * v(3) = sig(2)</div>
-<div class="line">H(3,1) | * v(1) + | H(3,2) | * v(2) + | H(3,3) | * v(3) = sig(2)</div>
+<p>Defines H*v for a RAS(p)-EA calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">A</span><span class="p">:</span><span class="n">b</span><span class="p">)</span>
+<span class="n">block3</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">iAa</span><span class="p">:</span><span class="n">aab</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="sf_ip_ea.linop.LinOpH.do_p_ip">
 <code class="sig-name descname">do_p_ip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">v</em>, <em class="sig-param">Fa</em>, <em class="sig-param">Fb</em>, <em class="sig-param">tei</em>, <em class="sig-param">offset_v</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.linop.LinOpH.do_p_ip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do RAS(p)-IP.</p>
-<p>block1 = v(i:a)
-block2 = v(ijA:aaa)</p>
-<p>Evaluate the following matrix vector multiply:</p>
-<div class="line-block">
-<div class="line">H(1,1) | * v(1) + | H(1,2) | * v(2) = sig(1)</div>
-<div class="line">H(2,1) | * v(1) + | H(2,2) | * v(2) = sig(2)</div>
+<p>Defines H*v for a RAS(p)-IP calculation. Blocks are defined as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block1</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">i</span><span class="p">:</span><span class="n">a</span><span class="p">)</span>
+<span class="n">block2</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">ijA</span><span class="p">:</span><span class="n">aaa</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Guess vector to multiply.</p>
+</dd>
+<dt><strong>Fa</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Alpha Fock matrix.</p>
+</dd>
+<dt><strong>Fb</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Beta Fock matrix.</p>
+</dd>
+<dt><strong>tei</strong><span class="classifier">TEI</span></dt><dd><p>Two-electron integral object.</p>
+</dd>
+<dt><strong>offset_v</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Vector of offset values for guess vector (usually ROHF energy)</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals.</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals.</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>The result of H*v.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -615,11 +1015,11 @@ corresponding to a particular state.</p>
 <dd><p>Generates an ordered list of determinants.</p>
 <p>This generates an ordered list of all of the determinants for the 
 Fock space described by the input parameters.</p>
-<dl class="simple">
-<dt>Determinants are in the following form (indexing starts at zero)::</dt><dd><p>det = […] (det[0] is 0th determinant, det[1] is 1st, etc.)
-det[count] = [[[elim (alpha)], [elim (beta)]], [[add (a)], [add (b)]]]</p>
-</dd>
-</dl>
+<p>Determinants are in the following form (indexing starts at zero):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">det</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="p">(</span><span class="n">det</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="mi">0</span><span class="n">th</span> <span class="n">determinant</span><span class="p">,</span> <span class="n">det</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="mi">1</span><span class="n">st</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span><span class="p">)</span>
+<span class="n">det</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[[</span><span class="n">elim</span> <span class="p">(</span><span class="n">alpha</span><span class="p">)],</span> <span class="p">[</span><span class="n">elim</span> <span class="p">(</span><span class="n">beta</span><span class="p">)]],</span> <span class="p">[[</span><span class="n">add</span> <span class="p">(</span><span class="n">a</span><span class="p">)],</span> <span class="p">[</span><span class="n">add</span> <span class="p">(</span><span class="n">b</span><span class="p">)]]]</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">

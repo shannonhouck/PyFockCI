@@ -614,6 +614,7 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
     Fock space described by the input parameters.
 
     Determinants are in the following form (indexing starts at zero)::
+
        det = [...] (det[0] is 0th determinant, det[1] is 1st, etc.)
        det[count] = [[[elim (alpha)], [elim (beta)]], [[add (a)], [add (b)]]]
 
