@@ -566,46 +566,81 @@ and information about the determinants.</p>
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.calc_s2">
 <code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">calc_s2</code><span class="sig-paren">(</span><em class="sig-param">vect</em>, <em class="sig-param">wfn</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.calc_s2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates S**2 for a given CI vector.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Input</dt><dd><p>n_SF – Number of spin-flips
-delta_ec – Change in electron count
-conf_space – Excitation scheme (Options: “”, “h”, “p”, “h,p”)
-vect – Eigenvector (CI coefficients)
-docc – Number of doubly occupied orbitals
-socc – Number of singly occupied orbitals
-virt – Number of doubly unoccupied orbitals</p>
+<dd><p>Calculate S**2 for a given Fock CI eigenvector.</p>
+<p>Calculates the S**2 expectation value for a given Fock CI eigenvector 
+corresponding to a particular state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>vect</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Eigenvector for which to compute S**2.</p>
 </dd>
-<dt>Returns</dt><dd><p>s2 – The S**2 expectation value for the state</p>
+<dt><strong>wfn</strong><span class="classifier">FockWfn</span></dt><dd><p>Reference Fock CI wavefunction object for the calculation.</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>S**2 value for the given eigenvector.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.calc_sz">
 <code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">calc_sz</code><span class="sig-paren">(</span><em class="sig-param">vect</em>, <em class="sig-param">wfn</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.calc_sz" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculate Sz for a given Fock CI eigenvector.</p>
+<p>Calculates the Sz expectation value for a given Fock CI eigenvector 
+corresponding to a particular state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>vect</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Eigenvector for which to compute Sz.</p>
+</dd>
+<dt><strong>wfn</strong><span class="classifier">FockWfn</span></dt><dd><p>Reference Fock CI wavefunction object for the calculation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>Sz value for the given eigenvector.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.generate_dets">
 <code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">generate_dets</code><span class="sig-paren">(</span><em class="sig-param">n_SF</em>, <em class="sig-param">delta_ec</em>, <em class="sig-param">conf_space</em>, <em class="sig-param">ras1</em>, <em class="sig-param">ras2</em>, <em class="sig-param">ras3</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.generate_dets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns ordered list of all determinants in the following form:
-det = […] (det[0] is 0th determinant, det[1] is 1st, etc.)
-det[count] = [[[elim (alpha)], [elim (beta)]], [[add (a)], [add (b)]]]
-Indexing starts at zero.
-Input</p>
-<blockquote>
-<div><p>n_SF – Number of spin-flips
-delta_ec – Change in electron count
-conf_space – Configuration space
-ras1 – Number of RAS1 orbitals
-ras2 – Number of RAS2 orbitals
-ras3 – Number of RAS3 orbitals</p>
-</div></blockquote>
+<dd><p>Generates an ordered list of determinants.</p>
+<p>This generates an ordered list of all of the determinants for the 
+Fock space described by the input parameters.</p>
 <dl class="simple">
-<dt>Returns</dt><dd><p>dets_list – List of determinants</p>
+<dt>Determinants are in the following form (indexing starts at zero)::</dt><dd><p>det = […] (det[0] is 0th determinant, det[1] is 1st, etc.)
+det[count] = [[[elim (alpha)], [elim (beta)]], [[add (a)], [add (b)]]]</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_SF</strong><span class="classifier">int</span></dt><dd><p>Number of spin-flips</p>
+</dd>
+<dt><strong>delta_ec</strong><span class="classifier">int</span></dt><dd><p>Change in electron count</p>
+</dd>
+<dt><strong>conf_space</strong><span class="classifier">str</span></dt><dd><p>Configuration space</p>
+</dd>
+<dt><strong>ras1</strong><span class="classifier">int</span></dt><dd><p>Number of RAS1 orbitals</p>
+</dd>
+<dt><strong>ras2</strong><span class="classifier">int</span></dt><dd><p>Number of RAS2 orbitals</p>
+</dd>
+<dt><strong>ras3</strong><span class="classifier">int</span></dt><dd><p>Number of RAS3 orbitals</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>Ordered list of determinants</dt><dd></dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -613,41 +648,43 @@ ras3 – Number of RAS3 orbitals</p>
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.print_det_list">
 <code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">print_det_list</code><span class="sig-paren">(</span><em class="sig-param">wfn</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.print_det_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints the full list of determinants to standard out.
-This is useful for post-CI analysis.
-Input</p>
-<blockquote>
-<div><p>n_SF – Number of spin-flips
-delta_ec – Change in electron count
-conf_space – Configuration space
-ras1 – Number of RAS1 orbitals
-ras2 – Number of RAS2 orbitals
-ras3 – Number of RAS3 orbitals</p>
-</div></blockquote>
+<dd><p>Prints the full list of determinants to standard output.</p>
+<p>This prints the full determinant list to standard output, in order. 
+This does not print by default, but is useful for some post-CI analysis.
+Information is printed to standard output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>wfn</strong><span class="classifier">FockWfn</span></dt><dd><p>Fock CI wavefunction object with determinants to print.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="sf_ip_ea.post_ci_analysis.print_dets">
 <code class="sig-prename descclassname">sf_ip_ea.post_ci_analysis.</code><code class="sig-name descname">print_dets</code><span class="sig-paren">(</span><em class="sig-param">vect</em>, <em class="sig-param">wfn</em>, <em class="sig-param">dets_to_print=10</em><span class="sig-paren">)</span><a class="headerlink" href="#sf_ip_ea.post_ci_analysis.print_dets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a CI vector, prints information about the most important
-determinants.
-Input</p>
-<blockquote>
-<div><p>vect – CI vector
-n_SF – Number of spin-flips
-delta_ec – Change in electron count
-conf_space – Configuration space
-ras1 – Number of RAS1 orbitals
-ras2 – Number of RAS2 orbitals
-ras3 – Number of RAS3 orbitals
-dets_to_print – Number of determinants to print</p>
-</div></blockquote>
+<dd><p>Given a CI vector/state, prints information about the most important 
+determinants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>vect</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Eigenvector corresponding to the desired state.</p>
+</dd>
+<dt><strong>wfn</strong><span class="classifier">FockWfn</span></dt><dd><p>Fock CI wavefunction object for the calculation.</p>
+</dd>
+<dt><strong>dets_to_print</strong><span class="classifier">int</span></dt><dd><p>Number of determinants to print. Optional. Defaults to 10.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
 <div class="section" id="module-sf_ip_ea.psi4_sf">
 <span id="sf-ip-ea-psi4-sf-module"></span><h2>sf_ip_ea.psi4_sf module<a class="headerlink" href="#module-sf_ip_ea.psi4_sf" title="Permalink to this headline">¶</a></h2>
-<p>Fock-space CI using Psi4’s interfact.</p>
+<p>Fock-space CI using Psi4’s interface.</p>
 <p>Runs a RAS-nSF-IP/EA calculation using Psi4 to construct the integrals.</p>
 <dl class="function">
 <dt id="sf_ip_ea.psi4_sf.do_sf_psi4">

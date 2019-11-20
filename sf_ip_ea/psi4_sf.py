@@ -1,5 +1,5 @@
 """
-Fock-space CI using Psi4's interfact.
+Fock-space CI using Psi4's interface.
 
 Runs a RAS-nSF-IP/EA calculation using Psi4 to construct the integrals.
 """

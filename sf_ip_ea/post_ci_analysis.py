@@ -10,6 +10,23 @@ import numpy as np
 from .tei import *
 
 def calc_sz(vect, wfn):
+    """
+    Calculate Sz for a given Fock CI eigenvector.
+
+    Calculates the Sz expectation value for a given Fock CI eigenvector 
+    corresponding to a particular state.
+
+    Parameters
+    ----------
+    vect : numpy.ndarray
+        Eigenvector for which to compute Sz.
+    wfn : FockWfn
+        Reference Fock CI wavefunction object for the calculation.
+
+    Returns
+    -------
+    Sz value for the given eigenvector.
+    """
     n_SF = wfn.n_SF
     delta_ec = wfn.delta_ec
     conf_space = wfn.conf_space
@@ -71,18 +88,21 @@ def calc_sz(vect, wfn):
 
 def calc_s2(vect, wfn):
     """
-    Calculates S**2 for a given CI vector.
+    Calculate S**2 for a given Fock CI eigenvector.
 
-       Input
-           n_SF -- Number of spin-flips
-           delta_ec -- Change in electron count
-           conf_space -- Excitation scheme (Options: "", "h", "p", "h,p")
-           vect -- Eigenvector (CI coefficients)
-           docc -- Number of doubly occupied orbitals
-           socc -- Number of singly occupied orbitals
-           virt -- Number of doubly unoccupied orbitals
-       Returns
-           s2 -- The S**2 expectation value for the state
+    Calculates the S**2 expectation value for a given Fock CI eigenvector 
+    corresponding to a particular state.
+
+    Parameters
+    ----------
+    vect : numpy.ndarray
+        Eigenvector for which to compute S**2.
+    wfn : FockWfn
+        Reference Fock CI wavefunction object for the calculation.
+
+    Returns
+    -------
+    S**2 value for the given eigenvector.
     """
     n_SF = wfn.n_SF
     delta_ec = wfn.delta_ec
@@ -587,20 +607,35 @@ def calc_s2(vect, wfn):
         return s2
 
 def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
-    """Returns ordered list of all determinants in the following form:
+    """
+    Generates an ordered list of determinants.
+
+    This generates an ordered list of all of the determinants for the 
+    Fock space described by the input parameters.
+
+    Determinants are in the following form (indexing starts at zero)::
        det = [...] (det[0] is 0th determinant, det[1] is 1st, etc.)
        det[count] = [[[elim (alpha)], [elim (beta)]], [[add (a)], [add (b)]]]
-       Indexing starts at zero.
-       Input
-           n_SF -- Number of spin-flips
-           delta_ec -- Change in electron count
-           conf_space -- Configuration space
-           ras1 -- Number of RAS1 orbitals
-           ras2 -- Number of RAS2 orbitals
-           ras3 -- Number of RAS3 orbitals
-       Returns
-           dets_list -- List of determinants
-   """
+
+    Parameters
+    ----------
+    n_SF : int
+        Number of spin-flips
+    delta_ec : int
+        Change in electron count
+    conf_space : str 
+        Configuration space
+    ras1 : int
+        Number of RAS1 orbitals
+    ras2 : int
+        Number of RAS2 orbitals
+    ras3 : int 
+        Number of RAS3 orbitals
+
+    Returns
+    -------
+    Ordered list of determinants
+    """
 
     # storing list of determinants
     dets_list = []
@@ -817,15 +852,17 @@ def generate_dets(n_SF, delta_ec, conf_space, ras1, ras2, ras3):
     return dets_list
 
 def print_det_list(wfn):
-    """Prints the full list of determinants to standard out.
-       This is useful for post-CI analysis.
-       Input
-           n_SF -- Number of spin-flips
-           delta_ec -- Change in electron count
-           conf_space -- Configuration space
-           ras1 -- Number of RAS1 orbitals
-           ras2 -- Number of RAS2 orbitals
-           ras3 -- Number of RAS3 orbitals
+    """
+    Prints the full list of determinants to standard output.
+
+    This prints the full determinant list to standard output, in order. 
+    This does not print by default, but is useful for some post-CI analysis.
+    Information is printed to standard output.
+
+    Parameters
+    ----------
+    wfn : FockWfn
+         Fock CI wavefunction object with determinants to print.
     """
     n_SF = wfn.n_SF
     delta_ec = wfn.delta_ec
@@ -849,17 +886,18 @@ def print_det_list(wfn):
 
 
 def print_dets(vect, wfn, dets_to_print=10):
-    """Given a CI vector, prints information about the most important
-       determinants.
-       Input
-           vect -- CI vector
-           n_SF -- Number of spin-flips
-           delta_ec -- Change in electron count
-           conf_space -- Configuration space
-           ras1 -- Number of RAS1 orbitals
-           ras2 -- Number of RAS2 orbitals
-           ras3 -- Number of RAS3 orbitals
-           dets_to_print -- Number of determinants to print
+    """
+    Given a CI vector/state, prints information about the most important 
+    determinants.
+
+    Parameters
+    ----------
+    vect : numpy.ndarray
+        Eigenvector corresponding to the desired state.
+    wfn : FockWfn
+         Fock CI wavefunction object for the calculation.
+    dets_to_print : int
+         Number of determinants to print. Optional. Defaults to 10.
     """
     n_SF = wfn.n_SF
     delta_ec = wfn.delta_ec
