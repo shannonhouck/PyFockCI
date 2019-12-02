@@ -370,7 +370,7 @@ class TEIDFNumPy(TEIDFBase):
         conf_space : string
             Excitations to include (hole, particle, etc).
         np_tei : numpy.ndarray
-            Basic NumPy two-electron integrals (AO).
+            Basic NumPy two-electron integrals (AO basis).
         np_J : numpy.ndarray
             The J matrix for rotation.
 
