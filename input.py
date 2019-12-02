@@ -10,26 +10,15 @@ import pickle
 
 n2_7 = psi4.core.Molecule.from_string("""
 0 7
-N
-N 1 2.0
+N 0 0 0
+N 0 0 0.75
 symmetry c1
 """)
-"""
-# 1.278
-0 7
-O 0.0 0.0 0.0
-O 2.0 0.0 0.0
-O 4.0 0.0 0.0
-H 0 0 0
-H 2 0 0
-H 0 2 0
-H 2 2 0
-"""
 
-options = {"BASIS": "vdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}
-sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 40}
+options = {"BASIS": "cc-pvtz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'df', 'reference': 'rohf'}
+sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 7}
 
-wfn = fock_ci( 1, 2, n2_7, conf_space="p", ref_opts=options, sf_opts=sf_options)
+wfn = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)
 
 '''
 options = {"basis": "cc-pvtz", "BASIS_GUESS": "sto-3g", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct', 'guess': 'gwh', 'reference': 'rohf'}

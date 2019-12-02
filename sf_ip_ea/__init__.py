@@ -76,6 +76,7 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
                 'GUESS_TYPE': 'CAS',
                 'INTEGRAL_TYPE': 'FULL',
                 'AUX_BASIS_NAME': '',
+                'DF_ROLE': 'JKFIT',
                 'RETURN_VECTS': False,
                 'RETURN_WFN': False}
     # make sure they're all caps!

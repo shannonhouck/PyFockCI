@@ -13,6 +13,9 @@ import math
 import numpy as np
 import psi4
 
+import os
+import psutil
+
 # importing our packages
 from .f import get_F
 from .tei import *
@@ -49,6 +52,11 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     psi4.core.clean()
     psi4.core.clean_options()
     psi4.core.clean_variables()
+
+    # MEMORY USAGE
+    process = psutil.Process(os.getpid())
+    print(process.memory_info().rss)
+
     # setting default options, reading in additional options from user
     psi4_opts = {'BASIS': 'cc-pvdz',
                  'scf_type': 'direct',
@@ -63,6 +71,9 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         e = wfn.energy()
     else:
         e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
+    # MEMORY USAGE
+    process = psutil.Process(os.getpid())
+    print(process.memory_info().rss)
     # obtain RAS spaces
     ras1 = wfn.doccpi()[0]
     ras2 = wfn.soccpi()[0]
@@ -72,6 +83,8 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     Cb = psi4.core.Matrix.to_array(wfn.Cb())
     Fa, Fb = get_F(wfn)
     # get two-electron integrals
+    if(wfn.density_fitted):
+        sf_opts.update({'INTEGRAL_TYPE': 'DF'})
     if(sf_opts['INTEGRAL_TYPE']=="FULL"):
         tei_int = TEIFullPsi4(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3,
                               conf_space)
@@ -79,11 +92,12 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         # if user hasn't defined which aux basis to use, default behavior
         # is to use the one from Psi4 wfn
         if(sf_opts['AUX_BASIS_NAME'] == ""):
-            aux_basis_name = wfn.basisset().name()
+            aux_basis_name = psi4.qcdb.basislist.corresponding_basis(
+                                 wfn.basisset().name(), role=sf_opts['DF_ROLE'])[0]
         else:
             aux_basis_name = sf_opts['AUX_BASIS_NAME']
         aux_basis = psi4.core.BasisSet.build(mol, "DF_BASIS_SCF", "", 
-                                             "JKFIT", aux_basis_name)
+                                             sf_opts['DF_ROLE'], aux_basis_name)
         tei_int = TEIDFPsi4(wfn.Ca(), wfn.basisset(), aux_basis, ras1, ras2,
                             ras3, conf_space)
     out = do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,

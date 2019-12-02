@@ -20,14 +20,6 @@ sf\_ip\_ea.f module
     :undoc-members:
     :show-inheritance:
 
-sf\_ip\_ea.get\_paulis module
------------------------------
-
-.. automodule:: sf_ip_ea.get_paulis
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 sf\_ip\_ea.linop module
 -----------------------
 
