@@ -16,6 +16,9 @@ from numpy import linalg as LIN
 from scipy import linalg as SCILIN
 from scipy.sparse import linalg as SPLIN
 
+import os
+import psutil
+
 # importing Psi4
 import psi4
 
@@ -85,6 +88,9 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
         else:
             opts.update({key.upper(): sf_opts[key]})
     # INTEGRAL HANDLING
+    # MEMORY USAGE
+    process = psutil.Process(os.getpid())
+    print(process.memory_info().rss)
     # make TEI object if we've passed in a numpy array
     if(isinstance(tei_int, np.ndarray)):
         if(opts['INTEGRAL_TYPE']=="FULL"):
@@ -92,6 +98,9 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
         elif(opts['INTEGRAL_TYPE']=="DF"):
             tei_int = TEIDFNumPy(C_in, ras1, ras2, ras3, conf_space,
                                  np_tei, np_J)
+    # MEMORY USAGE
+    process = psutil.Process(os.getpid())
+    print(process.memory_info().rss)
     # CALCULATION SETUP
     # determine number of spin-flips and total change in electron count
     n_SF = min(delta_a, delta_b)
@@ -128,6 +137,11 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
             opts['SF_DIAG_METHOD'] = "LANCZOS"
     print("\tDiagonalization: %s\n\tGuess: %s" %(opts['SF_DIAG_METHOD'],
                                                  opts['GUESS_TYPE']))
+
+    # MEMORY USAGE
+    process = psutil.Process(os.getpid())
+    print(process.memory_info().rss)
+
     # DIAGONALIZATION
     # use built-in Lanczos method
     # TODO: Support other guess options
@@ -198,6 +212,10 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
         exit()
     print("Diagonalization completed in %i seconds." 
           %(time.time() - start_diag_time) )
+
+    # MEMORY USAGE
+    process = psutil.Process(os.getpid())
+    print(process.memory_info().rss)
 
     # POST-HF ANALYSIS
     # set eigenvalues/vects
