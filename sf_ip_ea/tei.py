@@ -455,49 +455,41 @@ class TEIDFPsi4(TEIDFBase):
         # get info from Psi4
         zero = psi4.core.BasisSet.zero_ao_basis_set()
         mints = psi4.core.MintsHelper(basis)
-        # (Q|pq)
-        eri = psi4.core.Matrix.to_array(
-              mints.ao_eri(zero, aux, basis, basis))
-        eri = np.squeeze(eri)
-        C = psi4.core.Matrix.to_array(C)
-        # set up J^-1/2 (don't need to keep)
-        J = mints.ao_eri(zero, aux, zero, aux)
-        J.power(-0.5, 1e-14)
-        J = np.squeeze(J)
-        # Contract and obtain final form
-        eri = np.einsum("PQ,Qpq->Ppq", J, eri)
         # set up C
-        C_ras1 = C[:, 0:ras1]
-        C_ras2 = C[:, ras1:ras1+ras2]
-        C_ras3 = C[:, ras1+ras2:]
-        # move to MO basis
+        C = psi4.core.Matrix.to_array(C)
         # Notation: ij in active space, IJ in docc, AB in virtual
         # Bnm notation, where n and m indicate RAS space (1/2/3)
-        # all of them need RAS2
-        B2m = np.einsum('Ppq,pi->Piq', eri, C_ras2)
-        self.B22 = np.einsum('Piq,qj->Pij', B2m, C_ras2)
-        # if configuration space is "h"
+        if(conf_space == ""):
+            C_ras2 = psi4.core.Matrix.from_array(C[:, ras1:ras1+ras2+1])
+            Bm = psi4.core.DFTensor(basis, aux, C_ras2, ras2, 1)
+            self.B22 = psi4.core.Matrix.to_array(Bm.Qoo())
         if(conf_space == "h"):
-            B1m = np.einsum('Ppq,pI->PIq', eri, C_ras1)
-            self.B11 = np.einsum('PIq,qJ->PIJ', B1m, C_ras1)
-            self.B12 = np.einsum('PIq,qj->PIj', B1m, C_ras2)
-            self.B21 = np.einsum('Piq,qJ->PiJ', B2m, C_ras1)
+            C_ras12 = psi4.core.Matrix.from_array(C[:, 0:ras1+ras2])
+            Bm = psi4.core.DFTensor(basis, aux, C_ras12, ras1, ras2)
+            self.B11 = psi4.core.Matrix.to_array(Bm.Qoo())
+            self.B12 = psi4.core.Matrix.to_array(Bm.Qov())
+            self.B21 = psi4.core.Matrix.to_array(Bm.Qvo())
+            self.B22 = psi4.core.Matrix.to_array(Bm.Qvv())
         if(conf_space == "p"):
-            B3m = np.einsum('Ppq,pA->PAq', eri, C_ras3)
-            self.B33 = np.einsum('PAq,qB->PAB', B3m, C_ras3)
-            self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
-            self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
+            C_ras23 = psi4.core.Matrix.from_array(C[:, ras1:])
+            Bm = psi4.core.DFTensor(basis, aux, C_ras23, ras2, ras3)
+            self.B22 = psi4.core.Matrix.to_array(Bm.Qoo())
+            self.B23 = psi4.core.Matrix.to_array(Bm.Qov())
+            self.B32 = psi4.core.Matrix.to_array(Bm.Qvo())
+            self.B33 = psi4.core.Matrix.to_array(Bm.Qvv())
         if(conf_space == "h,p"):
-            B1m = np.einsum('Ppq,pI->PIq', eri, C_ras1)
-            self.B11 = np.einsum('PIq,qJ->PIJ', B1m, C_ras1)
-            self.B12 = np.einsum('PIq,qj->PIj', B1m, C_ras2)
-            self.B21 = np.einsum('Piq,qJ->PiJ', B2m, C_ras1)
-            self.B13 = np.einsum('PIq,qA->PIA', B1m, C_ras3)
-            B3m = np.einsum('Ppq,pA->PAq', eri, C_ras3)
-            self.B33 = np.einsum('PAq,qB->PAB', B3m, C_ras3)
-            self.B32 = np.einsum('PAq,qj->PAj', B3m, C_ras2)
-            self.B31 = np.einsum('PAq,qJ->PAJ', B3m, C_ras1)
-            self.B23 = np.einsum('Piq,qA->PiA', B2m, C_ras3)
+            C_ras12 = psi4.core.Matrix.from_array(C[:, 0:ras1+ras2])
+            Bm = psi4.core.DFTensor(basis, aux, C_ras12, ras1, ras2)
+            self.B11 = psi4.core.Matrix.to_array(Bm.Qoo())
+            self.B12 = psi4.core.Matrix.to_array(Bm.Qov())
+            self.B21 = psi4.core.Matrix.to_array(Bm.Qvo())
+            self.B22 = psi4.core.Matrix.to_array(Bm.Qvv())
+            C_ras23 = psi4.core.Matrix.from_array(C[:, ras1:])
+            Bm = psi4.core.DFTensor(basis, aux, C_ras23, ras2, ras3)
+            self.B22 = psi4.core.Matrix.to_array(Bm.Qoo())
+            self.B23 = psi4.core.Matrix.to_array(Bm.Qov())
+            self.B32 = psi4.core.Matrix.to_array(Bm.Qvo())
+            self.B33 = psi4.core.Matrix.to_array(Bm.Qvv())
         print("Constructed TEI object in %i seconds." 
               %(time.time() - tei_start_time))
 

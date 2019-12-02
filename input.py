@@ -15,7 +15,7 @@ N 0 0 0.75
 symmetry c1
 """)
 
-options = {"BASIS": "cc-pvtz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'reference': 'rohf'}
+options = {"BASIS": "cc-pvtz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'reference': 'rohf', 'scf_type': 'df'}
 sf_options = {'SF_DIAG_METHOD': 'LANCZOS', 'NUM_ROOTS': 7}
 
 wfn = fock_ci( 1, 1, n2_7, conf_space="", ref_opts=options, sf_opts=sf_options)

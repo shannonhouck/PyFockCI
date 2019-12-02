@@ -53,6 +53,7 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     # setting default options, reading in additional options from user
     psi4_opts = {'BASIS': 'cc-pvdz',
                  'scf_type': 'direct',
+                 'guess': 'gwh',
                  'e_convergence': 1e-10,
                  'd_convergence': 1e-10,
                  'reference': 'rohf'}
