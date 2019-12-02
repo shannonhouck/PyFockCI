@@ -53,7 +53,6 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     # setting default options, reading in additional options from user
     psi4_opts = {'BASIS': 'cc-pvdz',
                  'scf_type': 'direct',
-                 'guess': 'gwh',
                  'e_convergence': 1e-10,
                  'd_convergence': 1e-10,
                  'reference': 'rohf'}
@@ -75,7 +74,7 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     Fa, Fb = get_F(wfn)
     # get two-electron integrals
     if(wfn.density_fitted):
-        if(psi4_opts['scf_type'] != 'direct'):
+        if(not(psi4_opts['scf_type'] == 'direct')):
             sf_opts.update({'INTEGRAL_TYPE': 'DF'})
     if(sf_opts['INTEGRAL_TYPE']=="FULL"):
         tei_int = TEIFullPsi4(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3,
