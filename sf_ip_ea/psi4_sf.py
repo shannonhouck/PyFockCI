@@ -74,9 +74,6 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     Cb = psi4.core.Matrix.to_array(wfn.Cb())
     Fa, Fb = get_F(wfn)
     # get two-electron integrals
-    if(wfn.density_fitted()):
-        if(not(psi4_opts['scf_type'] == 'direct')):
-            sf_opts.update({'INTEGRAL_TYPE': 'DF'})
     if(sf_opts['INTEGRAL_TYPE']=="FULL"):
         tei_int = TEIFullPsi4(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3,
                               conf_space)
