@@ -43,7 +43,7 @@ def test_2():
     psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'calc_s_squared': True, 'scf_type': 'pk'}
     expected = [-108.714414191343366, -108.714414191343309, -108.525930630249476, -108.525930630249221]
-    wfn = sf_ip_ea.fock_ci( 0, 1, n2_3, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 4, 'SF_DIAG_METHOD': 'LANCZOS'} )
+    wfn = sf_ip_ea.fock_ci( 0, 1, n2_3, conf_space="p", ref_opts=options, sf_opts={'NUM_ROOTS': 4} )
     for i, true in enumerate(wfn.e):
         assert abs(true - expected[i]) < threshold
 

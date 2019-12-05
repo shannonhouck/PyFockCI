@@ -75,7 +75,7 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     # OPTIONS HANDLING
     opts =  {'SF_DIAG_METHOD': 'DAVIDSON',
              'NUM_ROOTS': 6,
-             'GUESS_TYPE': 'CAS',
+             'GUESS_TYPE': 'RANDOM',
              'INTEGRAL_TYPE': 'FULL',
              'AUX_BASIS_TYPE': ''}
     # capitalize as needed
@@ -130,15 +130,15 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
                                                  opts['GUESS_TYPE']))
 
     # DIAGONALIZATION
-    # use built-in Lanczos method
-    # TODO: Support other guess options
     start_diag_time = time.time()
+    # this option is for writing the Hamiltonian only (no iterations)
     if(opts['SF_DIAG_METHOD'] == "DO_MATRIX"):
         print("Hamiltonian Matrix:")
         wfn.H = A.matmat(np.eye(n_dets))
         print(wfn.H)
         vects = LIN.orth(np.random.rand(n_dets, num_roots))
         vals = np.zeros(num_roots)
+    # use scipy's built-in Lanczos method
     elif(opts['SF_DIAG_METHOD'] == "LANCZOS"):
         # do LANCZOS
         if(num_roots == n_dets):
@@ -164,10 +164,10 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
                 # CAS-IP/EA
                 elif(n_SF==0 and (delta_ec==-1 or delta_ec==1)):
                     n_cas_dets = int(ras2)
-                # Modify CAS root number if needed
                 cas_A = LinOpH((n_cas_dets,n_cas_dets), e, ras1, ras2, ras3,
                                 Fa, Fb, tei_int, n_SF, delta_ec,
                                 conf_space_in="")
+                # Modify CAS root number if needed
                 if(num_roots > n_cas_dets):
                     print("Number of roots requested is greater than number \
                            of CAS determinants. Using RANDOM guess instead.")
