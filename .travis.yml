@@ -22,5 +22,6 @@ install:
 # command to run tests
 script:
   - pytest -m methodtest
+  - pytest -m dftest
   - pytest -m blochtest
   - pytest -m davidsontest
