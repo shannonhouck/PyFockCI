@@ -195,9 +195,9 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
         vals, vects = davidson(A, guess_vect)
     else:
         print("Diag method not yet supported. \
-               Please use DAVIDSON or LANCZOS.")
+               Please choose DAVIDSON or LANCZOS.")
         exit()
-    print("Diagonalization completed in %i seconds." 
+    print("Diagonalization completed in %3.5f seconds." 
           %(time.time() - start_diag_time) )
 
     # POST-HF ANALYSIS
@@ -205,10 +205,13 @@ def do_sf_np(delta_a, delta_b, ras1, ras2, ras3, Fa, Fb, tei_int, e,
     wfn.e = vals
     wfn.vecs = vects
     # set spin/mult results
+    start_s_calc_time = time.time()
     for i, corr in enumerate(vals):
         wfn.sz[i] = calc_sz(vects[:, i], wfn)
         wfn.s2[i] = calc_s2(vects[:, i], wfn)
         wfn.s[i] = 0.5*(math.sqrt(1.0+4.0*wfn.s2[i]))-0.5
+    print("Calculation of Sz, S**2, and S done in %3.5f seconds." 
+          %(time.time() - start_s_calc_time) )
 
     # print info about determinants and coefficients
     wfn.print_roots()

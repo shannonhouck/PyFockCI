@@ -45,6 +45,7 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     -------
     A FockWfn object containing calculation results
     """
+    start_time = time.time()
     # cleanup in case of multiple calculations
     psi4.core.clean()
     psi4.core.clean_options()
@@ -93,5 +94,6 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
                    conf_space=conf_space, sf_opts=sf_opts)
     # write Psi4 wavefunction to output object
     out.wfn = wfn
+    print("Total Psi4 walltime: %3.5f seconds." %(time.time() - start_time) )
     return out
 

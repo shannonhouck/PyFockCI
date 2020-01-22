@@ -123,10 +123,11 @@ class FockWfn:
         This prints the energy, Sz, and S**2 values for each root to 
         standard output.
         """
-        print("\nROOT No.\tEnergy\t\t\tSz\tS**2")
+        print("\n")
+        print(" Root No.   Energy           \tSz      S**2")
         print("----------------------------------------------------------")
         for i in range(self.n_roots):
-            print("   %i\t\t%12.12f\t%3.3f\t%8.6f" 
+            print(" %4i       %5.12f \t%2.3f   %8.6f" 
                   % (i, self.e[i], self.sz[i], self.s2[i]))
         print("----------------------------------------------------------\n")
 
