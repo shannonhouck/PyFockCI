@@ -27,6 +27,7 @@ def calc_sz(vect, wfn):
     -------
     Sz value for the given eigenvector.
     """
+
     n_SF = wfn.n_SF
     delta_ec = wfn.delta_ec
     conf_space = wfn.conf_space
@@ -84,6 +85,7 @@ def calc_sz(vect, wfn):
                 if o not in add_a:
                     sz_vect[o] = -0.5
         sz_final = sz_final + v*v*np.sum(sz_vect)
+
     return sz_final
 
 def calc_s2(vect, wfn):
@@ -119,7 +121,7 @@ def calc_s2(vect, wfn):
         nb = nb + 1
     if(delta_ec==-1): # EA
         na = na - 1
-    
+
     # construct Sz*Sz
     for i, v in enumerate(vect):
         # grab determinants
@@ -163,12 +165,14 @@ def calc_s2(vect, wfn):
         # now evaluate Sz*Sz (over all orbitals i and j)
         tmp = 0.0
         for i in range(docc+socc+virt):
-            for j in range(docc+socc+virt):
-                if(i != j):
-                    tmp = tmp + sz_vect[i]*sz_vect[j]
-                else:
-                    if(abs(sz_vect[i]) == 0.5):
-                        tmp = tmp + 0.75
+            if(abs(sz_vect[i]) == 0.5):
+                tmp = tmp + 0.75
+        tmp = tmp + np.einsum("i,j->", sz_vect, sz_vect) - np.einsum("i,i->", sz_vect, sz_vect)
+        #    if(i != j):
+        #        tmp = tmp + sz_vect[i]*sz_vect[j]
+        #else:
+        #    if(abs(sz_vect[i]) == 0.5):
+        #        tmp = tmp + 0.75
         s2 = s2 + v*v*tmp
 
     '''
@@ -179,6 +183,14 @@ def calc_s2(vect, wfn):
 
         # do Sz^2
         #s2 = s2 + 2.0*v*v*(0.25*(na*na) + 0.25*(nb*nb) - 0.5*(na*nb))
+    # old code for Sz calculation
+    for i in range(docc+socc+virt):
+        for j in range(docc+socc+virt):
+            if(i != j):
+                tmp = tmp + sz_vect[i]*sz_vect[j]
+            else:
+                if(abs(sz_vect[i]) == 0.5):
+                    tmp = tmp + 0.75
     '''
 
     # CAS-1SF
