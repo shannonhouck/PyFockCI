@@ -70,8 +70,8 @@ def do_bloch(wfn, n_sites, site_list=None, site_list_orbs=None,
         localize the orbitals in wfn.wfn beforehand! Optional. 
         Defaults to False.
     neutral : bool
-        Calculate the J couplings using neutral determinants only. 
-        Optional. Defaults to False.
+        Indicates that the RAS eigenvectors passed in were calculated 
+        in the neutral determinant space only. Optional. Defaults to False.
 
     Returns
     -------
