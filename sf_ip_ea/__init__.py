@@ -61,6 +61,8 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
             * ``integral_type``: Which integrals to use (DF or FULL)
                 * ``FULL`` Use full integrals (no density fitting)
                 * ``DF`` Use density fit integrals
+            * ``frozen_core``: How many core orbitals to freeze
+            * ``frozen_virt``: How many virtual orbitals to freeze
 
     Returns
     -------
@@ -78,7 +80,10 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
                 'AUX_BASIS_NAME': '',
                 'DF_ROLE': 'JKFIT',
                 'RETURN_VECTS': False,
-                'RETURN_WFN': False}
+                'RETURN_WFN': False,
+                'FROZEN_CORE': 0,
+                'FROZEN_VIRT': 0,
+               }
     # make sure they're all caps!
     for key in sf_opts:
         if(isinstance(sf_opts[key], str)):

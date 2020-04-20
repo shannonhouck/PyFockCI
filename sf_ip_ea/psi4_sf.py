@@ -73,7 +73,25 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
     # get Fock and MO coefficients
     Ca = psi4.core.Matrix.to_array(wfn.Ca())
     Cb = psi4.core.Matrix.to_array(wfn.Cb())
+    # freeze core/virt if needed
+    frozen_core = sf_opts['FROZEN_CORE']
+    frozen_virt = sf_opts['FROZEN_VIRT']
+    print("FROZEN CORE", frozen_core)
+    print("FROZEN VIRT", frozen_virt)
+    if(frozen_core != 0):
+        Ca = Ca[:, frozen_core:]
+        Cb = Cb[:, frozen_core:]
+        ras1 = ras1 - frozen_core
+        print(Ca.shape)
+    if(frozen_virt != 0):
+        Ca = Ca[:, :-frozen_virt]
+        Cb = Cb[:, :-frozen_virt]
+        ras3 = ras3 - frozen_virt
+        print(Ca.shape)
+    wfn.Ca().copy(psi4.core.Matrix.from_array(Ca))
+    wfn.Cb().copy(psi4.core.Matrix.from_array(Cb))
     Fa, Fb = get_F(wfn)
+    print(Fa.shape)
     # get two-electron integrals
     if(sf_opts['INTEGRAL_TYPE']=="FULL"):
         tei_int = TEIFullPsi4(wfn.Ca(), wfn.basisset(), ras1, ras2, ras3,
