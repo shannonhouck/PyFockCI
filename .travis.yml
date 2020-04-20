@@ -23,5 +23,5 @@ install:
 script:
   - pytest -m methodtest
   - pytest -m dftest
-  - pytest -m blochtest
   - pytest -m davidsontest
+  - pytest -m frozentest
