@@ -39,15 +39,16 @@ class heis_ham:
     '''
     Does many Kronaker products... Recursively.
     non_I -- the paired indexes (i,j) that aren't the identity
+    s -- sites list
     p -- which pauli to use (x/y/z)
     index -- current index/depth
     max_index -- depth at which to end recursion
     '''
     def recursive_kron(self, non_I, s, p, index, max_index):
         if(index in non_I):
-            tmp = self.pauli[s][p]
+            tmp = self.pauli[s[index]][p]
         else:
-            tmp = self.pauli[s]['I']
+            tmp = self.pauli[s[index]]['I']
         if(index == max_index):
             return tmp
         else:
@@ -70,17 +71,17 @@ class heis_ham:
         Sz = np.zeros((n_dets,n_dets))
         S2 = np.zeros((n_dets,n_dets))
         for i, s in enumerate(sites):
-            Sz = Sz + self.recursive_kron([i], s, 'z', 0, max_ind)
-            Sx = Sx + self.recursive_kron([i], s, 'x', 0, max_ind)
-            Sy = Sy + self.recursive_kron([i], s, 'y', 0, max_ind)
-            S2 = S2 + self.recursive_kron([i,i], s, 's2', 0, max_ind)
+            Sz = Sz + self.recursive_kron([i], sites, 'z', 0, max_ind)
+            Sx = Sx + self.recursive_kron([i], sites, 'x', 0, max_ind)
+            Sy = Sy + self.recursive_kron([i], sites, 'y', 0, max_ind)
+            S2 = S2 + self.recursive_kron([i,i], sites, 's2', 0, max_ind)
             for j in range(i):
-                S2 = S2 + 2.0*(self.recursive_kron([i,j], s, 'x', 0, max_ind) +
-                                self.recursive_kron([i,j], s, 'y', 0, max_ind) +
-                                self.recursive_kron([i,j], s, 'z', 0, max_ind) )
-                H = H - 2.0*J[i,j]*(self.recursive_kron([i,j], s, 'x', 0, max_ind) +
-                                self.recursive_kron([i,j], s, 'y', 0, max_ind) +
-                                self.recursive_kron([i,j], s, 'z', 0, max_ind) )
+                S2 = S2 + 2.0*(self.recursive_kron([i,j], sites, 'x', 0, max_ind) +
+                                self.recursive_kron([i,j], sites, 'y', 0, max_ind) +
+                                self.recursive_kron([i,j], sites, 'z', 0, max_ind) )
+                H = H - 2.0*J[i,j]*(self.recursive_kron([i,j], sites, 'x', 0, max_ind) +
+                                self.recursive_kron([i,j], sites, 'y', 0, max_ind) +
+                                self.recursive_kron([i,j], sites, 'z', 0, max_ind) )
         c1 = 0.3891124
         tmp, HS_vecs = LIN.eigh(H + c1*Sz)
         self.H = H
