@@ -1,8 +1,8 @@
 
 <img src = "https://travis-ci.com/shannonhouck/sf-ip-ea.svg?token=yXoAYb1Qe6BWq8AUXzXG&branch=master">
 
-# sf-ip-ea
-Stand-alone SF-IP/EA code. In progress.
+# PyFockCI
+A (relatively) stand-alone code for performing RAS-SF-IP/EA calculations using a diagrammatic approach.
 
-<a href="https://shannonhouck.github.io/sf-ip-ea/build/index.html">For more information, see the docs.</a>
+<a href="https://shannonhouck.github.io/PyFockCI/build/index.html">For more information, see the docs.</a>
 
