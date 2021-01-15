@@ -42,10 +42,10 @@ def test_2():
     psi4.core.clean_options()
     psi4.core.clean_variables()
     expected = [-108.845616548841292, -108.779860044401957, -108.717563861488429, -108.717563861488415]
-    options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'scf_type': 'direct'}
-    wfn = sf_ip_ea.fock_ci( 2, 2, n2_3, conf_space="", ref_opts=options, sf_opts={'NUM_ROOTS': 4} )
-    for i, true in enumerate(wfn.e):
-        assert abs(true - expected[i]) < threshold
+    options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
+    wfn = sf_ip_ea.fock_ci( 2, 2, n2_3, conf_space="", ref_opts=options, sf_opts={'NUM_ROOTS': 6} )
+    for i, exp in enumerate(expected):
+        assert abs(wfn.e[i] - exp) < threshold
 
 @pytest.mark.methodtest
 def test_3():

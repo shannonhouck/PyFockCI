@@ -11,16 +11,25 @@ import pickle
 n2_7 = psi4.core.Molecule.from_string("""
  0 7
 N 0 0 0
-N 0 0 1.3
+N 0 0 1.5
 symmetry c1
 """)
 
+options = {"BASIS": "6-31G*", "DF_BASIS_SCF": "rimp2-vdz",
+           'e_convergence': 1e-10, 'd_convergence': 1e-10, 
+           'reference': 'rohf', 'scf_type': 'direct',
+           'guess': 'sad'}
+sf_options = {'SF_DIAG_METHOD': 'DAVIDSON', 'AUX_BASIS_NAME': 'rimp2-vdz',
+              'NUM_ROOTS': 7, 'INTEGRAL_TYPE': 'df'}
+'''
+
 options = {"BASIS": "cc-pvdz", 
            'e_convergence': 1e-10, 'd_convergence': 1e-10, 
-           'reference': 'rohf', 'scf_type': 'direct'}
+           'reference': 'rohf', 'scf_type': 'direct',
+           'guess': 'sad'}
 sf_options = {'SF_DIAG_METHOD': 'DAVIDSON', 
-              'NUM_ROOTS': 7, 'INTEGRAL_TYPE': 'full',
-              'frozen_virt': 5, 'frozen_core': 3}
+              'NUM_ROOTS': 7}
+'''
 
 wfn = fock_ci( 1, 1, n2_7, conf_space="h,p", ref_opts=options, sf_opts=sf_options)
 

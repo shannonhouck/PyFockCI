@@ -66,6 +66,7 @@ def do_sf_psi4(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={}):
         e = wfn.energy()
     else:
         e, wfn = psi4.energy('scf', molecule=mol, return_wfn=True)
+    print("Reference Energy: ", e)
     # obtain RAS spaces
     ras1 = wfn.doccpi()[0]
     ras2 = wfn.soccpi()[0]
