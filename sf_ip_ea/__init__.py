@@ -119,3 +119,4 @@ def fock_ci(delta_a, delta_b, mol, conf_space="", ref_opts={}, sf_opts={},
         print("ERROR: Program %s is not yet supported. Exiting..." %(program) )
         exit()
 
+from ._version import __version__

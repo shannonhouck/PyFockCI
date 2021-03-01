@@ -1,6 +1,8 @@
 import psi4
 import sf_ip_ea
 import pytest
+from qcelemental.testing import compare_values
+
 
 # threshold for value equality
 threshold = 1e-7
@@ -27,34 +29,27 @@ symmetry c1
 # Test: 1SF-CAS
 @pytest.mark.methodtest
 def test_1():
-    psi4.core.clean()
-    psi4.core.clean_options()
-    psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     expected = [-108.257015341635110, -108.220329170163453, -108.220329170162785, -108.199753179193195]
     wfn = sf_ip_ea.fock_ci( 1, 0, n2_7, conf_space="h", ref_opts=options, sf_opts={'NUM_ROOTS': 4} )
-    for i, true in enumerate(wfn.e):
-        assert abs(true - expected[i]) < threshold
+    for i, ene in enumerate(wfn.e):
+        assert compare_values(expected[i], ene, atol=threshold)
+
 
 @pytest.mark.methodtest
 def test_2():
-    psi4.core.clean()
-    psi4.core.clean_options()
-    psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'num_roots': 4, 'diis_start': 20, 'e_convergence': 1e-10, 'd_convergence': 1e-10}
     expected = [-108.299904314302950, -108.247296829002906, -108.236785088491118, -108.236785088490976]
     wfn = sf_ip_ea.fock_ci( 1, 0, n2_3, conf_space="h", ref_opts=options, sf_opts={'NUM_ROOTS': 8} )
     for i, exp in enumerate(expected):
-        assert abs(exp - wfn.e[i]) < threshold
+        assert compare_values(expected[i], wfn.e[i], atol=threshold)
+
 
 @pytest.mark.methodtest
 def test_3():
-    psi4.core.clean()
-    psi4.core.clean_options()
-    psi4.core.clean_variables()
     options = {"basis": "cc-pvdz", 'e_convergence': 1e-10, 'd_convergence': 1e-10, 'diag_method': 'rsp'}
     expected = [-149.083861036268075, -149.083861036267962]
     wfn = sf_ip_ea.fock_ci( 1, 0, o2, conf_space="h", ref_opts=options, sf_opts={'NUM_ROOTS': 2} )
-    for i, true in enumerate(wfn.e):
-        assert abs(true - expected[i]) < threshold
+    for i, ene in enumerate(wfn.e):
+        assert compare_values(expected[i], ene, atol=threshold)
 
